@@ -1,0 +1,79 @@
+18-447 Lab 1a, Spring 2016.  
+
+For this lab, you will be completing a functional simulator of a subset of MIPS.
+Please see the lab handout for details.
+
+
+/*** Files ***/
+
+1. "src/" subdirectory 
+- The shell: "shell.h", "shell.c" (DO NOT MODIFY)
+- MIPS opcode values: "mips.h" (DO NOT MODIFY)
+- The simulator skeleton: "sim.c" (MODIFY only where allowed)
+
+2. "inputs/" subdirectory 
+- Test inputs for the simulator (MIPS assembly code): "*.s"
+- MIPS assembler/hexdump (assembly code -> machine code -> hexdump): "asm2hex"
+
+
+/*** Instructions ***/
+
+1. You are to complete the process_instruction() function in sim.c to implement
+the MIPS instructions specified in the lab handout. The starter code
+already implements: addi, addiu, add, addu and syscall. Go ahead
+and try it out. 
+
+Run "make" to compile the simulator.
+
+$ cd src/
+$ make
+
+You should now have an executable file named "sim". The starter
+code build should execute the addiu test correctly out of the box.
+
+
+2. Use "asm2hex" to convert the test inputs ("*.s") into hexdumps of assembled
+machine code ("*.x").
+
+$ cd inputs/
+$ ./asm2hex addiu.s
+
+(Note: asm2hex requires access to /afs/ece/class/ece447/bin/.)
+
+You should now have a hexdump of the assembled machine code "addiu.x". Repeat
+this step for the rest of the test inputs.
+
+3. Run the hexdump in the simulator.
+
+$ src/sim inputs/addiu.x
+
+You should see the program load successfully.
+
+>> MIPS Simulator
+>> 
+>> Read 7 words from program into memory.
+>> 
+>> MIPS-SIM>
+
+Enter the command "rdump" to see the initial register state values
+
+Enter the command "run 1" to execute the first instruction
+"addiu $v0, $zero, 10".
+
+Enter the command "rdump" again to see if the register state
+values have been updated according to the first instruction.
+
+Enter the command "go" to run until "syscall".
+
+Enter the command "rdump" to see the final register state values
+
+
+4. Now try another test
+
+./sim ../inputs/arithtest.x
+
+This test should fail because the 3rd instruction's opcode 
+("or $4, $3, $2") has not been defined in execute().  
+
+This is where your work begins. Good luck!
+
