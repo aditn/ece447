@@ -113,6 +113,8 @@ void process_instruction()
 /**********************************************************/
 /*** specify the remaining dcd_op cases below this line ***/
   case OP_J:
+    NEXT_STATE.PC = CURRENT_STATE.PC + dcd_target;
+    break;
   case OP_JAL:
   case OP_BEQ:
   case OP_BNE:
@@ -120,10 +122,30 @@ void process_instruction()
   case OP_BGTZ:
   case OP_SLTI: 
   case OP_SLTIU:
+    if (dcd_rt!=0)
+      NEXT_STATE.REGS[dcd_rt] = CURRENT_STATE.REGS[dcd_rs] < dcd_se_imm;
+    NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+    break;
   case OP_ANDI:
+    if (dcd_rt!=0)
+      NEXT_STATE.REGS[dcd_rt] = CURRENT_STATE.REGS[dcd_rs] + dcd_se_imm;
+    NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+    break;
   case OP_ORI:
+    if (dcd_rt!=0)
+      NEXT_STATE.REGS[dcd_rt] = CURRENT_STATE.REGS[dcd_rs] | dcd_se_imm;
+    NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+    break;
   case OP_XORI:
+    if (dcd_rt!=0)
+      NEXT_STATE.REGS[dcd_rt] = CURRENT_STATE.REGS[dcd_rs] ^ dcd_se_imm;
+    NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+    break;
   case OP_LUI:
+    if (dcd_rt!=0)
+      NEXT_STATE.REGS[dcd_rt] = (dcd_se_imm<<16) & 0xFFFF0000;
+    NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+    break;
   case OP_LB:
   case OP_LH:
   case OP_LW:
