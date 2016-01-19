@@ -78,29 +78,29 @@ void process_instruction()
   case OP_SPECIAL: 
     { 
       switch (dcd_funct) {
-      case SUBOP_ADD: 
-      case SUBOP_ADDU: 
-	if (dcd_rd!=0)
-	  NEXT_STATE.REGS[dcd_rd] = CURRENT_STATE.REGS[dcd_rs] + CURRENT_STATE.REGS[dcd_rt];
-	NEXT_STATE.PC = CURRENT_STATE.PC + 4;
-	break;
-      case SUBOP_SYSCALL:
-	if (CURRENT_STATE.REGS[2] == 10)
-	  RUN_BIT = 0;
-	NEXT_STATE.PC = CURRENT_STATE.PC + 4;
-	break;
+        case SUBOP_ADD: 
+        case SUBOP_ADDU: 
+          if (dcd_rd!=0)
+            NEXT_STATE.REGS[dcd_rd] = CURRENT_STATE.REGS[dcd_rs] + CURRENT_STATE.REGS[dcd_rt];
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+          break;
+        case SUBOP_SYSCALL:
+          if (CURRENT_STATE.REGS[2] == 10)
+            RUN_BIT = 0;
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+          break;
 /*************************************************************/
 /*** specify the remaining dcd_funct cases below this line ***/
-	
-	
-	
-	
-	
+        
+  
+  
+  
+  
 /*** specify the remaining dcd_funct cases above this line ***/
 /*************************************************************/
-      default:
-	printf("Encountered unimplemented subopcode (0x%x). Ending simulation...\n\n", dcd_funct);
-	RUN_BIT = 0;
+        default:
+          printf("Encountered unimplemented subopcode (0x%x). Ending simulation...\n\n", dcd_funct);
+          RUN_BIT = 0;
       } /* switch (dcd_funct) */
     } /* case OP_SPECIAL */
     break;
@@ -112,7 +112,26 @@ void process_instruction()
     break;
 /**********************************************************/
 /*** specify the remaining dcd_op cases below this line ***/
-
+  case OP_J:
+  case OP_JAL:
+  case OP_BEQ:
+  case OP_BNE:
+  case OP_BLEZ:
+  case OP_BGTZ:
+  case OP_SLTI: 
+  case OP_SLTIU:
+  case OP_ANDI:
+  case OP_ORI:
+  case OP_XORI:
+  case OP_LUI:
+  case OP_LB:
+  case OP_LH:
+  case OP_LW:
+  case OP_LBU:
+  case OP_LHU:
+  case OP_SB:
+  case OP_SH:
+  case OP_SW:
 
 
 
