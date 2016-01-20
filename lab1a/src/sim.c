@@ -91,11 +91,73 @@ void process_instruction()
           break;
 /*************************************************************/
 /*** specify the remaining dcd_funct cases below this line ***/
+        case SUBOP_SLL:
+          if (dcd_rd != 0)
+            NEXT_STATE.REGS[dcd_rd] = CURRENT_STATE.REGS[dcd_rt] << dcd_shamt;
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+          break;
+        case SUBOP_SRL:
+          if (dcd_rd != 0)
+            NEXT_STATE.REGS[dcd_rd] = ((unsigned int) CURRENT_STATE.REGS[dcd_rt]) >> dcd_shamt;
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+          break;
+        case SUBOP_SRA:
+          if (dcd_rd != 0)
+            NEXT_STATE.REGS[dcd_rd] = ((int) CURRENT_STATE.REGS[dcd_rt]) >> dcd_shamt;
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+          break;
+        case SUBOP_SLLV:
+          if (dcd_rd != 0)
+            NEXT_STATE.REGS[dcd_rd] = CURRENT_STATE.REGS[dcd_rt] << CURRENT_STATE.REGS[dcd_rs];
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+          break;
+       case SUBOP_SRLV:
+          if (dcd_rd != 0)
+            NEXT_STATE.REGS[dcd_rd] = ((unsigned int) CURRENT_STATE.REGS[dcd_rt]) >> CURRENT_STATE.REGS[dcd_rs];
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+          break;
+        case SUBOP_SRAV:
+          if (dcd_rd != 0)
+            NEXT_STATE.REGS[dcd_rd] = ((int) CURRENT_STATE.REGS[dcd_rt]) >> CURRENT_STATE.REGS[dcd_rs];
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+          break;
+        case SUBOP_JR:
+          NEXT_STATE.PC = CURRENT_STATE.REGS[dcd_rs];
+        case SUBOP_JALR:
+          if (dcd_rd != 0)
+            NEXT_STATE.REGS[dcd_rd] = CURRENT_STATE.PC + 8; //is dcd_rd assumed to be 31?
+          NEXT_STATE.PC = CURRENT_STATE.REGS[dcd_rs];
+        case SUBOP_SUB:
+           //same as SUBU
+        case SUBOP_SUBU:
+          if (dcd_rd != 0)
+            NEXT_STATE.REGS[dcd_rd] = CURRENT_STATE.REGS[dcd_rs] - CURRENT_STATE.REGS[dcd_rt];
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+          break;
+        case SUBOP_AND:
+          if (dcd_rd != 0)
+            NEXT_STATE.REGS[dcd_rd] = CURRENT_STATE.REGS[dcd_rs] & CURRENT_STATE.REGS[dcd_rt];
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+          break;
+        case SUBOP_OR:
+          if (dcd_rd != 0)
+            NEXT_STATE.REGS[dcd_rd] = CURRENT_STATE.REGS[dcd_rs] | CURRENT_STATE.REGS[dcd_rt];
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+          break;
+        case SUBOP_XOR:
+        case SUBOP_NOR:
+        case SUBOP_SLT:
+        case SUBOP_SLTU:
+        case SUBOP_MULT:
+        case SUBOP_MFHI:
+        case SUBOP_MFLO:
+        case SUBOP_MTHI:
+        case SUBOP_MTLO:
+        case SUBOP_MULTU:
+        case SUBOP_DIV:
+        case SUBOP_DIVU:
         
-  
-  
-  
-  
+
 /*** specify the remaining dcd_funct cases above this line ***/
 /*************************************************************/
         default:
