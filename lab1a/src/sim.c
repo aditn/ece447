@@ -145,9 +145,29 @@ void process_instruction()
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
         case SUBOP_XOR:
+          if (dcd_rd != 0)
+            NEXT_STATE.REGS[dcd_rd] = CURRENT_STATE.REGS[dcd_rs] ^ CURRENT_STATE.REGS[dcd_rt];
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+          break;
         case SUBOP_NOR:
+          if (dcd_rd != 0)
+            NEXT_STATE.REGS[dcd_rd] = ~(CURRENT_STATE.REGS[dcd_rs] | CURRENT_STATE.REGS[dcd_rt]);
         case SUBOP_SLT:
+          if (dcd_rd != 0) {
+            if ((int) CURRENT_STATE.REGS[dcd_rs] < (int) CURRENT_STATE.REGS[dcd_rt])
+              NEXT_STATE.REGS[dcd_rd] = 1;
+            else
+              NEXT_STATE.REGS[dcd_rd] = 0;
+          }
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
         case SUBOP_SLTU:
+          if (dcd_rd != 0)
+            if ((unsigned int) CURRENT_STATE.REGS[dcd_rs] < (unsigned int) CURRENT_STATE.REGS[dcd_rt])
+              NEXT_STATE.REGS[dcd_rd] = 1;
+            else
+              NEXT_STATE.REGS[dcd_rd] = 0;
+          }
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
         case SUBOP_MULT:
         case SUBOP_MFHI:
         case SUBOP_MFLO:
