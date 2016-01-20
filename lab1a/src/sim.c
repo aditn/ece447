@@ -113,8 +113,6 @@ void process_instruction()
 /**********************************************************/
 /*** specify the remaining dcd_op cases below this line ***/
   case OP_J:
-    NEXT_STATE.PC = CURRENT_STATE.PC + 4;
-    //execute line right after jump then jump to addr
     NEXT_STATE.PC = CURRENT_STATE.PC & 0xF0000000 + dcd_target<<2;
     break;
   case OP_JAL:
