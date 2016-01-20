@@ -113,7 +113,9 @@ void process_instruction()
 /**********************************************************/
 /*** specify the remaining dcd_op cases below this line ***/
   case OP_J:
-    NEXT_STATE.PC = CURRENT_STATE.PC + dcd_target;
+    NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+    //execute line right after jump then jump to addr
+    NEXT_STATE.PC = CURRENT_STATE.PC & 0xF0000000 + dcd_target<<2;
     break;
   case OP_JAL:
   case OP_BEQ:
@@ -147,6 +149,7 @@ void process_instruction()
     NEXT_STATE.PC = CURRENT_STATE.PC + 4;
     break;
   case OP_LB:
+    NEXT_STATE.PC = mem_read_32(CURRENT_STATE.REGS[dcd_rs]+dcd_imm)
   case OP_LH:
   case OP_LW:
   case OP_LBU:
