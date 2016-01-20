@@ -178,11 +178,29 @@ void process_instruction()
     NEXT_STATE.PC = CURRENT_STATE.PC & 0xF0000000 + dcd_target<<2;
     break;
   case OP_JAL:
+    //need to link
+    break;
   case OP_BEQ:
+    if (CURRENT_STATE.REGS[dcd_rs] == CURRENT_STATE.REGS[dcd_rt])
+      NEXT_STATE.PC = CURRENT_STATE.PC & 0xF0000000 + dcd_se_imm<<2;
+    break;
   case OP_BNE:
+    if (CURRENT_STATE.REGS[dcd_rs] != CURRENT_STATE.REGS[dcd_rt])
+      NEXT_STATE.PC = CURRENT_STATE.PC & 0xF0000000 + dcd_se_imm<<2;
+    break;
   case OP_BLEZ:
+    if (int(sign_extend_b2w(CURRENT_STATE.REGS[dcd_rs])) <= 0)
+      NEXT_STATE.PC = CURRENT_STATE.PC & 0xF0000000 + dcd_se_imm<<2;
+    break;
   case OP_BGTZ:
-  case OP_SLTI: 
+    if (int(sign_extend_b2w(CURRENT_STATE.REGS[dcd_rs])) >= 0)
+      NEXT_STATE.PC = CURRENT_STATE.PC & 0xF0000000 + dcd_se_imm<<2;
+    break;
+  case OP_SLTI:
+    if (dcd_rt!=0)
+      NEXT_STATE.REGS[dcd_rt] = int(sign_extend_b2w(CURRENT_STATE.REGS[dcd_rs])) < 0;
+    NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+    break;
   case OP_SLTIU:
     if (dcd_rt!=0)
       NEXT_STATE.REGS[dcd_rt] = CURRENT_STATE.REGS[dcd_rs] < dcd_se_imm;
@@ -208,7 +226,7 @@ void process_instruction()
       NEXT_STATE.REGS[dcd_rt] = (dcd_se_imm<<16) & 0xFFFF0000;
     NEXT_STATE.PC = CURRENT_STATE.PC + 4;
     break;
-  case OP_LB:
+  case OP_LB: //need 32bit addr
     NEXT_STATE.PC = mem_read_32(CURRENT_STATE.REGS[dcd_rs]+dcd_imm)
   case OP_LH:
   case OP_LW:
