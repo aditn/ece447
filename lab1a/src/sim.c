@@ -98,12 +98,12 @@ void process_instruction()
           break;
         case SUBOP_SRL:
           if (dcd_rd != 0)
-            NEXT_STATE.REGS[dcd_rd] = ((unsigned int) CURRENT_STATE.REGS[dcd_rt]) >> dcd_shamt;
+            NEXT_STATE.REGS[dcd_rd] = CURRENT_STATE.REGS[dcd_rt] >> dcd_shamt;
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
         case SUBOP_SRA:
           if (dcd_rd != 0)
-            NEXT_STATE.REGS[dcd_rd] = ((int) CURRENT_STATE.REGS[dcd_rt]) >> dcd_shamt;
+            NEXT_STATE.REGS[dcd_rd] = ((int32_t) CURRENT_STATE.REGS[dcd_rt]) >> dcd_shamt;
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
         case SUBOP_SLLV:
@@ -113,12 +113,12 @@ void process_instruction()
           break;
        case SUBOP_SRLV:
           if (dcd_rd != 0)
-            NEXT_STATE.REGS[dcd_rd] = ((unsigned int) CURRENT_STATE.REGS[dcd_rt]) >> CURRENT_STATE.REGS[dcd_rs];
+            NEXT_STATE.REGS[dcd_rd] = CURRENT_STATE.REGS[dcd_rt] >> CURRENT_STATE.REGS[dcd_rs];
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
         case SUBOP_SRAV:
           if (dcd_rd != 0)
-            NEXT_STATE.REGS[dcd_rd] = ((int) CURRENT_STATE.REGS[dcd_rt]) >> CURRENT_STATE.REGS[dcd_rs];
+            NEXT_STATE.REGS[dcd_rd] = ((int32_t) CURRENT_STATE.REGS[dcd_rt]) >> CURRENT_STATE.REGS[dcd_rs];
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
         case SUBOP_JR:
@@ -152,31 +152,65 @@ void process_instruction()
         case SUBOP_NOR:
           if (dcd_rd != 0)
             NEXT_STATE.REGS[dcd_rd] = ~(CURRENT_STATE.REGS[dcd_rs] | CURRENT_STATE.REGS[dcd_rt]);
+          break;
         case SUBOP_SLT:
           if (dcd_rd != 0) {
-            if ((int) CURRENT_STATE.REGS[dcd_rs] < (int) CURRENT_STATE.REGS[dcd_rt])
+            if ((int32_t) CURRENT_STATE.REGS[dcd_rs] < (int32_t) CURRENT_STATE.REGS[dcd_rt])
               NEXT_STATE.REGS[dcd_rd] = 1;
             else
               NEXT_STATE.REGS[dcd_rd] = 0;
           }
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+          break;
         case SUBOP_SLTU:
           if (dcd_rd != 0)
-            if ((unsigned int) CURRENT_STATE.REGS[dcd_rs] < (unsigned int) CURRENT_STATE.REGS[dcd_rt])
+            if (CURRENT_STATE.REGS[dcd_rs] < CURRENT_STATE.REGS[dcd_rt])
               NEXT_STATE.REGS[dcd_rd] = 1;
             else
               NEXT_STATE.REGS[dcd_rd] = 0;
           }
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+          break;
         case SUBOP_MULT:
+          uint64_t ans = (uint64_t)((int64_t) NEXT_STATE.REGS[dcd_rs] * (int64_t) NEXT_STATE.REGS[dcd_rt]);
+          NEXT_STATE.HI = (uint32_t) (ans >> 32);
+          NEXT_STATE.LO = (uint32_t) ans;
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+          break;
         case SUBOP_MFHI:
+          if (dcd_rd != 0)
+            NEXT_STATE.REGS[dcd_rd] = CURRENT_STATE.HI;
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+          break;
         case SUBOP_MFLO:
+          if(dcd_rd != 0)
+            NEXT_STATE.REGS[dcd_rd] = CURRENT_STATE.LO;
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+          break;
         case SUBOP_MTHI:
+          NEXT_STATE.HI = CURRENT_STATE.REGS[dcd_rs];
+          break;
         case SUBOP_MTLO:
+          NEXT_STATE.LO = CURRENT_STATE.REGS[dcd_rs];
+          break;
         case SUBOP_MULTU:
+          uint64_t ans = (uint64_t) NEXT_STATE.REGS[dcd_rs] * (uint64_t) NEXT_STATE.REGS[dcd_rt];
+          NEXT_STATE.HI = (uint32_t) (ans >> 32);
+          NEXT_STATE.LO = (uint32_t) ans;
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+          break;
         case SUBOP_DIV:
+          int32_t rs_val = CURRENT_STATE.REGS[dcd_rs];
+          int32_t rt_val = CURRENT_STATE.REGS[dcd_rt];
+          NEXT_STATE.LO = (uint32_t) (rs_val / rt_val);
+          NEXT_STATE.HI = (uint32_t) (rs_val % rt_val);
+          break;
         case SUBOP_DIVU:
-        
+          uint32_t rs_val = CURRENT_STATE.REGS[dcd_rs];
+          uint32_t rt_val = CURRENT_STATE.REGS[dcd_rt];
+          NEXT_STATE.LO = rs_val / rt_val;
+          NEXT_STATE.HI = rs_val % rt_val;
+          break;
 
 /*** specify the remaining dcd_funct cases above this line ***/
 /*************************************************************/
