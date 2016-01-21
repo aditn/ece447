@@ -163,7 +163,7 @@ void process_instruction()
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
         case SUBOP_SLTU:
-          if (dcd_rd != 0)
+          if (dcd_rd != 0) {
             if (CURRENT_STATE.REGS[dcd_rs] < CURRENT_STATE.REGS[dcd_rt])
               NEXT_STATE.REGS[dcd_rd] = 1;
             else
@@ -172,9 +172,8 @@ void process_instruction()
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
         case SUBOP_MULT:
-          uint64_t ans = (uint64_t)((int64_t) NEXT_STATE.REGS[dcd_rs] * (int64_t) NEXT_STATE.REGS[dcd_rt]);
-          NEXT_STATE.HI = (uint32_t) (ans >> 32);
-          NEXT_STATE.LO = (uint32_t) ans;
+          NEXT_STATE.HI = (uint32_t) (((int64_t) NEXT_STATE.REGS[dcd_rs] * (int64_t) NEXT_STATE.REGS[dcd_rt]) >> 32);
+          NEXT_STATE.LO = (uint32_t) (((int64_t) NEXT_STATE.REGS[dcd_rs] * (int64_t) NEXT_STATE.REGS[dcd_rt]));
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
         case SUBOP_MFHI:
@@ -194,22 +193,17 @@ void process_instruction()
           NEXT_STATE.LO = CURRENT_STATE.REGS[dcd_rs];
           break;
         case SUBOP_MULTU:
-          uint64_t ans = (uint64_t) NEXT_STATE.REGS[dcd_rs] * (uint64_t) NEXT_STATE.REGS[dcd_rt];
-          NEXT_STATE.HI = (uint32_t) (ans >> 32);
-          NEXT_STATE.LO = (uint32_t) ans;
+          NEXT_STATE.HI = (uint32_t) (((uint64_t) NEXT_STATE.REGS[dcd_rs] * (uint64_t) NEXT_STATE.REGS[dcd_rt]) >> 32);
+          NEXT_STATE.LO = (uint32_t) (((uint64_t) NEXT_STATE.REGS[dcd_rs] * (uint64_t) NEXT_STATE.REGS[dcd_rt]));
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
         case SUBOP_DIV:
-          int32_t rs_val = CURRENT_STATE.REGS[dcd_rs];
-          int32_t rt_val = CURRENT_STATE.REGS[dcd_rt];
-          NEXT_STATE.LO = (uint32_t) (rs_val / rt_val);
-          NEXT_STATE.HI = (uint32_t) (rs_val % rt_val);
+          NEXT_STATE.LO = (uint32_t) ((int32_t) CURRENT_STATE.REGS[dcd_rs] / (int32_t) CURRENT_STATE.REGS[dcd_rt]);
+          NEXT_STATE.HI = (uint32_t) ((int32_t) CURRENT_STATE.REGS[dcd_rs] % (int32_t) CURRENT_STATE.REGS[dcd_rt]);
           break;
         case SUBOP_DIVU:
-          uint32_t rs_val = CURRENT_STATE.REGS[dcd_rs];
-          uint32_t rt_val = CURRENT_STATE.REGS[dcd_rt];
-          NEXT_STATE.LO = rs_val / rt_val;
-          NEXT_STATE.HI = rs_val % rt_val;
+          NEXT_STATE.LO = (uint32_t) ((int32_t) CURRENT_STATE.REGS[dcd_rs] / (int32_t) CURRENT_STATE.REGS[dcd_rt]);
+          NEXT_STATE.HI = (uint32_t) ((int32_t) CURRENT_STATE.REGS[dcd_rs] % (int32_t) CURRENT_STATE.REGS[dcd_rt]);
           break;
 
 /*** specify the remaining dcd_funct cases above this line ***/
