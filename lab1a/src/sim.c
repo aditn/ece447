@@ -276,15 +276,19 @@ void process_instruction()
     break;
   case OP_LB: //need 32bit addr
     NEXT_STATE.PC = mem_read_32(CURRENT_STATE.REGS[dcd_rs]+dcd_imm)
-  case OP_LH:
+  case OP_LH: 
   case OP_LW:
   case OP_LBU:
   case OP_LHU:
   case OP_SB:
+    mem_write_32(CURRENT_STATE.REGS[dcd_rs] + dcd_se_imm, CURRENT_STATE.REGS[dcd_rt] & 0xFF);
+    break;
   case OP_SH:
+    mem_write_32(CURRENT_STATE.REGS[dcd_rs] + dcd_se_imm, CURRENT_STATE.REGS[dcd_rt] & 0xFFFF);
+    break;
   case OP_SW:
-
-
+    mem_write_32(CURRENT_STATE.REGS[dcd_rs] + dcd_se_imm, CURRENT_STATE.REGS[dcd_rt]);
+    break;
 
 
 /*** specify the remaining dcd_op cases above this line ***/
