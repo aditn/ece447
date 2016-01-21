@@ -226,7 +226,8 @@ void process_instruction()
     NEXT_STATE.PC = (CURRENT_STATE.PC & 0xF0000000) + (dcd_target<<2);
     break;
   case OP_JAL:
-    //need to link
+    NEXT_STATE.REGS[31] = CURRENT_STATE.PC + 8;
+    NEXT_STATE.PC = (CURRENT_STATE.PC & 0xF0000000) + (dcd_target<<2);
     break;
   case OP_BEQ:
     if (CURRENT_STATE.REGS[dcd_rs] == CURRENT_STATE.REGS[dcd_rt])
