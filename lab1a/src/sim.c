@@ -265,17 +265,17 @@ void process_instruction()
     break;
   case OP_ANDI:
     if (dcd_rt!=0)
-      NEXT_STATE.REGS[dcd_rt] = CURRENT_STATE.REGS[dcd_rs] + dcd_se_imm;
+      NEXT_STATE.REGS[dcd_rt] = CURRENT_STATE.REGS[dcd_rs] + dcd_imm;
     NEXT_STATE.PC = CURRENT_STATE.PC + 4;
     break;
   case OP_ORI:
     if (dcd_rt!=0)
-      NEXT_STATE.REGS[dcd_rt] = CURRENT_STATE.REGS[dcd_rs] | dcd_se_imm;
+      NEXT_STATE.REGS[dcd_rt] = CURRENT_STATE.REGS[dcd_rs] | dcd_imm;
     NEXT_STATE.PC = CURRENT_STATE.PC + 4;
     break;
   case OP_XORI:
     if (dcd_rt!=0)
-      NEXT_STATE.REGS[dcd_rt] = CURRENT_STATE.REGS[dcd_rs] ^ dcd_se_imm;
+      NEXT_STATE.REGS[dcd_rt] = CURRENT_STATE.REGS[dcd_rs] ^ dcd_imm;
     NEXT_STATE.PC = CURRENT_STATE.PC + 4;
     break;
   case OP_LUI:
