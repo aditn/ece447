@@ -75,7 +75,7 @@ void process_instruction()
 
   /* update architectural state according to instruction */
   switch (dcd_op) {
-  case OP_SPECIAL: 
+  case OP_SPECIAL:
     { 
       switch (dcd_funct) {
         case SUBOP_ADD: 
@@ -232,27 +232,35 @@ void process_instruction()
   case OP_BEQ:
     if (CURRENT_STATE.REGS[dcd_rs] == CURRENT_STATE.REGS[dcd_rt])
       NEXT_STATE.PC = (CURRENT_STATE.PC & 0xF0000000) + (dcd_se_imm<<2);
+    else
+      NEXT_STATE.PC = CURRENT_STATE.PC + 4;
     break;
   case OP_BNE:
     if (CURRENT_STATE.REGS[dcd_rs] != CURRENT_STATE.REGS[dcd_rt])
       NEXT_STATE.PC = (CURRENT_STATE.PC & 0xF0000000) + (dcd_se_imm<<2);
+    else
+      NEXT_STATE.PC = CURRENT_STATE.PC + 4;
     break;
   case OP_BLEZ:
-    if (int(sign_extend_b2w(CURRENT_STATE.REGS[dcd_rs])) <= 0)
+    if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) <= 0)
       NEXT_STATE.PC = (CURRENT_STATE.PC & 0xF0000000) + (dcd_se_imm<<2);
+    else
+      NEXT_STATE.PC = CURRENT_STATE.PC + 4;
     break;
   case OP_BGTZ:
-    if (int(sign_extend_b2w(CURRENT_STATE.REGS[dcd_rs])) >= 0)
+    if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) >= 0)
       NEXT_STATE.PC = (CURRENT_STATE.PC & 0xF0000000) + (dcd_se_imm<<2);
+    else
+      NEXT_STATE.PC = CURRENT_STATE.PC + 4;
     break;
   case OP_SLTI:
     if (dcd_rt!=0)
-      NEXT_STATE.REGS[dcd_rt] = int(sign_extend_b2w(CURRENT_STATE.REGS[dcd_rs])) < 0;
+      NEXT_STATE.REGS[dcd_rt] = (((int32_t) CURRENT_STATE.REGS[dcd_rs]) < 0);
     NEXT_STATE.PC = CURRENT_STATE.PC + 4;
     break;
   case OP_SLTIU:
     if (dcd_rt!=0)
-      NEXT_STATE.REGS[dcd_rt] = CURRENT_STATE.REGS[dcd_rs] < dcd_se_imm;
+      NEXT_STATE.REGS[dcd_rt] = (CURRENT_STATE.REGS[dcd_rs] < dcd_se_imm);
     NEXT_STATE.PC = CURRENT_STATE.PC + 4;
     break;
   case OP_ANDI:
@@ -312,7 +320,6 @@ void process_instruction()
     mem_write_32(CURRENT_STATE.REGS[dcd_rs] + dcd_se_imm, CURRENT_STATE.REGS[dcd_rt]);
     NEXT_STATE.PC = CURRENT_STATE.PC + 4;
     break;
-
 
 /*** specify the remaining dcd_op cases above this line ***/
 /*********************************************************/
