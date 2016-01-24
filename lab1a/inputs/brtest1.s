@@ -19,53 +19,66 @@ l_0:
         addu $5, $5, $ra
         beq   $zero, $zero, l_2
 l_1:
+        addiu $18, $zero, 1
         addiu $5, $5, 7
         jal l_0
         j l_8
 l_2:    
+        addiu $19, $zero, 2
         addiu $5, $5, 9
         bne $3, $4, l_4
 l_3:
+        addiu $20, $zero, 3
         # Taken
         addiu $5, $5, 5
         bgez $zero, l_6
 l_4:
+        addiu $21, $zero, 4
         # Not taken
         addiu $5, $5, 11
         blez  $3, l_3
 l_5:
+        addiu $22, $zero, 5
         # Taken
         addiu $5, $5, 99
         bgtz  $3, l_3
 l_6:
+        addiu $23, $zero, 6
         # here
         addiu $5, $5, 111
         jr $ra
         # Should go to l_1, then go to l_8
 l_7:
+        addiu $24, $zero, 7
         # Should not get here
         addiu $5, $5, 200
         
         syscall
 l_8:    
+        addiu $25, $zero, 8
         addiu $5, $5, 215
         jal l_10
 l_9:
+        addiu $26, $zero, 9
         # Should not get here
         addiu $5, $5, 1
         syscall        
-l_10:    
+l_10:   
+        addiu $27, $zero, 10
         addu $5, $5, $6
         bltzal $4, l_12
 l_11:
+        addiu $28, $zero, 11
         # Should not get here
         addiu $5, $5, 400
         syscall
 l_12:    
+        addiu $29, $zero, 12
         addu $5, $5, $6
         bgezal $4, l_11
         
-l_13:    
+l_13:   
+        addiu $30, $zero, 13
         addiu $5, $5, 0xbeb0063d
         syscall
         

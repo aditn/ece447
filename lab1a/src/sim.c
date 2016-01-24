@@ -222,6 +222,39 @@ void process_instruction()
     break;
 /**********************************************************/
 /*** specify the remaining dcd_op cases below this line ***/
+  case OP_BRSPEC:
+  {
+    switch (dcd_funct) {
+      case BROP_BLTZ:
+        if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) < 0)
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4 + (dcd_se_imm<<2);
+        else
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+        break;
+      case BROP_BGEZ:
+        if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) >= 0)
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4 + (dcd_se_imm<<2);
+        else
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+        break;
+      case BROP_BLTZAL:
+        if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) < 0){
+          NEXT_STATE.REGS[31] = CURRENT_STATE.PC + 8;
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4 + (dcd_se_imm<<2);
+        }
+        else
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+        break;
+      case BROP_BGEZAL:
+        if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) >= 0){
+          NEXT_STATE.REGS[31] = CURRENT_STATE.PC + 8;
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4 + (dcd_se_imm<<2);
+        }
+        else
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
+        break;
+    }
+  }
   case OP_J:
     NEXT_STATE.PC = (CURRENT_STATE.PC & 0xF0000000) + (dcd_target<<2);
     break;
@@ -231,25 +264,25 @@ void process_instruction()
     break;
   case OP_BEQ:
     if (CURRENT_STATE.REGS[dcd_rs] == CURRENT_STATE.REGS[dcd_rt])
-      NEXT_STATE.PC = (CURRENT_STATE.PC & 0xF0000000) + (dcd_se_imm<<2);
+      NEXT_STATE.PC = CURRENT_STATE.PC + 4 + (dcd_se_imm<<2);
     else
       NEXT_STATE.PC = CURRENT_STATE.PC + 4;
     break;
   case OP_BNE:
     if (CURRENT_STATE.REGS[dcd_rs] != CURRENT_STATE.REGS[dcd_rt])
-      NEXT_STATE.PC = (CURRENT_STATE.PC & 0xF0000000) + (dcd_se_imm<<2);
+      NEXT_STATE.PC = CURRENT_STATE.PC + 4 + (dcd_se_imm<<2);
     else
       NEXT_STATE.PC = CURRENT_STATE.PC + 4;
     break;
   case OP_BLEZ:
     if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) <= 0)
-      NEXT_STATE.PC = (CURRENT_STATE.PC & 0xF0000000) + (dcd_se_imm<<2);
+      NEXT_STATE.PC = CURRENT_STATE.PC + 4 + (dcd_se_imm<<2);
     else
       NEXT_STATE.PC = CURRENT_STATE.PC + 4;
     break;
   case OP_BGTZ:
-    if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) >= 0)
-      NEXT_STATE.PC = (CURRENT_STATE.PC & 0xF0000000) + (dcd_se_imm<<2);
+    if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) > 0)
+      NEXT_STATE.PC = CURRENT_STATE.PC + 4 + (dcd_se_imm<<2);
     else
       NEXT_STATE.PC = CURRENT_STATE.PC + 4;
     break;
@@ -320,6 +353,7 @@ void process_instruction()
     mem_write_32(CURRENT_STATE.REGS[dcd_rs] + dcd_se_imm, CURRENT_STATE.REGS[dcd_rt]);
     NEXT_STATE.PC = CURRENT_STATE.PC + 4;
     break;
+
 
 /*** specify the remaining dcd_op cases above this line ***/
 /*********************************************************/
