@@ -229,23 +229,23 @@ void process_instruction()
 /*** specify the remaining dcd_op cases below this line ***/
   case OP_BRSPEC:
   {
-     switch (dcd_funct) {
+    switch (dcd_rt) {
       case BROP_BLTZ:
         if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) < 0)
-          NEXT_STATE.PC = CURRENT_STATE.PC + (dcd_se_imm<<2);
+          NEXT_STATE.PC = CURRENT_STATE.PC + (dcd_se_imm<<2) + 4;
         else
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
         break;
       case BROP_BGEZ:
         if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) >= 0)
-          NEXT_STATE.PC = CURRENT_STATE.PC + (dcd_se_imm<<2);
+          NEXT_STATE.PC = CURRENT_STATE.PC + (dcd_se_imm<<2) + 4;
         else
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
         break;
       case BROP_BLTZAL:
           NEXT_STATE.REGS[31] = CURRENT_STATE.PC + 4;
         if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) < 0){
-          NEXT_STATE.PC = CURRENT_STATE.PC + (dcd_se_imm<<2);
+          NEXT_STATE.PC = CURRENT_STATE.PC + (dcd_se_imm<<2) + 4;
         }
         else
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
@@ -253,14 +253,17 @@ void process_instruction()
       case BROP_BGEZAL:
           NEXT_STATE.REGS[31] = CURRENT_STATE.PC + 4;
         if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) >= 0){
-          NEXT_STATE.PC = CURRENT_STATE.PC + (dcd_se_imm<<2);
+          NEXT_STATE.PC = CURRENT_STATE.PC + (dcd_se_imm<<2) + 4;
         }
         else
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
         break;
+      default:
+        printf("Encountered unimplemented subopcode (0x%x). Ending simulation...\n\n",dcd_rt);
+        RUN_BIT = 0;
     }
   }
-  }
+  
   case OP_J:
     NEXT_STATE.PC = (CURRENT_STATE.PC & 0xF0000000) + (dcd_target<<2);
     break;
