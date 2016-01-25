@@ -125,7 +125,7 @@ void process_instruction()
           NEXT_STATE.PC = CURRENT_STATE.REGS[dcd_rs];
         case SUBOP_JALR:
           if (dcd_rd != 0)
-            NEXT_STATE.REGS[dcd_rd] = CURRENT_STATE.PC + 8; //is dcd_rd assumed to be 31?
+            NEXT_STATE.REGS[dcd_rd] = CURRENT_STATE.PC + 4; //is dcd_rd assumed to be 31?
           NEXT_STATE.PC = CURRENT_STATE.REGS[dcd_rs];
         case SUBOP_SUB:
            //same as SUBU
@@ -152,6 +152,7 @@ void process_instruction()
         case SUBOP_NOR:
           if (dcd_rd != 0)
             NEXT_STATE.REGS[dcd_rd] = ~(CURRENT_STATE.REGS[dcd_rs] | CURRENT_STATE.REGS[dcd_rt]);
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
         case SUBOP_SLT:
           if (dcd_rd != 0) {
@@ -188,9 +189,11 @@ void process_instruction()
           break;
         case SUBOP_MTHI:
           NEXT_STATE.HI = CURRENT_STATE.REGS[dcd_rs];
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
         case SUBOP_MTLO:
           NEXT_STATE.LO = CURRENT_STATE.REGS[dcd_rs];
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
         case SUBOP_MULTU:
           NEXT_STATE.HI = (uint32_t) (((uint64_t) NEXT_STATE.REGS[dcd_rs] * (uint64_t) NEXT_STATE.REGS[dcd_rt]) >> 32);
@@ -200,10 +203,12 @@ void process_instruction()
         case SUBOP_DIV:
           NEXT_STATE.LO = (uint32_t) ((int32_t) CURRENT_STATE.REGS[dcd_rs] / (int32_t) CURRENT_STATE.REGS[dcd_rt]);
           NEXT_STATE.HI = (uint32_t) ((int32_t) CURRENT_STATE.REGS[dcd_rs] % (int32_t) CURRENT_STATE.REGS[dcd_rt]);
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
         case SUBOP_DIVU:
-          NEXT_STATE.LO = (uint32_t) ((int32_t) CURRENT_STATE.REGS[dcd_rs] / (int32_t) CURRENT_STATE.REGS[dcd_rt]);
-          NEXT_STATE.HI = (uint32_t) ((int32_t) CURRENT_STATE.REGS[dcd_rs] % (int32_t) CURRENT_STATE.REGS[dcd_rt]);
+          NEXT_STATE.LO = CURRENT_STATE.REGS[dcd_rs] / CURRENT_STATE.REGS[dcd_rt];
+          NEXT_STATE.HI = CURRENT_STATE.REGS[dcd_rs] % CURRENT_STATE.REGS[dcd_rt];
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
 
 /*** specify the remaining dcd_funct cases above this line ***/
@@ -224,12 +229,12 @@ void process_instruction()
 /*** specify the remaining dcd_op cases below this line ***/
   case OP_BRSPEC:
   {
-    switch (dcd_funct) {
+     switch (dcd_funct) {
       case BROP_BLTZ:
         if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) < 0)
           NEXT_STATE.PC = CURRENT_STATE.PC + (dcd_se_imm<<2);
         else
-          NEXT_STATE.PC = CURRENT_STATE.PC;
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
         break;
       case BROP_BGEZ:
         if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) >= 0)
@@ -238,22 +243,23 @@ void process_instruction()
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
         break;
       case BROP_BLTZAL:
-        if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) < 0){
           NEXT_STATE.REGS[31] = CURRENT_STATE.PC + 4;
+        if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) < 0){
           NEXT_STATE.PC = CURRENT_STATE.PC + (dcd_se_imm<<2);
         }
         else
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
         break;
       case BROP_BGEZAL:
-        if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) >= 0){
           NEXT_STATE.REGS[31] = CURRENT_STATE.PC + 4;
+        if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) >= 0){
           NEXT_STATE.PC = CURRENT_STATE.PC + (dcd_se_imm<<2);
         }
         else
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
         break;
     }
+  }
   }
   case OP_J:
     NEXT_STATE.PC = (CURRENT_STATE.PC & 0xF0000000) + (dcd_target<<2);
