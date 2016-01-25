@@ -152,6 +152,7 @@ void process_instruction()
         case SUBOP_NOR:
           if (dcd_rd != 0)
             NEXT_STATE.REGS[dcd_rd] = ~(CURRENT_STATE.REGS[dcd_rs] | CURRENT_STATE.REGS[dcd_rt]);
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
         case SUBOP_SLT:
           if (dcd_rd != 0) {
@@ -188,9 +189,11 @@ void process_instruction()
           break;
         case SUBOP_MTHI:
           NEXT_STATE.HI = CURRENT_STATE.REGS[dcd_rs];
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
         case SUBOP_MTLO:
           NEXT_STATE.LO = CURRENT_STATE.REGS[dcd_rs];
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
         case SUBOP_MULTU:
           NEXT_STATE.HI = (uint32_t) (((uint64_t) NEXT_STATE.REGS[dcd_rs] * (uint64_t) NEXT_STATE.REGS[dcd_rt]) >> 32);
@@ -200,10 +203,12 @@ void process_instruction()
         case SUBOP_DIV:
           NEXT_STATE.LO = (uint32_t) ((int32_t) CURRENT_STATE.REGS[dcd_rs] / (int32_t) CURRENT_STATE.REGS[dcd_rt]);
           NEXT_STATE.HI = (uint32_t) ((int32_t) CURRENT_STATE.REGS[dcd_rs] % (int32_t) CURRENT_STATE.REGS[dcd_rt]);
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
         case SUBOP_DIVU:
           NEXT_STATE.LO = (uint32_t) ((int32_t) CURRENT_STATE.REGS[dcd_rs] / (int32_t) CURRENT_STATE.REGS[dcd_rt]);
           NEXT_STATE.HI = (uint32_t) ((int32_t) CURRENT_STATE.REGS[dcd_rs] % (int32_t) CURRENT_STATE.REGS[dcd_rt]);
+          NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
 
 /*** specify the remaining dcd_funct cases above this line ***/
