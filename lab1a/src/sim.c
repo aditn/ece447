@@ -206,8 +206,8 @@ void process_instruction()
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
         case SUBOP_DIVU:
-          NEXT_STATE.LO = (uint32_t) ((int32_t) CURRENT_STATE.REGS[dcd_rs] / (int32_t) CURRENT_STATE.REGS[dcd_rt]);
-          NEXT_STATE.HI = (uint32_t) ((int32_t) CURRENT_STATE.REGS[dcd_rs] % (int32_t) CURRENT_STATE.REGS[dcd_rt]);
+          NEXT_STATE.LO = CURRENT_STATE.REGS[dcd_rs] / CURRENT_STATE.REGS[dcd_rt];
+          NEXT_STATE.HI = CURRENT_STATE.REGS[dcd_rs] % CURRENT_STATE.REGS[dcd_rt];
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
           break;
 
