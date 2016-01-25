@@ -125,7 +125,7 @@ void process_instruction()
           NEXT_STATE.PC = CURRENT_STATE.REGS[dcd_rs];
         case SUBOP_JALR:
           if (dcd_rd != 0)
-            NEXT_STATE.REGS[dcd_rd] = CURRENT_STATE.PC + 8; //is dcd_rd assumed to be 31?
+            NEXT_STATE.REGS[dcd_rd] = CURRENT_STATE.PC + 4; //is dcd_rd assumed to be 31?
           NEXT_STATE.PC = CURRENT_STATE.REGS[dcd_rs];
         case SUBOP_SUB:
            //same as SUBU
@@ -227,28 +227,28 @@ void process_instruction()
     switch (dcd_funct) {
       case BROP_BLTZ:
         if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) < 0)
-          NEXT_STATE.PC = CURRENT_STATE.PC + 4 + (dcd_se_imm<<2);
+          NEXT_STATE.PC = CURRENT_STATE.PC + (dcd_se_imm<<2);
         else
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
         break;
       case BROP_BGEZ:
         if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) >= 0)
-          NEXT_STATE.PC = CURRENT_STATE.PC + 4 + (dcd_se_imm<<2);
+          NEXT_STATE.PC = CURRENT_STATE.PC + (dcd_se_imm<<2);
         else
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
         break;
       case BROP_BLTZAL:
+          NEXT_STATE.REGS[31] = CURRENT_STATE.PC + 4;
         if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) < 0){
-          NEXT_STATE.REGS[31] = CURRENT_STATE.PC + 8;
-          NEXT_STATE.PC = CURRENT_STATE.PC + 4 + (dcd_se_imm<<2);
+          NEXT_STATE.PC = CURRENT_STATE.PC + (dcd_se_imm<<2);
         }
         else
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
         break;
       case BROP_BGEZAL:
+          NEXT_STATE.REGS[31] = CURRENT_STATE.PC + 4;
         if (((int32_t) CURRENT_STATE.REGS[dcd_rs]) >= 0){
-          NEXT_STATE.REGS[31] = CURRENT_STATE.PC + 8;
-          NEXT_STATE.PC = CURRENT_STATE.PC + 4 + (dcd_se_imm<<2);
+          NEXT_STATE.PC = CURRENT_STATE.PC + (dcd_se_imm<<2);
         }
         else
           NEXT_STATE.PC = CURRENT_STATE.PC + 4;
@@ -259,7 +259,7 @@ void process_instruction()
     NEXT_STATE.PC = (CURRENT_STATE.PC & 0xF0000000) + (dcd_target<<2);
     break;
   case OP_JAL:
-    NEXT_STATE.REGS[31] = CURRENT_STATE.PC + 8;
+    NEXT_STATE.REGS[31] = CURRENT_STATE.PC + 4;
     NEXT_STATE.PC = (CURRENT_STATE.PC & 0xF0000000) + (dcd_target<<2);
     break;
   case OP_BEQ:
