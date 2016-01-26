@@ -123,10 +123,12 @@ void process_instruction()
           break;
         case SUBOP_JR:
           NEXT_STATE.PC = CURRENT_STATE.REGS[dcd_rs];
+          break;
         case SUBOP_JALR:
           if (dcd_rd != 0)
             NEXT_STATE.REGS[dcd_rd] = CURRENT_STATE.PC + 4; //is dcd_rd assumed to be 31?
           NEXT_STATE.PC = CURRENT_STATE.REGS[dcd_rs];
+          break;
         case SUBOP_SUB:
            //same as SUBU
         case SUBOP_SUBU:
