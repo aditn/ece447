@@ -219,7 +219,7 @@ module mips_core(/*AUTOARG*/
                               clk, load_ex_regs, rst_b);
    register #(32, 0) BadVAddrReg(bad_v_addr, pc, clk, load_bva, rst_b);
 
-   regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, dcd_rt, alu__out, ctrl_we, clk, rst_b, halted);
+   regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, dcd_rd, rd_data, ctrl_we, clk, rst_b, halted);
 endmodule // mips_core
 
 

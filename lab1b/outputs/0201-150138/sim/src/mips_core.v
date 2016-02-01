@@ -169,7 +169,7 @@ module mips_core(/*AUTOARG*/
    // Don't forget to hookup the "halted" signal to trigger the register dump 
  
    // synthesis translate_off
-   /*initial begin
+   initial begin
      // Delete this block when you are ready to try for real
      $display(""); 
      $display(""); 
@@ -181,7 +181,7 @@ module mips_core(/*AUTOARG*/
      $display(""); 
      $display(""); 
      $finish;
-   end*/
+   end
    // synthesis translate_on
 
    // Execute
@@ -219,7 +219,7 @@ module mips_core(/*AUTOARG*/
                               clk, load_ex_regs, rst_b);
    register #(32, 0) BadVAddrReg(bad_v_addr, pc, clk, load_bva, rst_b);
 
-   regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, dcd_rt, alu__out, ctrl_we, clk, rst_b, halted);
+   regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, dcd_rd, rd_data, ctrl_we, clk, rst_b, halted);
 endmodule // mips_core
 
 
