@@ -103,7 +103,7 @@ module mips_core(/*AUTOARG*/
    wire          dcd_bczft;
    
 
-   wire [31:0] newpc; //mux output for next state PC
+   wire [31:0] newpc; //mux input to PC
 
    // PC Management
    register #(32, text_start) PCReg(pc, nextpc, clk, ~internal_halt, rst_b);
@@ -187,7 +187,7 @@ module mips_core(/*AUTOARG*/
    end*/
    // synthesis translate_on
  
-   wire [31:0] alu_in; //mux output of rt_data and signed/unsigned imm to ALU
+   wire [31:0] alu_in; //mux input to ALU
 
    // Execute
    mips_ALU ALU(.alu__out(alu__out), 
@@ -225,32 +225,25 @@ module mips_core(/*AUTOARG*/
    register #(32, 0) BadVAddrReg(bad_v_addr, pc, clk, load_bva, rst_b);
 
    //New wirings
-   wire [4:0] wr_reg; //input to write register
-   wire [31:0] imm; //signed or unsigned immediate
-   wire [31:0] wr_data; //data to write to register file
+   wire [4:0] wr_reg;
+   wire [31:0] imm;
+   wire [31:0] mem_to_reg;
 
-   wire [31:0] br_target; //branch target
-   wire [31:0] j_target; //unconditional jump target
+   wire [31:0] br_target;
+   wire [31:0] j_target;
 
    //Register file
-   regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, wr_data, ctrl_we, clk, rst_b, halted);
+   regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, mem_to_reg, ctrl_we, clk, rst_b, halted);
    
-   //ALU (with placeholder select bits)
+   //ALU and memory (with placeholder select bits)
    mux2to1 #(5) regDest(wr_reg, dcd_rt, dcd_rd, 1'b0);
    mux2to1 aluSrc(alu_in, rt_data, imm, 1'b1);
    mux2to1 se(imm, dcd_e_imm, dcd_se_imm, 1'b1);
-
-   //Wirings to memory module
-   mux2to1 memToReg(wr_data, alu__out, mem_data_out, 1'b0);
-   assign instr_addr = newpc[31:2];
-   assign mem_addr = alu__out[31:2];
-   assign mem_data_in = rt_data;
-   assign mem_write_en = 4'b1111;
-   
+   mux2to1 memToReg(mem_to_reg, alu__out, mem_data_out, 1'b0);
 
    //Mux for next state PC
    mux4to1 pcMux(newpc, nextnextpc, br_target, rs_data, j_target, 2'b00);
-   adder br(br_target, pc + 4, (imm << 2), 1'b0);
+   adder br(br_target, pc, (imm << 2), 1'b0);
    concat conc(j_target, pc, dcd_target);
    
 

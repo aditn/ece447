@@ -233,7 +233,7 @@ module mips_core(/*AUTOARG*/
    wire [31:0] j_target; //unconditional jump target
 
    //Register file
-   regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, wr_data, ctrl_we, clk, rst_b, halted);
+   regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, mem_to_reg, ctrl_we, clk, rst_b, halted);
    
    //ALU (with placeholder select bits)
    mux2to1 #(5) regDest(wr_reg, dcd_rt, dcd_rd, 1'b0);
