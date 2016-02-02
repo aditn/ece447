@@ -326,6 +326,13 @@ module mux #(int width = 5) (
 
 endmodule
 
+module sign_ext (
+      input logic [15:0] in,
+      input logic sign,
+      output logic [31:0] out);
+
+    assign out = sign ? {{8{in[15]}}, in[15:0]} : {{8'h0}, in[15:0]};
+endmodule
 
 // Local Variables:
 // verilog-library-directories:("." "../447rtl")

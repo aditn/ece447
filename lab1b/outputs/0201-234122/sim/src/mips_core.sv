@@ -183,13 +183,11 @@ module mips_core(/*AUTOARG*/
      $finish;
    end*/
    // synthesis translate_on
- 
-   wire [31:0] alu_in;
 
    // Execute
    mips_ALU ALU(.alu__out(alu__out), 
                 .alu__op1(rs_data),
-                .alu__op2(alu_in),
+                .alu__op2(dcd_se_imm),
                 .alu__sel(alu__sel));
  
    // Miscellaneous stuff (Exceptions, syscalls, and halt)
@@ -223,13 +221,10 @@ module mips_core(/*AUTOARG*/
 
 
    wire [4:0] wr_reg;
-   wire [31:0] imm;
    regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, alu__out, ctrl_we, clk, rst_b, halted);
    
-   //ALU (placeholder select bits)
-   mux regDest(dcd_rt, dcd_rd, 1'b0, wr_reg);
-   mux #(32) aluSrc(rt_data, imm, 1'b1, alu_in);
-   mux #(32) se(dcd_e_imm, dcd_se_imm, 1'b1, imm);
+   //ALU
+   mux wrMux(dcd_rt, dcd_rd, 1'b0, wr_reg);
 
 
 endmodule // mips_core
@@ -317,7 +312,7 @@ module add_const(out, in);
 
 endmodule // adder
 
-module mux #(int width = 5) (
+module mux #(int width = 4) (
       input logic [width - 1:0] in0, in1, 
       input logic sel,
       output logic [width - 1:0] out);
@@ -326,6 +321,13 @@ module mux #(int width = 5) (
 
 endmodule
 
+module sign_ext (
+      input logic [15:0] in,
+      input logic sign,
+      output logic [31:0] out);
+
+    assign out = sign ? {{8{in[15]}}, in[15:0]} : {{8'h0}, in[15:0]};
+endmodule
 
 // Local Variables:
 // verilog-library-directories:("." "../447rtl")
