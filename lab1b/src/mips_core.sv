@@ -102,9 +102,12 @@ module mips_core(/*AUTOARG*/
    wire [19:0]   dcd_code;
    wire          dcd_bczft;
    
+
+   wire [31:0] newpc; //mux output for next state PC
+
    // PC Management
    register #(32, text_start) PCReg(pc, nextpc, clk, ~internal_halt, rst_b);
-   register #(32, text_start+4) PCReg2(nextpc, nextnextpc, clk,
+   register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
                                        ~internal_halt, rst_b);
    add_const #(4) NextPCAdder(nextnextpc, nextpc);
    assign        inst_addr = pc[31:2];
@@ -185,7 +188,7 @@ module mips_core(/*AUTOARG*/
    end*/
    // synthesis translate_on
  
-   wire [31:0] alu_in;
+   wire [31:0] alu_in; //mux output of rt_data and signed/unsigned imm to ALU
 
    // Execute
    mips_ALU ALU(.alu__out(alu__out), 
@@ -222,16 +225,33 @@ module mips_core(/*AUTOARG*/
                               clk, load_ex_regs, rst_b);
    register #(32, 0) BadVAddrReg(bad_v_addr, pc, clk, load_bva, rst_b);
 
+   //New wirings
+   wire [4:0] wr_reg; //input to write register
+   wire [31:0] imm; //signed or unsigned immediate
+   wire [31:0] wr_data; //data to write to register file
 
-   wire [4:0] wr_reg;
-   wire [31:0] imm;
-   regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, alu__out, ctrl_we, clk, rst_b, halted);
+   wire [31:0] br_target; //branch target
+   wire [31:0] j_target; //unconditional jump target
+
+   //Register file
+   regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, wr_data, ctrl_we, clk, rst_b, halted); //ctrl_we is RegWrite
    
-   //ALU (placeholder select bits)
-   mux regDest(dcd_rt, dcd_rd, 1'b0, wr_reg);
-   mux #(32) aluSrc(rt_data, imm, 1'b1, alu_in);
-   mux #(32) se(dcd_e_imm, dcd_se_imm, 1'b1, imm);
+   //ALU (with placeholder select bits)
+   mux2to1 #(5) regDest(wr_reg, dcd_rt, dcd_rd, 1'b0); //RegDst
+   mux2to1 aluSrc(alu_in, rt_data, imm, 1'b1); //ALUSrc
+   mux2to1 se(imm, dcd_e_imm, dcd_se_imm, 1'b1); //Signed
 
+   //Wirings to memory module
+   mux2to1 memToReg(wr_data, alu__out, mem_data_out, 1'b0); //MemtoReg
+   assign instr_addr = newpc[31:2];
+   assign mem_addr = alu__out[31:2];
+   assign mem_data_in = rt_data;
+   assign mem_write_en = 4'b1111; //MemWrite
+
+   //Mux for next state PC
+   mux4to1 pcMux(newpc, nextnextpc, br_target, rs_data, j_target, 2'b00); //jump/branch
+   adder br(br_target, pc + 4, (imm << 2), 1'b0); //no need for signal
+   concat conc(j_target, pc, dcd_target);
 
 endmodule // mips_core
 
@@ -318,10 +338,18 @@ module add_const(out, in);
 
 endmodule // adder
 
-module mux #(int width = 5) (
+////
+//// mux2to1
+////
+//// out (output) - data chosen to be outputted
+//// in0 (input)  - data lines
+//// in1 (input)  - data lines
+//// sel (input)  - selects which data to output
+////
+module mux2to1 #(int width = 32) (
+      output logic [width - 1:0] out,
       input logic [width - 1:0] in0, in1, 
-      input logic sel,
-      output logic [width - 1:0] out);
+      input logic sel);
     
     assign out = sel ? in1 : in0;
 
@@ -355,8 +383,46 @@ module control #(int width = 5) (
     end
 
 
+
 endmodule
 */
+=======
+////
+//// mux4to1
+////
+//// out (output) - data chosen to be outputted
+//// in0 (input)  - data lines
+//// in1 (input)  - data lines
+//// in2 (input)  - data lines
+//// in3 (input)  - data lines
+//// sel (input)  - selects which data to output
+////
+module mux4to1 #(int width = 32) (
+      output logic [width - 1:0] out,
+      input logic [width - 1:0] in0, in1, in2, in3,
+      input logic [1:0] sel);
+
+    assign out = sel[1] ? (sel[0] ? in3 : in2) : (sel[0] ? in1 : in0);
+
+endmodule
+
+////
+//// concat: concatenates the top 4 bits of PC and the bottom 26 bits 
+////         of the current instruction for unconditional jumps
+////
+//// j_target (output)  - data chosen to be outputted
+//// cur_pc (input)     - current PC
+//// dcd_target (input) - bottom 26 bits of instruction
+////
+module concat (
+      output logic [31:0] j_target,
+      input logic [31:0] cur_pc,
+      input logic [25:0] dcd_target);
+
+    assign j_target = {cur_pc[31:28], dcd_target[25:0], 2'b00};
+
+endmodule
+
 
 // Local Variables:
 // verilog-library-directories:("." "../447rtl")
