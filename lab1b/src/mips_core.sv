@@ -189,7 +189,7 @@ module mips_core(/*AUTOARG*/
    // Instantiate the register file from regfile.v here.
    // Don't forget to hookup the "halted" signal to trigger the register dump 
  
-   wire [31:0] alu_in; //mux output of rt_data and signed/unsigned imm to ALU
+   wire [31:0] alu_in; // mux output of rt_data and signed/unsigned imm to ALU
 
    // Execute
    mips_ALU ALU(.alu__out(alu__out), 

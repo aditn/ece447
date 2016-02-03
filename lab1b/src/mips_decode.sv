@@ -169,7 +169,7 @@ module mips_decode(/*AUTOARG*/
                alu__sel = `ALU_SLT;
                br = 1'b1;
                aluop = 1'b1;
-               // write PC+4 to $ra
+               //write PC+4 to $ra
              end
            `OP1_BGEZAL:
              begin
