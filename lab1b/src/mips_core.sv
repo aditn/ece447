@@ -156,6 +156,15 @@ module mips_core(/*AUTOARG*/
    wire			ctrl_we;		// From Decoder of mips_decode.v
    // End of automatics
 
+   //Control bits
+   wire regdst;
+   wire jmp; 
+   wire br; 
+   wire memtoreg;
+   wire aluop;
+   wire alusrc;
+   wire se;
+
    // Generate control signals
    mips_decode Decoder(/*AUTOINST*/
 		       // Outputs
@@ -163,6 +172,14 @@ module mips_core(/*AUTOARG*/
 		       .ctrl_Sys	(ctrl_Sys),
 		       .ctrl_RI		(ctrl_RI),
 		       .alu__sel	(alu__sel[3:0]),
+                       .regdst          (regdst),
+                       .jmp             (jmp),
+                       .br              (br),
+                       .memtoreg        (memtoreg),
+                       .aluop           (aluop),
+                       .alusrc          (alusrc),
+                       .se              (se),
+                       .mem_write_en    (mem_write_en),
 		       // Inputs
 		       .dcd_op		(dcd_op[5:0]),
 		       .dcd_funct2	(dcd_funct2[5:0]),
@@ -223,7 +240,7 @@ module mips_core(/*AUTOARG*/
    //ALU (with placeholder select bits)
    mux2to1 #(5) regDest(wr_reg, dcd_rt, dcd_rd, 1'b0); //RegDst
    mux2to1 aluSrc(alu_in, rt_data, imm, 1'b1); //ALUSrc
-   mux2to1 se(imm, dcd_e_imm, dcd_se_imm, 1'b1); //Signed
+   mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, 1'b1); //Signed
 
    //Wirings to memory module
    mux2to1 memToReg(wr_data, alu__out, mem_data_out, 1'b0); //MemtoReg
@@ -234,7 +251,7 @@ module mips_core(/*AUTOARG*/
 
    //Mux for next state PC
    mux4to1 pcMux(newpc, nextnextpc, br_target, rs_data, j_target, 2'b00); //jump/branch
-   adder br(br_target, pc + 4, (imm << 2), 1'b0); //no need for signal
+   adder brtarget(br_target, pc + 4, (imm << 2), 1'b0); //no need for signal
    concat conc(j_target, pc, dcd_target);
 
 endmodule // mips_core
