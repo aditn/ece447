@@ -288,7 +288,19 @@ module mips_ALU(alu__out, alu__op1, alu__op2, alu__sel);
         alu__out = alu__op1<<alu__op2;
       `ALU_SRLV:
         alu__out = alu__op1>>alu__op2;
-      //`ALU_SRAV:
+      `ALU_SRAV: //not right just a place holder
+        alu__out = alu__op1>>alu__op2;
+      `ALU_AND:
+        alu__out = alu__op1 & alu__op2;
+      `ALU_OR:
+        alu__out = alu__op1 | alu__op2;
+      `ALU_XOR:
+        alu__out = alu__op1 ^ alu__op2;
+      `ALU_NOR:
+        alu__out = alu__op1 ~ alu__op2;
+      `ALU_SLT://signed compare
+        alu__out = (alu__op1 < alu__op2);
+
     endcase
 
    end
