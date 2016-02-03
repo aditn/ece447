@@ -53,52 +53,96 @@
 ////
 module mips_decode(/*AUTOARG*/
    // Outputs
-   ctrl_we, ctrl_Sys, ctrl_RI, alu__sel,
+   ctrl_we, ctrl_Sys, ctrl_RI, alu__sel, regdst, jmp, br, memtoreg, aluop, alusrc, se, mem_write_en,
    // Inputs
    dcd_op, dcd_funct2, dcd_rt
    );
 
    input       [5:0] dcd_op, dcd_funct2;
    input       [4:0] dcd_rt;
-   output reg        ctrl_we, ctrl_Sys, ctrl_RI;
-   output reg  [3:0] alu__sel;
+   output reg        ctrl_we, ctrl_Sys, ctrl_RI, regdst, jmp, br, memtoreg, aluop, alusrc, se;
+   output reg  [3:0] alu__sel, mem_write_en;
+ 
 
-   always @(*) begin
+   always_comb begin
      alu__sel = 4'hx;
-     ctrl_we = 1'b0;
+     ctrl_we = 1'b1; //is reg write
      ctrl_Sys = 1'b0;
      ctrl_RI = 1'b0;
+
+     regdst = 1'b0;
+     jmp = 1'b0;
+     br = 1'b0;
+     memtoreg = 1'b0;
+     aluop = 1'b0;
+     alusrc = 1'b0; //source is register
+     se = 1'b0;
+     mem_write_en = 4'b0;
      case(dcd_op) // Main opcodes (op field)
        `OP_OTHER0: // Secondary opcodes (funct2 field; OP_OTHER0)
+         begin
+           regdst = 1'b1; //destination is Rd
+           aluop = 1'b1; //is an ALU op
          case(dcd_funct2)
-           //`OP0_SLL:
-           //`OP0_SRL:
-           //`OP0_SRA:
-           //`OP0_SLLV:
-           //`OP0_SRLV:
-           //`OP0_SRAV:
-           //`OP0_JR:
-           //`OP0_JALR:
+           `OP0_SLL:
+             begin
+               alu__sel = `ALU_SLL;
+               alusrc = 1'b1;
+             end
+          `OP0_SRL:
+             begin
+               alu__sel = `ALU_SRL;
+               alusrc = 1'b1;
+             end
+           `OP0_SRA:
+             begin
+               alu__sel = `ALU_SRA;
+               alusrc = 1'b1;
+             end
+           `OP0_SLLV:
+             alu__sel = `ALU_SLLV;
+           `OP0_SRLV:
+             alu__sel = `ALU_SRLV;
+           `OP0_SRAV:
+             alu__sel = `ALU_SRAV;
+           `OP0_JR:
+             begin
+               ctrl_we = 1'b0;
+               jmp = 1'b1;
+             end
+           `OP0_JALR:
+             //need to get PC+4 into $ra
+             jmp = 1'b1;
            `OP0_SYSCALL:
-                ctrl_Sys = 1'b1;
+             ctrl_Sys = 1'b1;
            //`OP0_MFHI:
            //`OP0_MTHI:
            //`OP0_MFLO:
            //`OP0_MTLO:
-           //`OP0_ADD:
-           //`OP0_ADDU:
-           //`OP0_SUB:
-           //`OP0_SUBU:
-           //`OP0_AND:
-           //`OP0_OR:
-           //`OP0_XOR:
-           //`OP0_NOR:
-           //`OP0_SLT:
-           //`OP0_SLTU:
-           
+           `OP0_ADD: //how does this become 
+             alu__sel = `ALU_ADD;
+           `OP0_ADDU:
+             alu__sel = `ALU_ADDU;
+           `OP0_SUB:
+             alu__sel = `ALU_SUB;
+           `OP0_SUBU:
+             alu__sel = `ALU_SUBU;
+           `OP0_AND:
+             alu__sel = `ALU_AND;
+           `OP0_OR:
+             alu__sel = `ALU_OR;
+           `OP0_XOR:
+             alu__sel = `ALU_XOR;
+           `OP0_NOR:
+             alu__sel = `ALU_NOR;
+           `OP0_SLT:
+             alu__sel = `ALU_SLT;
+           `OP0_SLTU:
+             alu__sel = `ALU_SLTU;
            default:
-                ctrl_RI = 1'b1;
-         endcase
+             ctrl_RI = 1'b1;
+         endcase //funct2
+         end
 
        /*`OP_OTHER1: // Secondary opcodes (rt field; OP_OTHER1)
          case(dcd_rt):
