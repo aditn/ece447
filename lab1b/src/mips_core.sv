@@ -297,7 +297,7 @@ module mips_ALU(alu__out, alu__op1, alu__op2, alu__sel);
       `ALU_XOR:
         alu__out = alu__op1 ^ alu__op2;
       `ALU_NOR:
-        alu__out = alu__op1 ~ alu__op2;
+        alu__out = ~(alu__op1 | alu__op2);
       `ALU_SLT://signed compare
         alu__out = (alu__op1 < alu__op2);
 

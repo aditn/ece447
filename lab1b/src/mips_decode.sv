@@ -109,10 +109,14 @@ module mips_decode(/*AUTOARG*/
              begin
                ctrl_we = 1'b0;
                jmp = 1'b1;
+               aluop = 1'b0;
              end
            `OP0_JALR:
+             begin
              //need to get PC+4 into $ra
-             jmp = 1'b1;
+               jmp = 1'b1;
+               aluop = 1'b0;
+             end
            `OP0_SYSCALL:
              ctrl_Sys = 1'b1;
            //`OP0_MFHI:
@@ -122,11 +126,11 @@ module mips_decode(/*AUTOARG*/
            `OP0_ADD: //how does this become 
              alu__sel = `ALU_ADD;
            `OP0_ADDU:
-             alu__sel = `ALU_ADDU;
+             alu__sel = `ALU_ADD; //same as add
            `OP0_SUB:
              alu__sel = `ALU_SUB;
            `OP0_SUBU:
-             alu__sel = `ALU_SUBU;
+             alu__sel = `ALU_SUB; //same as sub
            `OP0_AND:
              alu__sel = `ALU_AND;
            `OP0_OR:
@@ -138,20 +142,44 @@ module mips_decode(/*AUTOARG*/
            `OP0_SLT:
              alu__sel = `ALU_SLT;
            `OP0_SLTU:
-             alu__sel = `ALU_SLTU;
+             alu__sel = `ALU_SLT;
            default:
              ctrl_RI = 1'b1;
          endcase //funct2
-         end
+         end //OP_OTHER0
 
-       /*`OP_OTHER1: // Secondary opcodes (rt field; OP_OTHER1)
-         case(dcd_rt):
+       `OP_OTHER1: // Secondary opcodes (rt field; OP_OTHER1)
+         case(dcd_rt)
            `OP1_BLTZ:
+             begin
+               alu__sel = `ALU_SLT; // for brcond
+               ctrl_we = 1'b0;
+               br = 1'b1;
+               aluop = 1'b1;
+             end
            `OP1_BGEZ:
+             begin
+               alu__sel = `ALU_SUB; //for brcond
+               ctrl_we = 1'b0;
+               br = 1'b1;
+               aluop = 1'b1;
+             end
            `OP1_BLTZAL:
+             begin
+               alu__sel = `ALU_SLT;
+               br = 1'b1;
+               aluop = 1'b1;
+               // write PC+4 to $ra
+             end
            `OP1_BGEZAL:
+             begin
+               alu__sel = `ALU_SUB; //for brcond
+               br = 1'b1;
+               aluop = 1'b1;
+             end
            default:
-         endcase*/
+             ctrl_RI = 1'b1;
+         endcase //dcd_rt
          /*
        `OP_J:
        `OP_JAL:
