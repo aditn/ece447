@@ -250,12 +250,12 @@ endmodule // mips_core
 ////
 module mips_ALU(alu__out, alu__op1, alu__op2, alu__sel);
 
-   output logic [31:0] alu__out;
-   input logic [31:0]  alu__op1, alu__op2;
-   input logic [3:0]   alu__sel;
+   output [31:0] alu__out;
+   input [31:0]  alu__op1, alu__op2;
+   input [3:0]   alu__sel;
 
    always_comb begin
-    alu__out = 0;
+    alu_out = 0;
     case (alu__sel)
       `ALU_ADD:
         alu__out = alu__op1+alu__op2;
@@ -266,7 +266,7 @@ module mips_ALU(alu__out, alu__op1, alu__op2, alu__sel);
       `ALU_SRL:
         alu__out = alu__op1>>alu__op2;
       `ALU_SRA://need to check what $signed does
-        alu__out = $signed($signed(alu__op2) >>> alu__op1[4:0]);
+        $signed($signed(alu__op2) >>> alu__op1[4:0]);
       `ALU_SLLV://requires weird inputs
         alu__out = alu__op1<<alu__op2;
       `ALU_SRLV:
@@ -307,7 +307,7 @@ module register(q, d, clk, enable, rst_b);
 
 endmodule // register
 
-
+/*
 ////
 //// adder
 ////
@@ -324,7 +324,7 @@ module adder(out, in1, in2, sub);
    assign        out = sub?(in1 - in2):(in1 + in2);
 
 endmodule // adder
-
+*/
 
 ////
 //// add_const: An adder that adds a fixed constant value
@@ -359,7 +359,38 @@ module mux2to1 #(int width = 32) (
     assign out = sel ? in1 : in0;
 
 endmodule
+/*
+module control #(int width = 5) (
+      input logic clock,
+      input logic [width - 1:0] instr 
+      output logic aluSrc, sign, regWrite, regDest,
+                   memToReg, memRead, memWrite,
+                   pcSrc1, pcSrc2);
 
+    assign aluSrc = 0;
+    assign sign = 0;
+    assign regWrite = 0;
+    assign regDest = 0;
+    assign memToReg = 0;
+    assign memRead = 0;
+    assign memWrite = 0;
+    assign pcSrc1 = 0;
+    assign pcSrc2 = 0;
+
+    always_ff @(posedge clock)
+    begin
+      if (instr!=0 && instr!=OP_BEQ && instr != OP_BNE)
+        aluSrc = 1;
+      if (instr!=)
+        sign = 1;
+      if (OP_SB<=instr<=OP_SWR)
+        regWrite = 1;
+    end
+
+
+
+endmodule
+*/
 
 ////
 //// mux4to1
