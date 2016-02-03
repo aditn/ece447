@@ -172,22 +172,6 @@ module mips_core(/*AUTOARG*/
    // Instantiate the register file from regfile.v here.
    // Don't forget to hookup the "halted" signal to trigger the register dump 
  
-   // synthesis translate_off
-   /*initial begin
-     // Delete this block when you are ready to try for real
-     $display(""); 
-     $display(""); 
-     $display(""); 
-     $display(""); 
-     $display(">>>>> This works much better after you have hooked up the reg file. <<<<<");
-     $display(""); 
-     $display(""); 
-     $display(""); 
-     $display(""); 
-     $finish;
-   end*/
-   // synthesis translate_on
- 
    wire [31:0] alu_in; //mux output of rt_data and signed/unsigned imm to ALU
 
    // Execute
@@ -270,7 +254,29 @@ module mips_ALU(alu__out, alu__op1, alu__op2, alu__sel);
    input [31:0]  alu__op1, alu__op2;
    input [3:0]   alu__sel;
 
-   adder AdderUnit(alu__out, alu__op1, alu__op2, alu__sel[0]);
+   always_comb begin
+    alu_out = 0;
+    case (alu__sel)
+      `ALU_ADD:
+        alu__out = alu__op1+alu__op2;
+      `ALU_SUB:
+        alu__out = alu__op1-alu__op2;
+      `ALU_SLL:
+        alu__out = alu__op1<<alu__op2;
+      `ALU_SRL:
+        alu__out = alu__op1>>alu__op2;
+      `ALU_SRA://need to check what $signed does
+        $signed($signed(alu__op2) >>> alu__op1[4:0]);
+      `ALU_SLLV://requires weird inputs
+        alu__out = alu__op1<<alu__op2;
+      `ALU_SRLV:
+        alu__out = alu__op1>>alu__op2;
+      `ALU_SRAV:
+        
+
+
+   end
+   //adder AdderUnit(alu__out, alu__op1, alu__op2, alu__sel[0]);
 
 endmodule
 
@@ -302,7 +308,7 @@ module register(q, d, clk, enable, rst_b);
 
 endmodule // register
 
-
+/*
 ////
 //// adder
 ////
@@ -319,7 +325,7 @@ module adder(out, in1, in2, sub);
    assign        out = sub?(in1 - in2):(in1 + in2);
 
 endmodule // adder
-
+*/
 
 ////
 //// add_const: An adder that adds a fixed constant value
