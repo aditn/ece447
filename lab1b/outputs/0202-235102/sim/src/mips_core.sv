@@ -326,7 +326,7 @@ module mux #(int width = 5) (
     assign out = sel ? in1 : in0;
 
 endmodule
-/*
+
 module control #(int width = 5) (
       input logic clock,
       input logic [width - 1:0] instr 
@@ -356,7 +356,7 @@ module control #(int width = 5) (
 
 
 endmodule
-*/
+
 
 // Local Variables:
 // verilog-library-directories:("." "../447rtl")

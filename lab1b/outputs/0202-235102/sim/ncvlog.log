@@ -1,0 +1,280 @@
+ncvlog: 08.20-s015: (c) Copyright 1995-2009 Cadence Design Systems, Inc.
+TOOL:	ncvlog	08.20-s015: Started on Feb 02, 2016 at 23:51:02 EST
+ncvlog
+    -SV
+    -linedebug
+    -messages
+    -incdir src
+    src/exception_unit.v
+    src/mips_core.v
+    src/mips_decode.v
+    src/mips_mem.v
+    src/regfile.v
+    src/syscall_unit.v
+    src/testbench.v
+    src/mips_core.sv
+
+file: src/exception_unit.v
+	module worklib.exception_unit
+		errors: 0, warnings: 0
+file: src/mips_core.v
+	module worklib.mips_core
+		errors: 0, warnings: 0
+	module worklib.mips_ALU
+		errors: 0, warnings: 0
+	module worklib.register
+		errors: 0, warnings: 0
+	module worklib.adder
+		errors: 0, warnings: 0
+	module worklib.add_const
+		errors: 0, warnings: 0
+file: src/mips_decode.v
+           `OP0_SRL:
+                  |
+ncvlog: *E,NOTSTT (src/mips_decode.v,75|18): expecting a statement [9(IEEE)].
+(`define macro: OP0_SRL [src/mips_defines.vh line 145], file: src/mips_decode.v line 75)
+           `OP0_SRA:
+                  |
+ncvlog: *E,NOTSTT (src/mips_decode.v,76|18): expecting a statement [9(IEEE)].
+(`define macro: OP0_SRA [src/mips_defines.vh line 146], file: src/mips_decode.v line 76)
+           `OP0_SLLV:
+                   |
+ncvlog: *E,NOTSTT (src/mips_decode.v,77|19): expecting a statement [9(IEEE)].
+(`define macro: OP0_SLLV [src/mips_defines.vh line 147], file: src/mips_decode.v line 77)
+           `OP0_SRLV:
+                   |
+ncvlog: *E,NOTSTT (src/mips_decode.v,78|19): expecting a statement [9(IEEE)].
+(`define macro: OP0_SRLV [src/mips_defines.vh line 148], file: src/mips_decode.v line 78)
+           `OP0_SRAV:
+                   |
+ncvlog: *E,NOTSTT (src/mips_decode.v,79|19): expecting a statement [9(IEEE)].
+(`define macro: OP0_SRAV [src/mips_defines.vh line 149], file: src/mips_decode.v line 79)
+           `OP0_JR:
+                 |
+ncvlog: *E,NOTSTT (src/mips_decode.v,80|17): expecting a statement [9(IEEE)].
+(`define macro: OP0_JR [src/mips_defines.vh line 150], file: src/mips_decode.v line 80)
+           `OP0_JALR:
+                   |
+ncvlog: *E,NOTSTT (src/mips_decode.v,81|19): expecting a statement [9(IEEE)].
+(`define macro: OP0_JALR [src/mips_defines.vh line 151], file: src/mips_decode.v line 81)
+           `OP0_SYSCALL:
+                      |
+ncvlog: *E,NOTSTT (src/mips_decode.v,82|22): expecting a statement [9(IEEE)].
+(`define macro: OP0_SYSCALL [src/mips_defines.vh line 152], file: src/mips_decode.v line 82)
+           `OP0_MTHI:
+                   |
+ncvlog: *E,NOTSTT (src/mips_decode.v,85|19): expecting a statement [9(IEEE)].
+(`define macro: OP0_MTHI [src/mips_defines.vh line 155], file: src/mips_decode.v line 85)
+           `OP0_MFLO:
+                   |
+ncvlog: *E,NOTSTT (src/mips_decode.v,86|19): expecting a statement [9(IEEE)].
+(`define macro: OP0_MFLO [src/mips_defines.vh line 156], file: src/mips_decode.v line 86)
+           `OP0_MTLO:
+                   |
+ncvlog: *E,NOTSTT (src/mips_decode.v,87|19): expecting a statement [9(IEEE)].
+(`define macro: OP0_MTLO [src/mips_defines.vh line 157], file: src/mips_decode.v line 87)
+           `OP0_ADD:
+                  |
+ncvlog: *E,NOTSTT (src/mips_decode.v,88|18): expecting a statement [9(IEEE)].
+(`define macro: OP0_ADD [src/mips_defines.vh line 162], file: src/mips_decode.v line 88)
+           `OP0_ADDU:
+                   |
+ncvlog: *E,NOTSTT (src/mips_decode.v,89|19): expecting a statement [9(IEEE)].
+(`define macro: OP0_ADDU [src/mips_defines.vh line 163], file: src/mips_decode.v line 89)
+           `OP0_SUB:
+                  |
+ncvlog: *E,NOTSTT (src/mips_decode.v,90|18): expecting a statement [9(IEEE)].
+(`define macro: OP0_SUB [src/mips_defines.vh line 164], file: src/mips_decode.v line 90)
+           `OP0_SUBU:
+                   |
+ncvlog: *E,NOTSTT (src/mips_decode.v,91|19): expecting a statement [9(IEEE)].
+(`define macro: OP0_SUBU [src/mips_defines.vh line 165], file: src/mips_decode.v line 91)
+           `OP0_AND:
+                  |
+ncvlog: *E,NOTSTT (src/mips_decode.v,92|18): expecting a statement [9(IEEE)].
+(`define macro: OP0_AND [src/mips_defines.vh line 166], file: src/mips_decode.v line 92)
+           `OP0_OR:
+                 |
+ncvlog: *E,NOTSTT (src/mips_decode.v,93|17): expecting a statement [9(IEEE)].
+(`define macro: OP0_OR [src/mips_defines.vh line 167], file: src/mips_decode.v line 93)
+           `OP0_XOR:
+                  |
+ncvlog: *E,NOTSTT (src/mips_decode.v,94|18): expecting a statement [9(IEEE)].
+(`define macro: OP0_XOR [src/mips_defines.vh line 168], file: src/mips_decode.v line 94)
+           `OP0_NOR:
+                  |
+ncvlog: *E,NOTSTT (src/mips_decode.v,95|18): expecting a statement [9(IEEE)].
+(`define macro: OP0_NOR [src/mips_defines.vh line 169], file: src/mips_decode.v line 95)
+           `OP0_SLT:
+                  |
+ncvlog: *E,NOTSTT (src/mips_decode.v,96|18): expecting a statement [9(IEEE)].
+(`define macro: OP0_SLT [src/mips_defines.vh line 170], file: src/mips_decode.v line 96)
+           `OP0_SLTU:
+                   |
+ncvlog: *E,NOTSTT (src/mips_decode.v,97|19): expecting a statement [9(IEEE)].
+(`define macro: OP0_SLTU [src/mips_defines.vh line 171], file: src/mips_decode.v line 97)
+           default:
+                 |
+ncvlog: *E,NOTSTT (src/mips_decode.v,99|17): expecting a statement [9(IEEE)].
+         case(dcd_rt):
+                     |
+ncvlog: *E,ILLPRI (src/mips_decode.v,104|21): illegal expression primary [4.2(IEEE)].
+           `OP1_BGEZ:
+                   |
+ncvlog: *E,NOTSTT (src/mips_decode.v,106|19): expecting a statement [9(IEEE)].
+(`define macro: OP1_BGEZ [src/mips_defines.vh line 139], file: src/mips_decode.v line 106)
+           `OP1_BLTZAL:
+                     |
+ncvlog: *E,NOTSTT (src/mips_decode.v,107|21): expecting a statement [9(IEEE)].
+(`define macro: OP1_BLTZAL [src/mips_defines.vh line 140], file: src/mips_decode.v line 107)
+           `OP1_BGEZAL:
+                     |
+ncvlog: *E,NOTSTT (src/mips_decode.v,108|21): expecting a statement [9(IEEE)].
+(`define macro: OP1_BGEZAL [src/mips_defines.vh line 141], file: src/mips_decode.v line 108)
+           default:
+                 |
+ncvlog: *E,NOTSTT (src/mips_decode.v,109|17): expecting a statement [9(IEEE)].
+         endcase
+               |
+ncvlog: *E,NOTSTT (src/mips_decode.v,110|15): expecting a statement [9(IEEE)].
+       `OP_JAL:
+             |
+ncvlog: *E,NOTSTT (src/mips_decode.v,113|13): expecting a statement [9(IEEE)].
+(`define macro: OP_JAL [src/mips_defines.vh line 79], file: src/mips_decode.v line 113)
+       `OP_BEQ:
+             |
+ncvlog: *E,NOTSTT (src/mips_decode.v,114|13): expecting a statement [9(IEEE)].
+(`define macro: OP_BEQ [src/mips_defines.vh line 80], file: src/mips_decode.v line 114)
+       `OP_BNE:
+             |
+ncvlog: *E,NOTSTT (src/mips_decode.v,115|13): expecting a statement [9(IEEE)].
+(`define macro: OP_BNE [src/mips_defines.vh line 81], file: src/mips_decode.v line 115)
+       `OP_BLEZ:
+              |
+ncvlog: *E,NOTSTT (src/mips_decode.v,116|14): expecting a statement [9(IEEE)].
+(`define macro: OP_BLEZ [src/mips_defines.vh line 82], file: src/mips_decode.v line 116)
+       `OP_BGTZ:
+              |
+ncvlog: *E,NOTSTT (src/mips_decode.v,117|14): expecting a statement [9(IEEE)].
+(`define macro: OP_BGTZ [src/mips_defines.vh line 83], file: src/mips_decode.v line 117)
+       `OP_ADDI:
+              |
+ncvlog: *E,NOTSTT (src/mips_decode.v,118|14): expecting a statement [9(IEEE)].
+(`define macro: OP_ADDI [src/mips_defines.vh line 84], file: src/mips_decode.v line 118)
+       `OP_ADDIU:
+               |
+ncvlog: *E,NOTSTT (src/mips_decode.v,119|15): expecting a statement [9(IEEE)].
+(`define macro: OP_ADDIU [src/mips_defines.vh line 85], file: src/mips_decode.v line 119)
+       `OP_SLTIU:
+               |
+ncvlog: *E,NOTSTT (src/mips_decode.v,125|15): expecting a statement [9(IEEE)].
+(`define macro: OP_SLTIU [src/mips_defines.vh line 87], file: src/mips_decode.v line 125)
+       `OP_ANDI:
+              |
+ncvlog: *E,NOTSTT (src/mips_decode.v,126|14): expecting a statement [9(IEEE)].
+(`define macro: OP_ANDI [src/mips_defines.vh line 88], file: src/mips_decode.v line 126)
+       `OP_ORI:
+             |
+ncvlog: *E,NOTSTT (src/mips_decode.v,127|13): expecting a statement [9(IEEE)].
+(`define macro: OP_ORI [src/mips_defines.vh line 89], file: src/mips_decode.v line 127)
+       `OP_XORI:
+              |
+ncvlog: *E,NOTSTT (src/mips_decode.v,128|14): expecting a statement [9(IEEE)].
+(`define macro: OP_XORI [src/mips_defines.vh line 90], file: src/mips_decode.v line 128)
+       `OP_LUI:
+             |
+ncvlog: *E,NOTSTT (src/mips_decode.v,129|13): expecting a statement [9(IEEE)].
+(`define macro: OP_LUI [src/mips_defines.vh line 91], file: src/mips_decode.v line 129)
+       `OP_LB:
+            |
+ncvlog: *E,NOTSTT (src/mips_decode.v,130|12): expecting a statement [9(IEEE)].
+(`define macro: OP_LB [src/mips_defines.vh line 96], file: src/mips_decode.v line 130)
+       `OP_LH:
+            |
+ncvlog: *E,NOTSTT (src/mips_decode.v,131|12): expecting a statement [9(IEEE)].
+(`define macro: OP_LH [src/mips_defines.vh line 97], file: src/mips_decode.v line 131)
+       `OP_LW:
+            |
+ncvlog: *E,NOTSTT (src/mips_decode.v,132|12): expecting a statement [9(IEEE)].
+(`define macro: OP_LW [src/mips_defines.vh line 99], file: src/mips_decode.v line 132)
+       `OP_LBU:
+             |
+ncvlog: *E,NOTSTT (src/mips_decode.v,133|13): expecting a statement [9(IEEE)].
+(`define macro: OP_LBU [src/mips_defines.vh line 100], file: src/mips_decode.v line 133)
+       `OP_LHU:
+             |
+ncvlog: *E,NOTSTT (src/mips_decode.v,134|13): expecting a statement [9(IEEE)].
+(`define macro: OP_LHU [src/mips_defines.vh line 101], file: src/mips_decode.v line 134)
+       `OP_SB:
+            |
+ncvlog: *E,NOTSTT (src/mips_decode.v,135|12): expecting a statement [9(IEEE)].
+(`define macro: OP_SB [src/mips_defines.vh line 103], file: src/mips_decode.v line 135)
+       `OP_SH:
+            |
+ncvlog: *E,NOTSTT (src/mips_decode.v,136|12): expecting a statement [9(IEEE)].
+(`define macro: OP_SH [src/mips_defines.vh line 104], file: src/mips_decode.v line 136)
+       `OP_SW:
+            |
+ncvlog: *E,NOTSTT (src/mips_decode.v,137|12): expecting a statement [9(IEEE)].
+(`define macro: OP_SW [src/mips_defines.vh line 106], file: src/mips_decode.v line 137)
+       default:
+             |
+ncvlog: *E,NOTSTT (src/mips_decode.v,138|13): expecting a statement [9(IEEE)].
+	module worklib.mips_decode
+		errors: 49, warnings: 0
+file: src/mips_mem.v
+	module worklib.mips_mem
+		errors: 0, warnings: 0
+file: src/regfile.v
+	module worklib.regfile
+		errors: 0, warnings: 0
+file: src/syscall_unit.v
+	module worklib.syscall_unit
+		errors: 0, warnings: 0
+file: src/testbench.v
+	module worklib.testbench
+		errors: 0, warnings: 0
+	module worklib.clock
+		errors: 0, warnings: 0
+file: src/mips_core.sv
+module mips_core(/*AUTOARG*/
+               |
+ncvlog: *W,RECOMP (src/mips_core.sv,63|15): recompiling design unit worklib.mips_core.
+	First compiled from line 63 of src/mips_core.v.
+	module worklib.mips_core
+		errors: 0, warnings: 1
+module mips_ALU(alu__out, alu__op1, alu__op2, alu__sel);
+              |
+ncvlog: *W,RECOMP (src/mips_core.sv,247|14): recompiling design unit worklib.mips_ALU.
+	First compiled from line 234 of src/mips_core.v.
+	module worklib.mips_ALU
+		errors: 0, warnings: 1
+module register(q, d, clk, enable, rst_b);
+              |
+ncvlog: *W,RECOMP (src/mips_core.sv,266|14): recompiling design unit worklib.register.
+	First compiled from line 253 of src/mips_core.v.
+	module worklib.register
+		errors: 0, warnings: 1
+module adder(out, in1, in2, sub);
+           |
+ncvlog: *W,RECOMP (src/mips_core.sv,294|11): recompiling design unit worklib.adder.
+	First compiled from line 281 of src/mips_core.v.
+	module worklib.adder
+		errors: 0, warnings: 1
+module add_const(out, in);
+               |
+ncvlog: *W,RECOMP (src/mips_core.sv,310|15): recompiling design unit worklib.add_const.
+	First compiled from line 297 of src/mips_core.v.
+	module worklib.add_const
+		errors: 0, warnings: 1
+	module worklib.mux
+		errors: 0, warnings: 0
+      output logic aluSrc, sign, regWrite, regDest,
+           |
+ncvlog: *W,POLICI (src/mips_core.sv,333|11): comma assumed just prior to this symbol to separate declarations in ANSI port list.
+      if (instr!=)
+                 |
+ncvlog: *E,ILLPRI (src/mips_core.sv,351|17): illegal expression primary [4.2(IEEE)].
+	module worklib.control
+		errors: 1, warnings: 1
+TOOL:	ncvlog	08.20-s015: Exiting on Feb 02, 2016 at 23:51:02 EST  (total: 00:00:00)

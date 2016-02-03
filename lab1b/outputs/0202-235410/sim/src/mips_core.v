@@ -162,8 +162,7 @@ module mips_core(/*AUTOARG*/
 		       .alu__sel	(alu__sel[3:0]),
 		       // Inputs
 		       .dcd_op		(dcd_op[5:0]),
-		       .dcd_funct2	(dcd_funct2[5:0]),
-           .dcd_rt (dcd_rt));
+		       .dcd_funct2	(dcd_funct2[5:0]));
  
    // Register File
    // Instantiate the register file from regfile.v here.
@@ -184,13 +183,11 @@ module mips_core(/*AUTOARG*/
      $finish;
    end*/
    // synthesis translate_on
- 
-   wire [31:0] alu_in;
 
    // Execute
    mips_ALU ALU(.alu__out(alu__out), 
                 .alu__op1(rs_data),
-                .alu__op2(alu_in),
+                .alu__op2(dcd_se_imm),
                 .alu__sel(alu__sel));
  
    // Miscellaneous stuff (Exceptions, syscalls, and halt)
@@ -222,17 +219,7 @@ module mips_core(/*AUTOARG*/
                               clk, load_ex_regs, rst_b);
    register #(32, 0) BadVAddrReg(bad_v_addr, pc, clk, load_bva, rst_b);
 
-
-   wire [4:0] wr_reg;
-   wire [31:0] imm;
-   regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, alu__out, ctrl_we, clk, rst_b, halted);
-   
-   //ALU (placeholder select bits)
-   mux regDest(dcd_rt, dcd_rd, 1'b0, wr_reg);
-   mux #(32) aluSrc(rt_data, imm, 1'b1, alu_in);
-   mux #(32) se(dcd_e_imm, dcd_se_imm, 1'b1, imm);
-
-
+   regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, dcd_rt, alu__out, ctrl_we, clk, rst_b, halted);
 endmodule // mips_core
 
 
@@ -317,46 +304,6 @@ module add_const(out, in);
    assign   out = in + add_value;
 
 endmodule // adder
-
-module mux #(int width = 5) (
-      input logic [width - 1:0] in0, in1, 
-      input logic sel,
-      output logic [width - 1:0] out);
-    
-    assign out = sel ? in1 : in0;
-
-endmodule
-/*
-module control #(int width = 5) (
-      input logic clock,
-      input logic [width - 1:0] instr 
-      output logic aluSrc, sign, regWrite, regDest,
-                   memToReg, memRead, memWrite,
-                   pcSrc1, pcSrc2);
-
-    assign aluSrc = 0;
-    assign sign = 0;
-    assign regWrite = 0;
-    assign regDest = 0;
-    assign memToReg = 0;
-    assign memRead = 0;
-    assign memWrite = 0;
-    assign pcSrc1 = 0;
-    assign pcSrc2 = 0;
-
-    always_ff @(posedge clock)
-    begin
-      if (instr!=0 && instr!=OP_BEQ && instr != OP_BNE)
-        aluSrc = 1;
-      if (instr!=)
-        sign = 1;
-      if (OP_SB<=instr<=OP_SWR)
-        regWrite = 1;
-    end
-
-
-endmodule
-*/
 
 // Local Variables:
 // verilog-library-directories:("." "../447rtl")

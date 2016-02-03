@@ -100,27 +100,27 @@ module mips_decode(/*AUTOARG*/
                 ctrl_RI = 1'b1;
          endcase
 
-       /*`OP_OTHER1: // Secondary opcodes (rt field; OP_OTHER1)
+       `OP_OTHER1: // Secondary opcodes (rt field; OP_OTHER1)
          case(dcd_rt):
            `OP1_BLTZ:
            `OP1_BGEZ:
            `OP1_BLTZAL:
            `OP1_BGEZAL:
            default:
-         endcase*/
-         /*
+         endcase
+         
        `OP_J:
        `OP_JAL:
        `OP_BEQ:
        `OP_BNE:
        `OP_BLEZ:
        `OP_BGTZ:
-       `OP_ADDI:*/
+       `OP_ADDI:
        `OP_ADDIU:
          begin
             alu__sel = `ALU_ADD;
             ctrl_we = 1'b1;
-         end/*
+         end
        `OP_SLTI:
        `OP_SLTIU:
        `OP_ANDI:
@@ -134,7 +134,7 @@ module mips_decode(/*AUTOARG*/
        `OP_LHU:
        `OP_SB:
        `OP_SH:
-       `OP_SW:*/
+       `OP_SW:
        default:
          begin
             ctrl_RI = 1'b1;

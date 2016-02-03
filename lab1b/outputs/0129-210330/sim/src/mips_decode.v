@@ -55,11 +55,10 @@ module mips_decode(/*AUTOARG*/
    // Outputs
    ctrl_we, ctrl_Sys, ctrl_RI, alu__sel,
    // Inputs
-   dcd_op, dcd_funct2, dcd_rt
+   dcd_op, dcd_funct2
    );
 
    input       [5:0] dcd_op, dcd_funct2;
-   input       [4:0] dcd_rt;
    output reg        ctrl_we, ctrl_Sys, ctrl_RI;
    output reg  [3:0] alu__sel;
 
@@ -68,73 +67,19 @@ module mips_decode(/*AUTOARG*/
      ctrl_we = 1'b0;
      ctrl_Sys = 1'b0;
      ctrl_RI = 1'b0;
-     case(dcd_op) // Main opcodes (op field)
-       `OP_OTHER0: // Secondary opcodes (funct2 field; OP_OTHER0)
+     case(dcd_op)
+       `OP_OTHER0:
          case(dcd_funct2)
-           //`OP0_SLL:
-           //`OP0_SRL:
-           //`OP0_SRA:
-           //`OP0_SLLV:
-           //`OP0_SRLV:
-           //`OP0_SRAV:
-           //`OP0_JR:
-           //`OP0_JALR:
            `OP0_SYSCALL:
                 ctrl_Sys = 1'b1;
-           //`OP0_MFHI:
-           //`OP0_MTHI:
-           //`OP0_MFLO:
-           //`OP0_MTLO:
-           //`OP0_ADD:
-           //`OP0_ADDU:
-           //`OP0_SUB:
-           //`OP0_SUBU:
-           //`OP0_AND:
-           //`OP0_OR:
-           //`OP0_XOR:
-           //`OP0_NOR:
-           //`OP0_SLT:
-           //`OP0_SLTU:
-           
            default:
                 ctrl_RI = 1'b1;
          endcase
-
-       /*`OP_OTHER1: // Secondary opcodes (rt field; OP_OTHER1)
-         case(dcd_rt):
-           `OP1_BLTZ:
-           `OP1_BGEZ:
-           `OP1_BLTZAL:
-           `OP1_BGEZAL:
-           default:
-         endcase*/
-         /*
-       `OP_J:
-       `OP_JAL:
-       `OP_BEQ:
-       `OP_BNE:
-       `OP_BLEZ:
-       `OP_BGTZ:
-       `OP_ADDI:*/
        `OP_ADDIU:
          begin
             alu__sel = `ALU_ADD;
             ctrl_we = 1'b1;
-         end/*
-       `OP_SLTI:
-       `OP_SLTIU:
-       `OP_ANDI:
-       `OP_ORI:
-       `OP_XORI:
-       `OP_LUI:
-       `OP_LB:
-       `OP_LH:
-       `OP_LW:
-       `OP_LBU:
-       `OP_LHU:
-       `OP_SB:
-       `OP_SH:
-       `OP_SW:*/
+         end
        default:
          begin
             ctrl_RI = 1'b1;
