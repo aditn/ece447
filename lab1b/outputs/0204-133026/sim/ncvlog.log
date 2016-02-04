@@ -1,0 +1,117 @@
+ncvlog: 08.20-s015: (c) Copyright 1995-2009 Cadence Design Systems, Inc.
+TOOL:	ncvlog	08.20-s015: Started on Feb 04, 2016 at 13:30:26 EST
+ncvlog
+    -SV
+    -linedebug
+    -messages
+    -incdir src
+    src/exception_unit.v
+    src/mips_mem.v
+    src/regfile.v
+    src/syscall_unit.v
+    src/testbench.v
+    src/mips_core.sv
+    src/mips_decode.sv
+
+file: src/exception_unit.v
+	module worklib.exception_unit
+		errors: 0, warnings: 0
+file: src/mips_mem.v
+	module worklib.mips_mem
+		errors: 0, warnings: 0
+file: src/regfile.v
+	module worklib.regfile
+		errors: 0, warnings: 0
+file: src/syscall_unit.v
+	module worklib.syscall_unit
+		errors: 0, warnings: 0
+file: src/testbench.v
+	module worklib.testbench
+		errors: 0, warnings: 0
+	module worklib.clock
+		errors: 0, warnings: 0
+file: src/mips_core.sv
+	module worklib.mips_core
+		errors: 0, warnings: 0
+          begin
+              |
+ncvlog: *E,ILLPRI (src/mips_core.sv,337|14): illegal expression primary [4.2(IEEE)].
+            `BR_BLTZ:
+                   |
+ncvlog: *E,NOTSTT (src/mips_core.sv,338|19): expecting a statement [9(IEEE)].
+(`define macro: BR_BLTZ [src/internal_defines.vh line 38], file: src/mips_core.sv line 338)
+      `ALU_SLL:
+             |
+ncvlog: *E,NOTSTT (src/mips_core.sv,371|13): expecting a statement [9(IEEE)].
+(`define macro: ALU_SLL [src/internal_defines.vh line 8], file: src/mips_core.sv line 371)
+      `ALU_SRL:
+             |
+ncvlog: *E,NOTSTT (src/mips_core.sv,373|13): expecting a statement [9(IEEE)].
+(`define macro: ALU_SRL [src/internal_defines.vh line 9], file: src/mips_core.sv line 373)
+      `ALU_SRA://need to check what $signed does
+             |
+ncvlog: *E,NOTSTT (src/mips_core.sv,375|13): expecting a statement [9(IEEE)].
+(`define macro: ALU_SRA [src/internal_defines.vh line 10], file: src/mips_core.sv line 375)
+      `ALU_SLLV://requires weird inputs
+              |
+ncvlog: *E,NOTSTT (src/mips_core.sv,377|14): expecting a statement [9(IEEE)].
+(`define macro: ALU_SLLV [src/internal_defines.vh line 11], file: src/mips_core.sv line 377)
+      `ALU_SRLV:
+              |
+ncvlog: *E,NOTSTT (src/mips_core.sv,379|14): expecting a statement [9(IEEE)].
+(`define macro: ALU_SRLV [src/internal_defines.vh line 12], file: src/mips_core.sv line 379)
+      `ALU_SRAV:
+              |
+ncvlog: *E,NOTSTT (src/mips_core.sv,381|14): expecting a statement [9(IEEE)].
+(`define macro: ALU_SRAV [src/internal_defines.vh line 13], file: src/mips_core.sv line 381)
+      `ALU_AND:
+             |
+ncvlog: *E,NOTSTT (src/mips_core.sv,383|13): expecting a statement [9(IEEE)].
+(`define macro: ALU_AND [src/internal_defines.vh line 14], file: src/mips_core.sv line 383)
+      `ALU_OR:
+            |
+ncvlog: *E,NOTSTT (src/mips_core.sv,385|12): expecting a statement [9(IEEE)].
+(`define macro: ALU_OR [src/internal_defines.vh line 15], file: src/mips_core.sv line 385)
+      `ALU_XOR:
+             |
+ncvlog: *E,NOTSTT (src/mips_core.sv,387|13): expecting a statement [9(IEEE)].
+(`define macro: ALU_XOR [src/internal_defines.vh line 16], file: src/mips_core.sv line 387)
+      `ALU_NOR:
+             |
+ncvlog: *E,NOTSTT (src/mips_core.sv,389|13): expecting a statement [9(IEEE)].
+(`define macro: ALU_NOR [src/internal_defines.vh line 17], file: src/mips_core.sv line 389)
+      `ALU_SLT://signed compare
+             |
+ncvlog: *E,NOTSTT (src/mips_core.sv,391|13): expecting a statement [9(IEEE)].
+(`define macro: ALU_SLT [src/internal_defines.vh line 18], file: src/mips_core.sv line 391)
+      `ALU_ADDR:
+              |
+ncvlog: *E,NOTSTT (src/mips_core.sv,393|14): expecting a statement [9(IEEE)].
+(`define macro: ALU_ADDR [src/internal_defines.vh line 19], file: src/mips_core.sv line 393)
+    endcase
+          |
+ncvlog: *E,NOTSTT (src/mips_core.sv,396|10): expecting a statement [9(IEEE)].
+	module worklib.mips_ALU
+		errors: 15, warnings: 0
+	module worklib.register
+		errors: 0, warnings: 0
+	module worklib.adder
+		errors: 0, warnings: 0
+	module worklib.add_const
+		errors: 0, warnings: 0
+	module worklib.mux2to1
+		errors: 0, warnings: 0
+	module worklib.mux4to1
+		errors: 0, warnings: 0
+	module worklib.muxSpecial
+		errors: 0, warnings: 0
+	module worklib.concat
+		errors: 0, warnings: 0
+	module worklib.loader
+		errors: 0, warnings: 0
+	module worklib.storer
+		errors: 0, warnings: 0
+file: src/mips_decode.sv
+	module worklib.mips_decode
+		errors: 0, warnings: 0
+TOOL:	ncvlog	08.20-s015: Exiting on Feb 04, 2016 at 13:30:26 EST  (total: 00:00:00)
