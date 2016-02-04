@@ -162,7 +162,8 @@ module mips_core(/*AUTOARG*/
    wire br; 
    wire memtoreg;
    wire aluop;
-   wire alusrc;
+   wire alusrc1;
+   wire alusrc2;
    wire se;
 
    // Generate control signals
@@ -177,7 +178,8 @@ module mips_core(/*AUTOARG*/
                        .br              (br),
                        .memtoreg        (memtoreg),
                        .aluop           (aluop),
-                       .alusrc          (alusrc),
+                       .alusrc1         (alusrc1),
+                       .alusrc2         (alusrc2),
                        .se              (se),
                        .mem_write_en    (mem_write_en),
 		       // Inputs
@@ -239,13 +241,13 @@ module mips_core(/*AUTOARG*/
    regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, wr_data, ctrl_we, clk, rst_b, halted); //ctrl_we is RegWrite
    
    //ALU (with placeholder select bits)
-   mux2to1 #(5) regDest(wr_reg, dcd_rt, dcd_rd, 1'b0); //RegDst
-   mux2to1 aluSrc1(alu_in1, rs_data, rt_data, 1'b0); //ALUSrc1
-   mux2to1 aluSrc2(alu_in2, rt_data, imm, 1'b1); //ALUSrc2
-   mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, 1'b1); //Signed
+   mux2to1 #(5) regDest(wr_reg, dcd_rt, dcd_rd, regdst); //RegDst
+   mux2to1 aluSrc1(alu_in1, rs_data, rt_data, alusrc1); //ALUSrc1
+   mux2to1 aluSrc2(alu_in2, rt_data, imm, alusrc2); //ALUSrc2
+   mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se); //Signed
 
    //Wirings to memory module
-   mux2to1 memToReg(wr_data, alu__out, mem_data_out, 1'b0); //MemtoReg
+   mux2to1 memToReg(wr_data, alu__out, mem_data_out, memtoreg); //MemtoReg
    assign instr_addr = newpc[31:2];
    assign mem_addr = alu__out[31:2];
    assign mem_data_in = rt_data;

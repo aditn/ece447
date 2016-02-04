@@ -55,20 +55,21 @@
 //// br      (output) - Whether the instruction is a branch
 //// memtoreg (output) - Selects either ALU or memory to write to a register
 //// aluop   (output) - Whether the operation is an ALU operation
-//// alusrc  (output) - Selects the second input to the ALU (register data or immediate)
+//// alusrc1 (output) - Selects the first input to the ALU (rs_data or rt_data)
+//// alusrc2 (output) - Selects the second input to the ALU (register data or immediate)
 //// se      (output) - Selects whether to sign extend the immediate
 //// mem_write_en (output) - Which portion of a word to write to memory
 ////
 module mips_decode(/*AUTOARG*/
    // Outputs
-   ctrl_we, ctrl_Sys, ctrl_RI, alu__sel, regdst, jmp, br, memtoreg, aluop, alusrc, se, mem_write_en,
+   ctrl_we, ctrl_Sys, ctrl_RI, alu__sel, regdst, jmp, br, memtoreg, aluop, alusrc1, alusrc2, se, mem_write_en,
    // Inputs
    dcd_op, dcd_funct2, dcd_rt
    );
 
    input       [5:0] dcd_op, dcd_funct2;
    input       [4:0] dcd_rt;
-   output reg        ctrl_we, ctrl_Sys, ctrl_RI, regdst, jmp, br, memtoreg, aluop, alusrc, se;
+   output reg        ctrl_we, ctrl_Sys, ctrl_RI, regdst, jmp, br, memtoreg, aluop, alusrc1, alusrc2, se;
    output reg  [3:0] alu__sel, mem_write_en;
  
 
@@ -83,7 +84,8 @@ module mips_decode(/*AUTOARG*/
      br = 1'b0; //not brance
      memtoreg = 1'b0; //write to reg from ALU, not mem
      aluop = 1'b0; //not aluop
-     alusrc = 1'b0; //source is register
+     alusrc1 = 1'b0; //source is rs_data
+     alusrc2 = 1'b0; //source is register
      se = 1'b0; //unsigned
      mem_write_en = 4'b0; //no mem write
      case(dcd_op) // Main opcodes (op field)
@@ -95,17 +97,17 @@ module mips_decode(/*AUTOARG*/
            `OP0_SLL:
              begin
                alu__sel = `ALU_SLL;
-               alusrc = 1'b1;
+               alusrc2 = 1'b1;
              end
           `OP0_SRL:
              begin
                alu__sel = `ALU_SRL;
-               alusrc = 1'b1;
+               alusrc2 = 1'b1;
              end
            `OP0_SRA:
              begin
                alu__sel = `ALU_SRA;
-               alusrc = 1'b1;
+               alusrc2 = 1'b1;
              end
            `OP0_SLLV:
              alu__sel = `ALU_SLLV;
@@ -199,45 +201,45 @@ module mips_decode(/*AUTOARG*/
          begin
            alu__sel = `ALU_ADD;
            aluop = 1'b1;
-           alusrc = 1'b1;
+           alusrc2 = 1'b1;
            se = 1'b1;
          end
        `OP_ADDIU:
          begin
            alu__sel = `ALU_ADD;
            aluop = 1'b1;
-           alusrc = 1'b1;
+           alusrc2 = 1'b1;
          end
        `OP_SLTI:
          begin
            alu__sel = `ALU_SLT;
            aluop = 1'b1;
-           alusrc = 1'b1;
+           alusrc2 = 1'b1;
            se = 1'b1;
          end
        `OP_SLTIU:
          begin
            alu__sel = `ALU_SLT;
            aluop = 1'b1;
-           alusrc = 1'b1;
+           alusrc2 = 1'b1;
          end
        `OP_ANDI:
          begin
            alu__sel = `ALU_AND;
            aluop = 1'b1;
-           alusrc = 1'b1;
+           alusrc2 = 1'b1;
          end
        `OP_ORI:
          begin
            alu__sel = `ALU_OR;
            aluop = 1'b1;
-           alusrc = 1'b1;
+           alusrc2 = 1'b1;
          end
        `OP_XORI:
          begin
            alu__sel = `ALU_XOR;
            aluop = 1'b1;
-           alusrc = 1'b1;
+           alusrc2 = 1'b1;
          end
        //`OP_LUI: //extra alu__sel bit?
        //`OP_LB:
