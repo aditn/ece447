@@ -34,3 +34,10 @@
 `define ST_SH        2'b01
 `define ST_SW        2'b10
 
+// Branch conditions
+`define BR_BLTZ      3'b000
+`define BR_BGEZ      3'b001
+`define BR_BEQ       3'b010
+`define BR_BNE       3'b011
+`define BR_BLEZ      3'b100
+`define BR_BGTZ      3'b101
