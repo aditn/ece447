@@ -601,8 +601,11 @@ endmodule
 //// storer: operates on data for store instructions
 ////
 //// store_data (output) - data to load into registers
-//// mem_data  (input)  - data read from memory
-//// load_sel  (input)  - selects what to output
+//// mem_write_en (output) - memory write enable bits
+//// rt_data   (input)  - data from rt register
+//// store_sel  (input)  - selects which store operation to perform
+//// offset    (input)  - byte offset
+////
 module storer (
       output logic [31:0] store_data,
       output logic [3:0] mem_write_en,
