@@ -32,3 +32,4 @@
 `define ST_SB        2'b00
 `define ST_SH        2'b01
 `define ST_SW        2'b10
+
