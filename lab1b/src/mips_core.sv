@@ -111,7 +111,7 @@ module mips_core(/*AUTOARG*/
    // PC Management
    //register #(32, text_start) PCReg(pc, pcNextFinal, clk, ~internal_halt, rst_b);
    register #(32, text_start) PCReg(pc, newpc, clk, ~internal_halt, rst_b);
-   register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
+   register #(32, text_start+4) PCReg2(nextnextpc, newpc, clk,
                                        ~internal_halt, rst_b);
    //mux2to1 pickNextPC (pcNextFinal, nextpc, nextnextpc,(pcMuxSel[1]|pcMuxSel[0]));
    add_const #(4) NextPCAdder(nextpc, pc);
@@ -146,12 +146,10 @@ module mips_core(/*AUTOARG*/
        $display ( "=== Simulation Cycle %d ===", $time );
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    pc, inst, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
-       $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
        $display ("HI: %x, LO: %x, pcMuxSel: %d, nextpc: %x, nextnextpc:%x", hi_out, lo_out,pcMuxSel,nextpc,nextnextpc);
        $display ("jLink_en:%d, wr_reg: %d, wr_data: %x",jLink_en, wr_reg, wr_data);
-       $display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        $display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
-       $display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", branchTrue, pcMuxSel, pcMuxSelFinal);
+       $display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b, newpc: %h", branchTrue, pcMuxSel, pcMuxSelFinal, newpc);
        $display ("");
      end
    end
@@ -271,8 +269,8 @@ module mips_core(/*AUTOARG*/
    wire [31:0] lo_out; //LO Register out
    wire [31:0] hi_in; //HI Register in
    wire [31:0] lo_in; //LO Register in
-   wire [31:0] load_data;
-   wire [31:0] store_data;
+   wire [31:0] load_data; //data to load to memory
+   wire [31:0] store_data; //data to store to memory
 
    //Register file
    regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, wr_data, ctrl_we, clk, rst_b, halted); //ctrl_we is RegWrite
@@ -294,20 +292,19 @@ module mips_core(/*AUTOARG*/
    assign instr_addr = newpc[31:2];
    assign mem_addr = alu__out[31:2];
    assign mem_data_in = store_data;
-   //assign mem_write_en = 4'b1111; //MemWrite
 
    //To read from / write to memory
    loader loader(load_data, dcd_imm, mem_data_out, load_sel, alu__out);
    storer storer(store_data, mem_write_en, rt_data, store_sel, alu__out);
 
    //Mux for next state PC
-   mux4to1 pcMux(newpc, pc + 4, br_target, rs_data, j_target, pcMuxSelFinal); //jump/branch
+   mux4to1 pcMux(newpc, nextpc, br_target, rs_data, j_target, pcMuxSelFinal); //jump/branch
    adder brtarget(br_target, pc + 4, (imm << 2), 1'b0); //no need for signal
    concat conc(j_target, pc, dcd_target);
    muxSpecial choosePcMuxSel(pcMuxSelFinal,pcMuxSel,branchTrue);
 
    //Decide wr_data and wr_reg
-   mux2to1 dataToReg(wr_data, wr_dataMem, pc+8, jLink_en);
+   mux2to1 dataToReg(wr_data, wr_dataMem, pc+4, jLink_en);
    mux2to1 #(5)regNumber(wr_reg, wr_regNum, 5'd31, jLink_en); //how to define decimal?
 
 endmodule // mips_core
@@ -317,9 +314,11 @@ endmodule // mips_core
 //// mips_ALU: Performs all arithmetic and logical operations
 ////
 //// out (output) - Final result
+//// branchTrue (output) - Selects whether a branch condition was fulfilled
 //// in1 (input)  - Operand modified by the operation
 //// in2 (input)  - Operand used (in arithmetic ops) to modify in1
 //// sel (input)  - Selects which operation is to be performed
+//// brcond (input) - Selects the type of branch instruction executed, if any
 ////
 module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
 
@@ -337,11 +336,12 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
         alu__out = alu__op1+alu__op2;
       `ALU_SUB:
         begin
+          alu__out = alu__op1-alu__op2;
           $display("brcond: %b", brcond);
           case(brcond)
             `BR_BLTZ:
               begin
-                if ($signed(alu__op1)<0)
+                if (alu__out<0)
                   branchTrue = 1'b1;
               end
             `BR_BGEZ:
@@ -370,8 +370,6 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
                 if ($signed(alu__op1)>0)
                   branchTrue = 1'b1;
               end
-            default:
-              alu__out = alu__op1-alu__op2;
           endcase
         end
       `ALU_SLL:
@@ -516,12 +514,9 @@ endmodule
 ////
 //// muxSpecial
 ////
-//// out (output) - data chosen to be outputted
-//// in0 (input)  - data lines
-//// in1 (input)  - data lines
-//// in2 (input)  - data lines
-//// in3 (input)  - data lines
-//// sel (input)  - selects which data to output
+//// pcMuxSelFinal (output) - the mux select bits for PC
+//// pcMuxSel (input) - select bits from the decoder
+//// sel (input) - whether the branch condition was met
 ////
 module muxSpecial #(int width = 2) (
       output logic [width - 1:0] pcMuxSelFinal,
