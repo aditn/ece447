@@ -113,8 +113,7 @@ module mips_core(/*AUTOARG*/
    register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
                                        ~internal_halt, rst_b);
    //mux2to1 pickNextPC (pcNextFinal, nextpc, nextnextpc,(pcMuxSel[1]|pcMuxSel[0]));
-   add_const #(4) NextPCAdder(nextnextpc, nextpc);
-   //add_const #(4) NextPCAdder(nextnextpc, nextpc, pcMuxSel);
+   add_const #(4) NextPCAdder(nextnextpc, nextpc, pcMuxSel);
    assign        inst_addr = pc[31:2];
 
    // Instruction decoding
@@ -418,7 +417,7 @@ module add_const(out, in);//, sel);
    input logic  [31:0] in;
    //input logic [1:0] sel;
    
-   assign out = in+add_value;
+   out = in+add_value;
    /*always_comb begin
       if (sel == 2'b00)
         out = in + add_value;

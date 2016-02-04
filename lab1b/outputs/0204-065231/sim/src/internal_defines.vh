@@ -16,7 +16,6 @@
 `define ALU_XOR      4'b1010
 `define ALU_NOR      4'b1011
 `define ALU_SLT      4'b1100
-`define ALU_ADDR     4'b1111
 
 
 
@@ -28,9 +27,7 @@
 `define LOAD_LBU     3'b100
 `define LOAD_LHU     3'b101
 
-
-// Store instructions for storer module
-`define ST_SB        2'b00
-`define ST_SH        2'b01
-`define ST_SW        2'b10
+`define ST_SB 2'b00
+`define ST_SH 2'b01
+`define ST_SW 2'b10
 
