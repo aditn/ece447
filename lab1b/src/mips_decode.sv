@@ -94,8 +94,10 @@ module mips_decode(/*AUTOARG*/
      alusrc2 = 1'b0; //source is register
      se = 1'b0; //unsigned
      mem_write_en = 4'b0; //no mem write
+     load_sel = 3'bx;
      hi_en = 1'b0; //HI reg not enabled
      lo_en = 1'b0; //LO reg not enabled
+
      case(dcd_op) // Main opcodes (op field)
        `OP_OTHER0: // Secondary opcodes (funct2 field; OP_OTHER0)
          begin
@@ -261,14 +263,70 @@ module mips_decode(/*AUTOARG*/
            memtoreg = 2'b01;
            load_sel = `LOAD_LUI;
          end
-       //`OP_LB:
-       //`OP_LH:
-       //`OP_LW:
-       //`OP_LBU:
-       //`OP_LHU:
-       //`OP_SB:
-       //`OP_SH:
-       //`OP_SW:*/
+       `OP_LB:
+         begin
+           alu__sel = `ALU_ADD;
+           se = 1'b1;
+           alusrc2 = 1'b1;
+           memtoreg = 1'b1;
+           load_sel = `LOAD_LB;
+         end
+       `OP_LH:
+         begin
+           alu__sel = `ALU_ADD;
+           se = 1'b1;
+           alusrc2 = 1'b1;
+           memtoreg = 1'b1;
+           load_sel = `LOAD_LH;
+         end
+       `OP_LW:
+         begin
+           alu__sel = `ALU_ADD;
+           se = 1'b1;
+           alusrc2 = 1'b1;
+           memtoreg = 1'b1;
+           load_sel = `LOAD_LW;
+         end
+       `OP_LBU:
+         begin
+           alu__sel = `ALU_ADD;
+           se = 1'b1;
+           alusrc2 = 1'b1;
+           memtoreg = 1'b1;
+           load_sel = `LOAD_LBU;
+         end
+       `OP_LHU:
+         begin
+           alu__sel = `ALU_ADD;
+           se = 1'b1;
+           alusrc2 = 1'b1;
+           memtoreg = 1'b1;
+           load_sel = `LOAD_LHU;
+         end
+       `OP_SB:
+         begin
+           ctrl_we = 1'b0;
+           alu__sel = `ALU_ADD;
+           alusrc2 = 1'b1;
+           se = 1'b1;
+           mem_write_en = 4'b0001;
+         end
+       `OP_SH:
+         begin
+           ctrl_we = 1'b0;
+           alu__sel = `ALU_ADD;
+           alusrc2 = 1'b1;
+           se = 1'b1;
+           mem_write_en = 4'b0011;
+         end
+       `OP_SW:
+         begin
+           ctrl_we = 1'b0;
+           alu__sel = `ALU_ADD;
+           alusrc2 = 1'b1;
+           se = 1'b1;
+           mem_write_en = 4'b1111;
+         end
        default:
          begin
             ctrl_RI = 1'b1;

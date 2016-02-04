@@ -81,9 +81,9 @@ module mips_core(/*AUTOARG*/
 
    // Forced interface signals -- required for synthesis to work OK.
    // This is probably not what you want!
-   assign        mem_addr = 0;
+   /*assign        mem_addr = 0;
    assign        mem_data_in = mem_data_out;
-   assign        mem_write_en = 4'b0;
+   assign        mem_write_en = 4'b0;*/
 
    // Internal signals
    wire [31:0]   pc, nextpc, nextnextpc;
@@ -140,6 +140,8 @@ module mips_core(/*AUTOARG*/
        $display ( "=== Simulation Cycle %d ===", $time );
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    pc, inst, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
+
+       $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
      end
    end
    // synthesis translate_on
@@ -190,6 +192,8 @@ module mips_core(/*AUTOARG*/
 		       .dcd_op		(dcd_op[5:0]),
 		       .dcd_funct2	(dcd_funct2[5:0]),
            .dcd_rt (dcd_rt));
+
+
  
    // Register File
    // Instantiate the register file from regfile.v here.
