@@ -264,6 +264,8 @@ module mips_core(/*AUTOARG*/
    mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se); //Signed
 
    //Wirings to memory module
+<<<<<<< HEAD
+   //mux2to1 memToReg(wr_data, alu__out, mem_data_out, memtoreg); //MemtoReg
    mux4to1 memToReg(wr_data,alu__out, load_data, hi_out, lo_out, memtoreg);
    assign instr_addr = newpc[31:2];
    assign mem_addr = alu__out[31:2];

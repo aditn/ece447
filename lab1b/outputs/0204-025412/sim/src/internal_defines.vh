@@ -17,9 +17,6 @@
 `define ALU_NOR      4'b1011
 `define ALU_SLT      4'b1100
 `define LOAD_LUI     4'b1101
-`define LOAD_LB      4'b1110
-`define LOAD_LH     4'b1101
-
 
 
 
