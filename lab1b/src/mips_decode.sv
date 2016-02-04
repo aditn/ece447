@@ -50,6 +50,14 @@
 //// we      (output) - Write to the register file
 //// Sys     (output) - System call exception
 //// RI      (output) - Reserved instruction exception
+//// regdst  (output) - Selects the destination register (Rt or Rd)
+//// jmp     (output) - Whether the instruction is a jump
+//// br      (output) - Whether the instruction is a branch
+//// memtoreg (output) - Selects either ALU or memory to write to a register
+//// aluop   (output) - Whether the operation is an ALU operation
+//// alusrc  (output) - Selects the second input to the ALU (register data or immediate)
+//// se      (output) - Selects whether to sign extend the immediate
+//// mem_write_en (output) - Which portion of a word to write to memory
 ////
 module mips_decode(/*AUTOARG*/
    // Outputs
@@ -70,14 +78,14 @@ module mips_decode(/*AUTOARG*/
      ctrl_Sys = 1'b0;
      ctrl_RI = 1'b0;
 
-     regdst = 1'b0;
-     jmp = 1'b0;
-     br = 1'b0;
-     memtoreg = 1'b0;
-     aluop = 1'b0;
+     regdst = 1'b0; //destination reg is Rt
+     jmp = 1'b0; //not jump
+     br = 1'b0; //not brance
+     memtoreg = 1'b0; //write to reg from ALU, not mem
+     aluop = 1'b0; //not aluop
      alusrc = 1'b0; //source is register
-     se = 1'b0;
-     mem_write_en = 4'b0;
+     se = 1'b0; //unsigned
+     mem_write_en = 4'b0; //no mem write
      case(dcd_op) // Main opcodes (op field)
        `OP_OTHER0: // Secondary opcodes (funct2 field; OP_OTHER0)
          begin
@@ -169,7 +177,7 @@ module mips_decode(/*AUTOARG*/
                alu__sel = `ALU_SLT;
                br = 1'b1;
                aluop = 1'b1;
-               //write PC+4 to $ra
+               //need write PC+4 to $ra
              end
            `OP1_BGEZAL:
              begin
@@ -180,33 +188,66 @@ module mips_decode(/*AUTOARG*/
            default:
              ctrl_RI = 1'b1;
          endcase //dcd_rt
-         /*
-       `OP_J:
-       `OP_JAL:
-       `OP_BEQ:
-       `OP_BNE:
-       `OP_BLEZ:
-       `OP_BGTZ:
-       `OP_ADDI:*/
+       
+       //`OP_J:
+       //`OP_JAL:
+       //`OP_BEQ:
+       //`OP_BNE:
+       //`OP_BLEZ:
+       //`OP_BGTZ:
+       `OP_ADDI:
+         begin
+           alu__sel = `ALU_ADD;
+           aluop = 1'b1;
+           alusrc = 1'b1;
+           se = 1'b1;
+         end
        `OP_ADDIU:
          begin
-            alu__sel = `ALU_ADD;
-            ctrl_we = 1'b1;
-         end/*
+           alu__sel = `ALU_ADD;
+           aluop = 1'b1;
+           alusrc = 1'b1;
+         end
        `OP_SLTI:
+         begin
+           alu__sel = `ALU_SLT;
+           aluop = 1'b1;
+           alusrc = 1'b1;
+           se = 1'b1;
+         end
        `OP_SLTIU:
+         begin
+           alu__sel = `ALU_SLT;
+           aluop = 1'b1;
+           alusrc = 1'b1;
+         end
        `OP_ANDI:
+         begin
+           alu__sel = `ALU_AND;
+           aluop = 1'b1;
+           alusrc = 1'b1;
+         end
        `OP_ORI:
+         begin
+           alu__sel = `ALU_ORI;
+           aluop = 1'b1;
+           alusrc = 1'b1;
+         end
        `OP_XORI:
-       `OP_LUI:
-       `OP_LB:
-       `OP_LH:
-       `OP_LW:
-       `OP_LBU:
-       `OP_LHU:
-       `OP_SB:
-       `OP_SH:
-       `OP_SW:*/
+         begin
+           alu__sel = `ALU_ORI;
+           aluop = 1'b1;
+           alusrc = 1'b1;
+         end
+       //`OP_LUI: //extra alu__sel bit?
+       //`OP_LB:
+       //`OP_LH:
+       //`OP_LW:
+       //`OP_LBU:
+       //`OP_LHU:
+       //`OP_SB:
+       //`OP_SH:
+       //`OP_SW:*/
        default:
          begin
             ctrl_RI = 1'b1;
