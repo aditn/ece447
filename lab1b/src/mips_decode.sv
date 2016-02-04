@@ -142,7 +142,7 @@ module mips_decode(/*AUTOARG*/
            `OP0_JALR:
              begin
              //need to get PC+4 into $ra
-               pcMuxSel = 2'b11;
+               pcMuxSel = 2'b10;
                aluop = 1'b0;
                jLink_en = 1'b1;
              end
