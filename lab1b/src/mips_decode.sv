@@ -59,17 +59,21 @@
 //// alusrc2 (output) - Selects the second input to the ALU (register data or immediate)
 //// se      (output) - Selects whether to sign extend the immediate
 //// mem_write_en (output) - Which portion of a word to write to memory
+//// hi_en (output) - Enables writing to HI register
+//// lo_en (output) - Enables writing to LO register
 ////
+
 module mips_decode(/*AUTOARG*/
    // Outputs
-   ctrl_we, ctrl_Sys, ctrl_RI, alu__sel, regdst, jmp, br, memtoreg, aluop, alusrc1, alusrc2, se, mem_write_en,
+   ctrl_we, ctrl_Sys, ctrl_RI, alu__sel, regdst, jmp, br, memtoreg, aluop, alusrc1, alusrc2, se, mem_write_en, hi_en,lo_en
    // Inputs
    dcd_op, dcd_funct2, dcd_rt
    );
 
    input       [5:0] dcd_op, dcd_funct2;
    input       [4:0] dcd_rt;
-   output reg        ctrl_we, ctrl_Sys, ctrl_RI, regdst, jmp, br, memtoreg, aluop, alusrc1, alusrc2, se;
+   output reg        ctrl_we, ctrl_Sys, ctrl_RI, regdst, jmp, br, aluop, alusrc1, alusrc2, se, hi_en, lo_en;
+   output reg  [1:0] memtoreg;
    output reg  [3:0] alu__sel, mem_write_en;
  
 
@@ -82,12 +86,14 @@ module mips_decode(/*AUTOARG*/
      regdst = 1'b0; //destination reg is Rt
      jmp = 1'b0; //not jump
      br = 1'b0; //not brance
-     memtoreg = 1'b0; //write to reg from ALU, not mem
+     memtoreg = 2'b0; //write to reg from ALU, not mem
      aluop = 1'b0; //not aluop
      alusrc1 = 1'b0; //source is rs_data
      alusrc2 = 1'b0; //source is register
      se = 1'b0; //unsigned
      mem_write_en = 4'b0; //no mem write
+     hi_en = 1'b0; //HI reg not enabled
+     lo_en = 1'b0; //LO reg not enabled
      case(dcd_op) // Main opcodes (op field)
        `OP_OTHER0: // Secondary opcodes (funct2 field; OP_OTHER0)
          begin
@@ -132,10 +138,14 @@ module mips_decode(/*AUTOARG*/
              end
            `OP0_SYSCALL:
              ctrl_Sys = 1'b1;
-           //`OP0_MFHI:
-           //`OP0_MTHI:
-           //`OP0_MFLO:
-           //`OP0_MTLO:
+           `OP0_MFHI: //read from HI reg
+             memtoreg=2'b10;
+           `OP0_MTHI: //write to HI reg
+             hi_en = 1'b1;
+           `OP0_MFLO: //read from LO reg
+             memtoreg=2'b11;
+           `OP0_MTLO: //write to LO reg
+             hi_en = 1'b1;
            `OP0_ADD: 
              alu__sel = `ALU_ADD;
            `OP0_ADDU:
