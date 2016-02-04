@@ -201,7 +201,7 @@ module mips_core(/*AUTOARG*/
                        .alusrc1         (alusrc1),
                        .alusrc2         (alusrc2),
                        .se              (se),
-                       .mem_write_en    (mem_write_en),
+                       .mem_write_en    (),
                        .hi_en           (hi_en),
                        .lo_en           (lo_en),
                        .load_sel        (load_sel),
@@ -297,8 +297,8 @@ module mips_core(/*AUTOARG*/
    //assign mem_write_en = 4'b1111; //MemWrite
 
    //To read from / write to memory
-   loader loader(load_data, dcd_imm, mem_data_out, load_sel);
-   storer storer(store_data, rt_data, store_sel);
+   loader loader(load_data, dcd_imm, mem_data_out, load_sel, alu__out);
+   storer storer(store_data, mem_write_en, rt_data, store_sel, alu__out);
 
    //Mux for next state PC
    mux4to1 pcMux(newpc, nextnextpc, br_target, rs_data, j_target, pcMuxSelFinal); //jump/branch
@@ -567,22 +567,28 @@ module loader (
       output logic [31:0] load_data,
       input logic [15:0] dcd_imm,
       input logic [31:0] mem_data,
-      input logic [2:0] load_sel);
+      input logic [2:0] load_sel,
+      input logic [31:0] offset);
+
+    logic [31:0] data;
+    assign data = (mem_data << ((offset & 32'h3) * 8));
 
     always_comb begin
       case(load_sel)
         `LOAD_LUI:
           load_data = {dcd_imm, 16'b0};
         `LOAD_LB:
-          load_data = {{24{mem_data[31]}}, mem_data[31:24]};
+          //load_data = {{24{mem_data[31]}}, mem_data[31:24]};
+          load_data = {{24{data[31]}}, data[31:24] };
         `LOAD_LH:
-          load_data = {{16{mem_data[31]}}, mem_data[31:16]};
+          //load_data = {{16{mem_data[31]}}, mem_data[31:16]};
+          load_data = {{16{data[31]}}, data[31:16]};
         `LOAD_LW:
           load_data = mem_data;
         `LOAD_LBU:
-          load_data = {24'b0, mem_data[31:24]};
+          load_data = {24'b0, data[31:24]};
         `LOAD_LHU:
-          load_data = {16'b0, mem_data[31:16]};
+          load_data = {16'b0, data[31:16]};
         default:
           load_data = 32'hxxxx;
       endcase
@@ -597,19 +603,34 @@ endmodule
 //// load_sel  (input)  - selects what to output
 module storer (
       output logic [31:0] store_data,
+      output logic [3:0] mem_write_en,
       input logic [31:0] rt_data,
-      input logic [1:0] store_sel);
+      input logic [1:0] store_sel,
+      input logic [31:0] offset);
 
+    
     always_comb begin
       case(store_sel)
         `ST_SB:
-          store_data = {rt_data[7:0], 24'b0};
+          begin
+            store_data = {rt_data[7:0], 24'b0} >> ((offset & 32'h3) * 8);
+            mem_write_en = 4'b0001 << (offset & 32'h3);
+          end
         `ST_SH:
-          store_data = {rt_data[15:0], 16'b0};
+          begin
+            store_data = {rt_data[15:0], 16'b0} >> ((offset & 32'h3) * 8);
+            mem_write_en = 4'b0011 << (offset & 32'h3);
+          end
         `ST_SW:
-          store_data = rt_data;
+          begin
+            store_data = rt_data;
+            mem_write_en = 4'b1111;
+          end
         default:
-          store_data = 32'hxxxx;
+          begin
+            store_data = 32'hxxxx;
+            mem_write_en = 4'b0000;
+          end
       endcase
     end
 endmodule

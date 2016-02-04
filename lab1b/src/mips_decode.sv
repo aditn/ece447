@@ -360,7 +360,7 @@ module mips_decode(/*AUTOARG*/
            alu__sel = `ALU_ADDR;
            alusrc2 = 1'b1;
            se = 1'b1;
-           mem_write_en = 4'b0001;
+           mem_write_en = 4'b1000;
            store_sel = `ST_SB;
          end
        `OP_SH:
@@ -369,7 +369,7 @@ module mips_decode(/*AUTOARG*/
            alu__sel = `ALU_ADDR;
            alusrc2 = 1'b1;
            se = 1'b1;
-           mem_write_en = 4'b0011;
+           mem_write_en = 4'b1100;
            store_sel = `ST_SH;
          end
        `OP_SW:
