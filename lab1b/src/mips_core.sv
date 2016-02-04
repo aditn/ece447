@@ -168,6 +168,8 @@ module mips_core(/*AUTOARG*/
    wire alusrc2;
    wire se;
    wire [2:0] load_sel;
+   wire hi_en;
+   wire lo_en;
 
    // Generate control signals
    mips_decode Decoder(/*AUTOINST*/
@@ -248,8 +250,6 @@ module mips_core(/*AUTOARG*/
    wire [31:0] lo_out; //LO Register out
    wire [31:0] hi_in; //HI Register in
    wire [31:0] lo_in; //LO Register in
-   wire [31:0] hi_en; //HI Register enable
-   wire [31:0] lo_en; //LO Register enable
 
 
    wire [31:0] load_data;
@@ -268,7 +268,6 @@ module mips_core(/*AUTOARG*/
    mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se); //Signed
 
    //Wirings to memory module
-<<<<<<< HEAD
    //mux2to1 memToReg(wr_data, alu__out, mem_data_out, memtoreg); //MemtoReg
    mux4to1 memToReg(wr_data,alu__out, load_data, hi_out, lo_out, memtoreg);
    assign instr_addr = newpc[31:2];
