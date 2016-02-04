@@ -143,10 +143,10 @@ module mips_core(/*AUTOARG*/
        $display ( "=== Simulation Cycle %d ===", $time );
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    pc, inst, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
-
        $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
        $display ("HI: %x, LO: %x, pcMuxSel: %d, nextpc: %x, nextnextpc:%x", hi_out, lo_out,pcMuxSel,nextpc,nextnextpc);
        $display ("pcNextFinal:%x",pcNextFinal);
+       $display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        $display ("");
      end
    end
@@ -177,6 +177,7 @@ module mips_core(/*AUTOARG*/
    wire [2:0] load_sel;
    wire hi_en;
    wire lo_en;
+   wire [1:0] store_sel;
 
    // Generate control signals
    mips_decode Decoder(/*AUTOINST*/
@@ -197,6 +198,7 @@ module mips_core(/*AUTOARG*/
                        .hi_en           (hi_en),
                        .lo_en           (lo_en),
                        .load_sel        (load_sel),
+                       .store_sel       (store_sel),
 		       // Inputs
 		       .dcd_op		(dcd_op[5:0]),
 		       .dcd_funct2	(dcd_funct2[5:0]),
@@ -260,6 +262,7 @@ module mips_core(/*AUTOARG*/
    wire [31:0] hi_in; //HI Register in
    wire [31:0] lo_in; //LO Register in
    wire [31:0] load_data;
+   wire [31:0] store_data;
 
    //Register file
    regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, wr_data, ctrl_we, clk, rst_b, halted); //ctrl_we is RegWrite
@@ -280,11 +283,12 @@ module mips_core(/*AUTOARG*/
    mux4to1 memToReg(wr_dataMem,alu__out, load_data, hi_out, lo_out, memtoreg);
    assign instr_addr = newpc[31:2];
    assign mem_addr = alu__out[31:2];
-   assign mem_data_in = rt_data;
+   assign mem_data_in = store_data;
    //assign mem_write_en = 4'b1111; //MemWrite
 
-   //To read from memory
+   //To read from / write to memory
    loader loader(load_data, dcd_imm, mem_data_out, load_sel);
+   storer storer(store_data, rt_data, store_sel);
 
    //Mux for next state PC
    mux4to1 pcMux(newpc, nextnextpc, br_target, rs_data, j_target, pcMuxSel); //jump/branch
@@ -341,6 +345,8 @@ module mips_ALU(alu__out, alu__op1, alu__op2, alu__sel);
         alu__out = ~(alu__op1 | alu__op2);
       `ALU_SLT://signed compare
         alu__out = (alu__op1 < alu__op2) ? 32'b1 : 32'b0;
+      `ALU_ADDR:
+        alu__out = alu__op1+alu__op2;
 
     endcase
 
@@ -491,17 +497,42 @@ module loader (
         `LOAD_LUI:
           load_data = {dcd_imm, 16'b0};
         `LOAD_LB:
-          load_data = {{24{mem_data[7]}}, mem_data[7:0]};
+          load_data = {{24{mem_data[31]}}, mem_data[31:24]};
         `LOAD_LH:
-          load_data = {{16{mem_data[15]}}, mem_data[15:0]};
+          load_data = {{16{mem_data[31]}}, mem_data[31:16]};
         `LOAD_LW:
           load_data = mem_data;
         `LOAD_LBU:
-          load_data = {24'b0, mem_data[7:0]};
+          load_data = {24'b0, mem_data[31:24]};
         `LOAD_LHU:
-          load_data = {16'b0, mem_data[15:0]};
+          load_data = {16'b0, mem_data[31:16]};
         default:
           load_data = 32'hxxxx;
+      endcase
+    end
+endmodule
+
+////
+//// storer: operates on data for store instructions
+////
+//// store_data (output) - data to load into registers
+//// mem_data  (input)  - data read from memory
+//// load_sel  (input)  - selects what to output
+module storer (
+      output logic [31:0] store_data,
+      input logic [31:0] rt_data,
+      input logic [1:0] store_sel);
+
+    always_comb begin
+      case(store_sel)
+        `ST_SB:
+          store_data = {rt_data[7:0], 24'b0};
+        `ST_SH:
+          store_data = {rt_data[15:0], 16'b0};
+        `ST_SW:
+          store_data = rt_data;
+        default:
+          store_data = 32'hxxxx;
       endcase
     end
 endmodule
