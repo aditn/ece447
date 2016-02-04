@@ -97,16 +97,19 @@ module mips_decode(/*AUTOARG*/
            `OP0_SLL:
              begin
                alu__sel = `ALU_SLL;
+               alusrc1 = 1'b1;
                alusrc2 = 1'b1;
              end
           `OP0_SRL:
              begin
                alu__sel = `ALU_SRL;
+               alusrc1 = 1'b1;
                alusrc2 = 1'b1;
              end
            `OP0_SRA:
              begin
                alu__sel = `ALU_SRA;
+               alusrc1 = 1'b1;
                alusrc2 = 1'b1;
              end
            `OP0_SLLV:
@@ -133,7 +136,7 @@ module mips_decode(/*AUTOARG*/
            //`OP0_MTHI:
            //`OP0_MFLO:
            //`OP0_MTLO:
-           `OP0_ADD: //how does this become 
+           `OP0_ADD: 
              alu__sel = `ALU_ADD;
            `OP0_ADDU:
              alu__sel = `ALU_ADD; //same as add
