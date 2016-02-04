@@ -165,6 +165,7 @@ module mips_core(/*AUTOARG*/
    wire alusrc1;
    wire alusrc2;
    wire se;
+   wire [2:0] load_sel;
 
    // Generate control signals
    mips_decode Decoder(/*AUTOINST*/
@@ -182,6 +183,7 @@ module mips_core(/*AUTOARG*/
                        .alusrc2         (alusrc2),
                        .se              (se),
                        .mem_write_en    (mem_write_en),
+                       .load_sel        (load_sel),
 		       // Inputs
 		       .dcd_op		(dcd_op[5:0]),
 		       .dcd_funct2	(dcd_funct2[5:0]),
@@ -237,6 +239,8 @@ module mips_core(/*AUTOARG*/
    wire [31:0] br_target; //branch target
    wire [31:0] j_target; //unconditional jump target
 
+   wire [31:0] load_data;
+
    //Register file
    regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, wr_data, ctrl_we, clk, rst_b, halted); //ctrl_we is RegWrite
    
@@ -247,11 +251,14 @@ module mips_core(/*AUTOARG*/
    mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se); //Signed
 
    //Wirings to memory module
-   mux2to1 memToReg(wr_data, alu__out, mem_data_out, memtoreg); //MemtoReg
+   mux2to1 memToReg(wr_data, alu__out, load_data, memtoreg); //MemtoReg
    assign instr_addr = newpc[31:2];
    assign mem_addr = alu__out[31:2];
    assign mem_data_in = rt_data;
-   assign mem_write_en = 4'b1111; //MemWrite
+   //assign mem_write_en = 4'b1111; //MemWrite
+
+   //To read from memory
+   loader loader(load_data, dcd_imm, mem_data_out, load_sel);
 
    //Mux for next state PC
    mux4to1 pcMux(newpc, nextnextpc, br_target, rs_data, j_target, 2'b00); //jump/branch
@@ -430,6 +437,38 @@ module concat (
 
 endmodule
 
+////
+//// loader: operates on data for load instructions
+////
+//// load_data (output) - data to load into registers
+//// dcd_imm   (input)  - immediate (for LUI)
+//// mem_data  (input)  - data read from memory
+//// load_sel  (input)  - selects what to output
+module loader (
+      output logic [31:0] load_data,
+      input logic [15:0] dcd_imm,
+      input logic [31:0] mem_data,
+      input logic [2:0] load_sel);
+
+    always_comb begin
+      case(load_sel)
+        `LOAD_LUI:
+          load_data = {dcd_imm, 16'b0};
+        `LOAD_LB:
+          load_data = {{24{mem_data[7]}}, mem_data[7:0]};
+        `LOAD_LH:
+          load_data = {{16{mem_data[15]}}, mem_data[15:0]};
+        `LOAD_LW:
+          load_data = mem_data;
+        `LOAD_LBU:
+          load_data = {24'b0, mem_data[7:0]};
+        `LOAD_LHU:
+          load_data = {16'b0, mem_data[15:0]};
+        default:
+          load_data = 32'hxxxx;
+      endcase
+    end
+endmodule
 
 // Local Variables:
 // verilog-library-directories:("." "../447rtl")

@@ -59,10 +59,11 @@
 //// alusrc2 (output) - Selects the second input to the ALU (register data or immediate)
 //// se      (output) - Selects whether to sign extend the immediate
 //// mem_write_en (output) - Which portion of a word to write to memory
+//// load_sel (output) - Selects which load operation for loader to perform
 ////
 module mips_decode(/*AUTOARG*/
    // Outputs
-   ctrl_we, ctrl_Sys, ctrl_RI, alu__sel, regdst, jmp, br, memtoreg, aluop, alusrc1, alusrc2, se, mem_write_en,
+   ctrl_we, ctrl_Sys, ctrl_RI, alu__sel, regdst, jmp, br, memtoreg, aluop, alusrc1, alusrc2, se, mem_write_en, load_sel,
    // Inputs
    dcd_op, dcd_funct2, dcd_rt
    );
@@ -71,6 +72,7 @@ module mips_decode(/*AUTOARG*/
    input       [4:0] dcd_rt;
    output reg        ctrl_we, ctrl_Sys, ctrl_RI, regdst, jmp, br, memtoreg, aluop, alusrc1, alusrc2, se;
    output reg  [3:0] alu__sel, mem_write_en;
+   output reg  [2:0] load_sel;
  
 
    always_comb begin
@@ -244,7 +246,11 @@ module mips_decode(/*AUTOARG*/
            aluop = 1'b1;
            alusrc2 = 1'b1;
          end
-       //`OP_LUI: //extra alu__sel bit?
+       `OP_LUI:
+         begin
+           memtoreg = 1'b1;
+           load_sel = `LOAD_LUI;
+         end
        //`OP_LB:
        //`OP_LH:
        //`OP_LW:
