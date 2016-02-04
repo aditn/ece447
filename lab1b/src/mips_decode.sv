@@ -229,13 +229,13 @@ module mips_decode(/*AUTOARG*/
          end
        `OP_ORI:
          begin
-           alu__sel = `ALU_ORI;
+           alu__sel = `ALU_OR;
            aluop = 1'b1;
            alusrc = 1'b1;
          end
        `OP_XORI:
          begin
-           alu__sel = `ALU_ORI;
+           alu__sel = `ALU_XOR;
            aluop = 1'b1;
            alusrc = 1'b1;
          end

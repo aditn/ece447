@@ -189,12 +189,13 @@ module mips_core(/*AUTOARG*/
    // Instantiate the register file from regfile.v here.
    // Don't forget to hookup the "halted" signal to trigger the register dump 
  
-   wire [31:0] alu_in; // mux output of rt_data and signed/unsigned imm to ALU
+   wire [31:0] alu_in1; // mux output of rs_data and rt_data
+   wire [31:0] alu_in2; // mux output of rt_data and signed/unsigned imm to ALU
 
    // Execute
    mips_ALU ALU(.alu__out(alu__out), 
-                .alu__op1(rs_data),
-                .alu__op2(alu_in),
+                .alu__op1(alu_in1),
+                .alu__op2(alu_in2),
                 .alu__sel(alu__sel));
  
    // Miscellaneous stuff (Exceptions, syscalls, and halt)
@@ -239,7 +240,8 @@ module mips_core(/*AUTOARG*/
    
    //ALU (with placeholder select bits)
    mux2to1 #(5) regDest(wr_reg, dcd_rt, dcd_rd, 1'b0); //RegDst
-   mux2to1 aluSrc(alu_in, rt_data, imm, 1'b1); //ALUSrc
+   mux2to1 aluSrc1(alu_in1, rs_data, rt_data, 1'b0); //ALUSrc1
+   mux2to1 aluSrc2(alu_in2, rt_data, imm, 1'b1); //ALUSrc2
    mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, 1'b1); //Signed
 
    //Wirings to memory module
@@ -279,17 +281,17 @@ module mips_ALU(alu__out, alu__op1, alu__op2, alu__sel);
       `ALU_SUB:
         alu__out = alu__op1-alu__op2;
       `ALU_SLL:
-        alu__out = alu__op1<<alu__op2;
+        alu__out = alu__op1<<{27'b0, alu__op2[10:6]}; //rt << sa
       `ALU_SRL:
-        alu__out = alu__op1>>alu__op2;
+        alu__out = alu__op1>>{27'b0, alu__op2[10:6]}; //rt >> sa
       `ALU_SRA://need to check what $signed does
-        alu__out = $signed($signed(alu__op2) >>> alu__op1[4:0]);
+        alu__out = $signed($signed(alu__op1) >>> {27'b0, alu__op2[10:6]}); //rt >> sa
       `ALU_SLLV://requires weird inputs
-        alu__out = alu__op1<<alu__op2;
+        alu__out = alu__op2<<alu__op1; //rt << rs
       `ALU_SRLV:
-        alu__out = alu__op1>>alu__op2;
-      `ALU_SRAV: //not right just a place holder
-        alu__out = alu__op1>>alu__op2;
+        alu__out = alu__op2>>alu__op1; //rt >> rs
+      `ALU_SRAV:
+        alu__out = $signed($signed(alu__op2) >>> alu__op1);
       `ALU_AND:
         alu__out = alu__op1 & alu__op2;
       `ALU_OR:
@@ -299,7 +301,7 @@ module mips_ALU(alu__out, alu__op1, alu__op2, alu__sel);
       `ALU_NOR:
         alu__out = ~(alu__op1 | alu__op2);
       `ALU_SLT://signed compare
-        alu__out = (alu__op1 < alu__op2);
+        alu__out = (alu__op1 < alu__op2) ? 32'b1 : 32'b0;
 
     endcase
 
