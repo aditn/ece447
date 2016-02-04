@@ -61,11 +61,12 @@
 //// mem_write_en (output) - Which portion of a word to write to memory
 //// hi_en (output) - Enables writing to HI register
 //// lo_en (output) - Enables writing to LO register
+//// load_sel (output) - Selects which load operation for loader to perform
 ////
 
 module mips_decode(/*AUTOARG*/
    // Outputs
-   ctrl_we, ctrl_Sys, ctrl_RI, alu__sel, regdst, jmp, br, memtoreg, aluop, alusrc1, alusrc2, se, mem_write_en, hi_en,lo_en
+   ctrl_we, ctrl_Sys, ctrl_RI, alu__sel, regdst, jmp, br, memtoreg, aluop, alusrc1, alusrc2, se, mem_write_en, hi_en,lo_en, load_sel
    // Inputs
    dcd_op, dcd_funct2, dcd_rt
    );
@@ -75,6 +76,7 @@ module mips_decode(/*AUTOARG*/
    output reg        ctrl_we, ctrl_Sys, ctrl_RI, regdst, jmp, br, aluop, alusrc1, alusrc2, se, hi_en, lo_en;
    output reg  [1:0] memtoreg;
    output reg  [3:0] alu__sel, mem_write_en;
+   output reg  [2:0] load_sel;
  
 
    always_comb begin
@@ -86,7 +88,7 @@ module mips_decode(/*AUTOARG*/
      regdst = 1'b0; //destination reg is Rt
      jmp = 1'b0; //not jump
      br = 1'b0; //not brance
-     memtoreg = 2'b0; //write to reg from ALU, not mem
+     memtoreg = 2'b00; //write to reg from ALU, not mem
      aluop = 1'b0; //not aluop
      alusrc1 = 1'b0; //source is rs_data
      alusrc2 = 1'b0; //source is register
@@ -254,7 +256,11 @@ module mips_decode(/*AUTOARG*/
            aluop = 1'b1;
            alusrc2 = 1'b1;
          end
-       //`OP_LUI: //extra alu__sel bit?
+       `OP_LUI:
+         begin
+           memtoreg = 2'b01;
+           load_sel = `LOAD_LUI;
+         end
        //`OP_LB:
        //`OP_LH:
        //`OP_LW:
