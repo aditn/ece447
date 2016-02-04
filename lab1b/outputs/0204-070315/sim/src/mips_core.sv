@@ -105,16 +105,14 @@ module mips_core(/*AUTOARG*/
    wire[1:0] pcMuxSel;
 
    wire [31:0] newpc; //mux output for next state PC
-   //wire [31:0] pcNextFinal;
+   wire [31:0] pcNextFinal;
 
    // PC Management
-   //register #(32, text_start) PCReg(pc, pcNextFinal, clk, ~internal_halt, rst_b);
-   register #(32, text_start) PCReg(pc, nextpc, clk, ~internal_halt, rst_b);
+   register #(32, text_start) PCReg(pc, pcNextFinal, clk, ~internal_halt, rst_b);
    register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
                                        ~internal_halt, rst_b);
-   //mux2to1 pickNextPC (pcNextFinal, nextpc, nextnextpc,(pcMuxSel[1]|pcMuxSel[0]));
-   add_const #(4) NextPCAdder(nextnextpc, nextpc);
-   //add_const #(4) NextPCAdder(nextnextpc, nextpc, pcMuxSel);
+   mux2to1 pickNextPC (pcNextFinal, nextpc, nextnextpc,(pcMuxSel[1]|pcMuxSel[0]));
+   add_const #(4) NextPCAdder(nextnextpc, nextpc, pcMuxSel);
    assign        inst_addr = pc[31:2];
 
    // Instruction decoding
@@ -147,7 +145,7 @@ module mips_core(/*AUTOARG*/
                    pc, inst, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
        $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
        $display ("HI: %x, LO: %x, pcMuxSel: %d, nextpc: %x, nextnextpc:%x", hi_out, lo_out,pcMuxSel,nextpc,nextnextpc);
-       //$display ("pcNextFinal:%x",pcNextFinal);
+       $display ("pcNextFinal:%x",pcNextFinal);
        $display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        $display ("");
      end
@@ -410,21 +408,20 @@ endmodule // adder
 //// out (output) - adder result
 //// in  (input)  - Operand
 ////
-module add_const(out, in);//, sel);
+module add_const(out, in, sel);
 
    parameter add_value = 1;
 
    output logic [31:0] out;
    input logic  [31:0] in;
-   //input logic [1:0] sel;
-   
-   assign out = in+add_value;
-   /*always_comb begin
+   input logic [1:0] sel;
+
+   always_comb begin
       if (sel == 2'b00)
         out = in + add_value;
       else
         out = in - add_value;
-    end*/
+    end
 
 endmodule // adder
 
