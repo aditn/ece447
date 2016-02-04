@@ -27,4 +27,3 @@
 `define LOAD_LBU     3'b100
 `define LOAD_LHU     3'b101
 
-
