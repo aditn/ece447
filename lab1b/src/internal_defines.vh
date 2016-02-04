@@ -18,6 +18,8 @@
 `define ALU_SLT      4'b1100
 `define ALU_ADDR     4'b1111
 
+
+
 // Load instruction for loader module
 `define LOAD_LUI     3'b000
 `define LOAD_LB      3'b001

@@ -102,14 +102,17 @@ module mips_core(/*AUTOARG*/
    wire [19:0]   dcd_code;
    wire          dcd_bczft;
    
+   wire[1:0] pcMuxSel;
 
    wire [31:0] newpc; //mux output for next state PC
+   wire [31:0] pcNextFinal;
 
    // PC Management
-   register #(32, text_start) PCReg(pc, nextpc, clk, ~internal_halt, rst_b);
+   register #(32, text_start) PCReg(pc, pcNextFinal, clk, ~internal_halt, rst_b);
    register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
                                        ~internal_halt, rst_b);
-   add_const #(4) NextPCAdder(nextnextpc, nextpc);
+   mux2to1 pickNextPC (pcNextFinal, nextpc, nextnextpc,(pcMuxSel[1]|pcMuxSel[0]));
+   add_const #(4) NextPCAdder(nextnextpc, nextpc, pcMuxSel);
    assign        inst_addr = pc[31:2];
 
    // Instruction decoding
@@ -140,8 +143,11 @@ module mips_core(/*AUTOARG*/
        $display ( "=== Simulation Cycle %d ===", $time );
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    pc, inst, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
-
+       $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
+       $display ("HI: %x, LO: %x, pcMuxSel: %d, nextpc: %x, nextnextpc:%x", hi_out, lo_out,pcMuxSel,nextpc,nextnextpc);
+       $display ("pcNextFinal:%x",pcNextFinal);
        $display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
+       $display ("");
      end
    end
    // synthesis translate_on
@@ -160,8 +166,9 @@ module mips_core(/*AUTOARG*/
 
    //Control bits
    wire regdst;
-   wire jmp; 
-   wire br; 
+   
+   wire jLink_en;
+
    wire [1:0] memtoreg;
    wire aluop;
    wire alusrc1;
@@ -180,8 +187,8 @@ module mips_core(/*AUTOARG*/
 		       .ctrl_RI		(ctrl_RI),
 		       .alu__sel	(alu__sel[3:0]),
                        .regdst          (regdst),
-                       .jmp             (jmp),
-                       .br              (br),
+                       .pcMuxSel        (pcMuxSel),
+                       .jLink_en        (jLink_en),
                        .memtoreg        (memtoreg),
                        .aluop           (aluop),
                        .alusrc1         (alusrc1),
@@ -245,6 +252,8 @@ module mips_core(/*AUTOARG*/
    wire [4:0] wr_reg; //input to write register
    wire [31:0] imm; //signed or unsigned immediate
    wire [31:0] wr_data; //data to write to register file
+   wire [31:0] wr_dataMem; //intermediate data to write to register file
+   wire [31:0] wr_regNum;//intermediate reg to write to 
 
    wire [31:0] br_target; //branch target
    wire [31:0] j_target; //unconditional jump target
@@ -252,27 +261,26 @@ module mips_core(/*AUTOARG*/
    wire [31:0] lo_out; //LO Register out
    wire [31:0] hi_in; //HI Register in
    wire [31:0] lo_in; //LO Register in
-
-
    wire [31:0] load_data;
    wire [31:0] store_data;
 
    //Register file
    regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, wr_data, ctrl_we, clk, rst_b, halted); //ctrl_we is RegWrite
    
-   //HI LO registers
+   //HI, LO registers
    register #(32,0) hiReg(hi_out, hi_in, clk, hi_en, rst_b);
    register #(32,0) loReg(lo_out, lo_in, clk, lo_en, rst_b);
+   assign hi_in = rs_data;
+   assign lo_in = rs_data;
 
    //ALU
-   mux2to1 #(5) regDest(wr_reg, dcd_rt, dcd_rd, regdst); //RegDst
+   mux2to1 #(5) regDest(wr_regNum, dcd_rt, dcd_rd, regdst); //RegDst
    mux2to1 aluSrc1(alu_in1, rs_data, rt_data, alusrc1); //ALUSrc1
    mux2to1 aluSrc2(alu_in2, rt_data, imm, alusrc2); //ALUSrc2
    mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se); //Signed
 
    //Wirings to memory module
-   //mux2to1 memToReg(wr_data, alu__out, mem_data_out, memtoreg); //MemtoReg
-   mux4to1 memToReg(wr_data,alu__out, load_data, hi_out, lo_out, memtoreg);
+   mux4to1 memToReg(wr_dataMem,alu__out, load_data, hi_out, lo_out, memtoreg);
    assign instr_addr = newpc[31:2];
    assign mem_addr = alu__out[31:2];
    assign mem_data_in = store_data;
@@ -283,9 +291,13 @@ module mips_core(/*AUTOARG*/
    storer storer(store_data, rt_data, store_sel);
 
    //Mux for next state PC
-   mux4to1 pcMux(newpc, nextnextpc, br_target, rs_data, j_target, 2'b00); //jump/branch
+   mux4to1 pcMux(newpc, nextnextpc, br_target, rs_data, j_target, pcMuxSel); //jump/branch
    adder brtarget(br_target, pc + 4, (imm << 2), 1'b0); //no need for signal
    concat conc(j_target, pc, dcd_target);
+
+   //Decide wr_data and wr_reg
+   mux2to1 dataToReg(wr_data, wr_dataMem, pc+8, jLink_en);
+   mux2to1 #(5)regNumber(wr_reg, wr_regNum, 31, jLink_en); //how to define decimal?
 
 endmodule // mips_core
 
@@ -396,14 +408,20 @@ endmodule // adder
 //// out (output) - adder result
 //// in  (input)  - Operand
 ////
-module add_const(out, in);
+module add_const(out, in, sel);
 
    parameter add_value = 1;
 
-   output   [31:0] out;
-   input    [31:0] in;
+   output logic [31:0] out;
+   input logic  [31:0] in;
+   input logic [1:0] sel;
 
-   assign   out = in + add_value;
+   always_comb begin
+      if (sel == 2'b00)
+        out = in + add_value;
+      else
+        out = in - add_value;
+    end
 
 endmodule // adder
 

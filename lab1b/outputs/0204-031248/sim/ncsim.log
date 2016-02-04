@@ -1,0 +1,141 @@
+ncsim: 08.20-s015: (c) Copyright 1995-2009 Cadence Design Systems, Inc.
+ncsim> database -open -shm -default waveforms
+Created default SHM database waveforms
+ncsim> probe -shm -create -depth all -all 
+Created probe 1
+ncsim> run 
+=== Simulation Cycle                  150 ===
+[pc=00400000, inst=3c031000] [op=0f, rs= 0, rt= 3, rd= 2, imm=1000, f2=00] [reset=0, halted=0]
+Store address:          0,          0, Store word:          0, ALUOUT:          0, en:  0
+=== Simulation Cycle                  250 ===
+[pc=00400004, inst=240500ff] [op=09, rs= 0, rt= 5, rd= 0, imm=00ff, f2=3f] [reset=0, halted=0]
+Store address:          0,         63, Store word:          0, ALUOUT:        255, en:  0
+=== Simulation Cycle                  350 ===
+[pc=00400008, inst=00a53020] [op=00, rs= 5, rt= 5, rd= 6, imm=3020, f2=20] [reset=0, halted=0]
+Store address:        255,        127, Store word:        255, ALUOUT:        510, en:  0
+=== Simulation Cycle                  450 ===
+[pc=0040000c, inst=00c63820] [op=00, rs= 6, rt= 6, rd= 7, imm=3820, f2=20] [reset=0, halted=0]
+Store address:        510,        255, Store word:        510, ALUOUT:       1020, en:  0
+=== Simulation Cycle                  550 ===
+[pc=00400010, inst=24e87530] [op=09, rs= 7, rt= 8, rd=14, imm=7530, f2=30] [reset=0, halted=0]
+Store address:          0,       7755, Store word:          0, ALUOUT:      31020, en:  0
+=== Simulation Cycle                  650 ===
+[pc=00400014, inst=ac650000] [op=2b, rs= 3, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+Store address:        255,   67108864, Store word:        255, ALUOUT:  268435456, en: 15
+=== Simulation Cycle                  750 ===
+[pc=00400018, inst=ac660004] [op=2b, rs= 3, rt= 6, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+Store address:        510,   67108865, Store word:        510, ALUOUT:  268435460, en: 15
+=== Simulation Cycle                  850 ===
+[pc=0040001c, inst=ac670008] [op=2b, rs= 3, rt= 7, rd= 0, imm=0008, f2=08] [reset=0, halted=0]
+Store address:       1020,   67108866, Store word:       1020, ALUOUT:  268435464, en: 15
+=== Simulation Cycle                  950 ===
+[pc=00400020, inst=ac68000c] [op=2b, rs= 3, rt= 8, rd= 0, imm=000c, f2=0c] [reset=0, halted=0]
+Store address:      31020,   67108867, Store word:      31020, ALUOUT:  268435468, en: 15
+=== Simulation Cycle                 1050 ===
+[pc=00400024, inst=8c690000] [op=23, rs= 3, rt= 9, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+Store address:          0,   67108864, Store word:          0, ALUOUT:  268435456, en:  0
+=== Simulation Cycle                 1150 ===
+[pc=00400028, inst=8c6a0004] [op=23, rs= 3, rt=10, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+Store address:          0,   67108865, Store word:          0, ALUOUT:  268435460, en:  0
+=== Simulation Cycle                 1250 ===
+[pc=0040002c, inst=8c6b0008] [op=23, rs= 3, rt=11, rd= 0, imm=0008, f2=08] [reset=0, halted=0]
+Store address:          0,   67108866, Store word:          0, ALUOUT:  268435464, en:  0
+=== Simulation Cycle                 1350 ===
+[pc=00400030, inst=8c6c000c] [op=23, rs= 3, rt=12, rd= 0, imm=000c, f2=0c] [reset=0, halted=0]
+Store address:          0,   67108867, Store word:          0, ALUOUT:  268435468, en:  0
+=== Simulation Cycle                 1450 ===
+[pc=00400034, inst=24630004] [op=09, rs= 3, rt= 3, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+Store address:  268435456,   67108865, Store word:  268435456, ALUOUT:  268435460, en:  0
+=== Simulation Cycle                 1550 ===
+[pc=00400038, inst=ac650000] [op=2b, rs= 3, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+Store address:        255,   67108865, Store word:        255, ALUOUT:  268435460, en: 15
+=== Simulation Cycle                 1650 ===
+[pc=0040003c, inst=ac660004] [op=2b, rs= 3, rt= 6, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+Store address:        510,   67108866, Store word:        510, ALUOUT:  268435464, en: 15
+=== Simulation Cycle                 1750 ===
+[pc=00400040, inst=ac670008] [op=2b, rs= 3, rt= 7, rd= 0, imm=0008, f2=08] [reset=0, halted=0]
+Store address:       1020,   67108867, Store word:       1020, ALUOUT:  268435468, en: 15
+=== Simulation Cycle                 1850 ===
+[pc=00400044, inst=ac68000c] [op=2b, rs= 3, rt= 8, rd= 0, imm=000c, f2=0c] [reset=0, halted=0]
+Store address:      31020,   67108868, Store word:      31020, ALUOUT:  268435472, en: 15
+=== Simulation Cycle                 1950 ===
+[pc=00400048, inst=8c6dfffc] [op=23, rs= 3, rt=13, rd=31, imm=fffc, f2=3c] [reset=0, halted=0]
+Store address:          0,   67108864, Store word:          0, ALUOUT:  268435456, en:  0
+=== Simulation Cycle                 2050 ===
+[pc=0040004c, inst=8c6e0000] [op=23, rs= 3, rt=14, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+Store address:          0,   67108865, Store word:          0, ALUOUT:  268435460, en:  0
+=== Simulation Cycle                 2150 ===
+[pc=00400050, inst=8c6f0004] [op=23, rs= 3, rt=15, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+Store address:          0,   67108866, Store word:          0, ALUOUT:  268435464, en:  0
+=== Simulation Cycle                 2250 ===
+[pc=00400054, inst=8c700008] [op=23, rs= 3, rt=16, rd= 0, imm=0008, f2=08] [reset=0, halted=0]
+Store address:          0,   67108867, Store word:          0, ALUOUT:  268435468, en:  0
+=== Simulation Cycle                 2350 ===
+[pc=00400058, inst=00098820] [op=00, rs= 0, rt= 9, rd=17, imm=8820, f2=20] [reset=0, halted=0]
+Store address:        255,         63, Store word:        255, ALUOUT:        255, en:  0
+=== Simulation Cycle                 2450 ===
+[pc=0040005c, inst=022a8820] [op=00, rs=17, rt=10, rd=17, imm=8820, f2=20] [reset=0, halted=0]
+Store address:        510,        191, Store word:        510, ALUOUT:        765, en:  0
+=== Simulation Cycle                 2550 ===
+[pc=00400060, inst=022b8820] [op=00, rs=17, rt=11, rd=17, imm=8820, f2=20] [reset=0, halted=0]
+Store address:       1020,        446, Store word:       1020, ALUOUT:       1785, en:  0
+=== Simulation Cycle                 2650 ===
+[pc=00400064, inst=022c8820] [op=00, rs=17, rt=12, rd=17, imm=8820, f2=20] [reset=0, halted=0]
+Store address:      31020,       8201, Store word:      31020, ALUOUT:      32805, en:  0
+=== Simulation Cycle                 2750 ===
+[pc=00400068, inst=022d8820] [op=00, rs=17, rt=13, rd=17, imm=8820, f2=20] [reset=0, halted=0]
+Store address:        255,       8265, Store word:        255, ALUOUT:      33060, en:  0
+=== Simulation Cycle                 2850 ===
+[pc=0040006c, inst=022e8820] [op=00, rs=17, rt=14, rd=17, imm=8820, f2=20] [reset=0, halted=0]
+Store address:        255,       8328, Store word:        255, ALUOUT:      33315, en:  0
+=== Simulation Cycle                 2950 ===
+[pc=00400070, inst=022f8820] [op=00, rs=17, rt=15, rd=17, imm=8820, f2=20] [reset=0, halted=0]
+Store address:        510,       8456, Store word:        510, ALUOUT:      33825, en:  0
+=== Simulation Cycle                 3050 ===
+[pc=00400074, inst=02308820] [op=00, rs=17, rt=16, rd=17, imm=8820, f2=20] [reset=0, halted=0]
+Store address:       1020,       8711, Store word:       1020, ALUOUT:      34845, en:  0
+=== Simulation Cycle                 3150 ===
+[pc=00400078, inst=2402000a] [op=09, rs= 0, rt= 2, rd= 0, imm=000a, f2=0a] [reset=0, halted=0]
+Store address:          0,          2, Store word:          0, ALUOUT:         10, en:  0
+[End of program at 0x0040007c]
+=== Simulation Cycle                 3250 ===
+[pc=0040007c, inst=0000000c] [op=00, rs= 0, rt= 0, rd= 0, imm=000c, f2=0c] [reset=0, halted=0]
+Store address:          0,          0, Store word:          0, ALUOUT:          0, en:  0
+--- 18-447 Register file dump ---
+=== Simulation Cycle                 3250 ===
+R          0	= 0x00000000	( 0 )
+R          1	= 0x00000000	( 0 )
+R          2	= 0x0000000a	( 10 )
+R          3	= 0x10000004	( 268435460 )
+R          4	= 0x00000000	( 0 )
+R          5	= 0x000000ff	( 255 )
+R          6	= 0x000001fe	( 510 )
+R          7	= 0x000003fc	( 1020 )
+R          8	= 0x0000792c	( 31020 )
+R          9	= 0x000000ff	( 255 )
+R         10	= 0x000001fe	( 510 )
+R         11	= 0x000003fc	( 1020 )
+R         12	= 0x0000792c	( 31020 )
+R         13	= 0x000000ff	( 255 )
+R         14	= 0x000000ff	( 255 )
+R         15	= 0x000001fe	( 510 )
+R         16	= 0x000003fc	( 1020 )
+R         17	= 0x0000881d	( 34845 )
+R         18	= 0x00000000	( 0 )
+R         19	= 0x00000000	( 0 )
+R         20	= 0x00000000	( 0 )
+R         21	= 0x00000000	( 0 )
+R         22	= 0x00000000	( 0 )
+R         23	= 0x00000000	( 0 )
+R         24	= 0x00000000	( 0 )
+R         25	= 0x00000000	( 0 )
+R         26	= 0x00000000	( 0 )
+R         27	= 0x00000000	( 0 )
+R         28	= 0x00000000	( 0 )
+R         29	= 0x00000000	( 0 )
+R         30	= 0x00000000	( 0 )
+R         31	= 0x00000000	( 0 )
+--- End register file dump ---
+Simulation complete via $finish(1) at time 3250 NS + 4
+./src/testbench.v:85 	  $finish;
+ncsim> exit 

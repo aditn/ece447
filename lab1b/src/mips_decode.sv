@@ -51,9 +51,8 @@
 //// Sys     (output) - System call exception
 //// RI      (output) - Reserved instruction exception
 //// regdst  (output) - Selects the destination register (Rt or Rd)
-//// jmp     (output) - Whether the instruction is a jump
-//// br      (output) - Whether the instruction is a branch
-//// memtoreg (output) - Selects either ALU or memory to write to a register
+//// pcMuxSel(output) - Chooses next PC in pcMux
+//// memtoreg(output) - Selects either ALU or memory to write to a register
 //// aluop   (output) - Whether the operation is an ALU operation
 //// alusrc1 (output) - Selects the first input to the ALU (rs_data or rt_data)
 //// alusrc2 (output) - Selects the second input to the ALU (register data or immediate)
@@ -66,15 +65,16 @@
 
 module mips_decode(/*AUTOARG*/
    // Outputs
-   ctrl_we, ctrl_Sys, ctrl_RI, alu__sel, regdst, jmp, br, memtoreg, aluop, alusrc1, alusrc2, se, mem_write_en, hi_en,lo_en, load_sel, store_sel,
+   ctrl_we, ctrl_Sys, ctrl_RI, alu__sel, regdst, pcMuxSel, jLink_en, memtoreg, aluop, alusrc1, alusrc2, se, mem_write_en, hi_en,lo_en, load_sel, store_sel
+
    // Inputs
    dcd_op, dcd_funct2, dcd_rt
    );
 
    input       [5:0] dcd_op, dcd_funct2;
    input       [4:0] dcd_rt;
-   output reg        ctrl_we, ctrl_Sys, ctrl_RI, regdst, jmp, br, aluop, alusrc1, alusrc2, se, hi_en, lo_en;
-   output reg  [1:0] memtoreg;
+   output reg        ctrl_we, ctrl_Sys, ctrl_RI, regdst, jLink_en, aluop, alusrc1, alusrc2, se, hi_en, lo_en;
+   output reg  [1:0] memtoreg, pcMuxSel;
    output reg  [3:0] alu__sel, mem_write_en;
    output reg  [2:0] load_sel;
    output reg  [1:0] store_sel;
@@ -87,13 +87,16 @@ module mips_decode(/*AUTOARG*/
      ctrl_RI = 1'b0;
 
      regdst = 1'b0; //destination reg is Rt
-     jmp = 1'b0; //not jump
-     br = 1'b0; //not brance
+     pcMuxSel = 2'b00; //not jump
+     jLink_en = 1'b0; //not linking
+
      memtoreg = 2'b00; //write to reg from ALU, not mem
      aluop = 1'b0; //not aluop
      alusrc1 = 1'b0; //source is rs_data
      alusrc2 = 1'b0; //source is register
+
      se = 1'b0; //unsigned
+
      mem_write_en = 4'b0; //no mem write
      load_sel = 3'bx;
      store_sel = 2'bx;
@@ -130,17 +133,18 @@ module mips_decode(/*AUTOARG*/
              alu__sel = `ALU_SRLV;
            `OP0_SRAV:
              alu__sel = `ALU_SRAV;
-           `OP0_JR:
+           `OP0_JR: //jump to addr in reg
              begin
                ctrl_we = 1'b0;
-               jmp = 1'b1;
+               pcMuxSel = 2'b11;
                aluop = 1'b0;
              end
            `OP0_JALR:
              begin
              //need to get PC+4 into $ra
-               jmp = 1'b1;
+               pcMuxSel = 2'b11;
                aluop = 1'b0;
+               jLink_en = 1'b1;
              end
            `OP0_SYSCALL:
              ctrl_Sys = 1'b1;
@@ -151,7 +155,7 @@ module mips_decode(/*AUTOARG*/
            `OP0_MFLO: //read from LO reg
              memtoreg=2'b11;
            `OP0_MTLO: //write to LO reg
-             hi_en = 1'b1;
+             lo_en = 1'b1;
            `OP0_ADD: 
              alu__sel = `ALU_ADD;
            `OP0_ADDU:
@@ -183,35 +187,47 @@ module mips_decode(/*AUTOARG*/
              begin
                alu__sel = `ALU_SLT; // for brcond
                ctrl_we = 1'b0;
-               br = 1'b1;
+               pcMuxSel = 2'b01;
                aluop = 1'b1;
              end
            `OP1_BGEZ:
              begin
                alu__sel = `ALU_SUB; //for brcond
                ctrl_we = 1'b0;
-               br = 1'b1;
+               pcMuxSel = 2'b01;
                aluop = 1'b1;
              end
            `OP1_BLTZAL:
              begin
                alu__sel = `ALU_SLT;
-               br = 1'b1;
+               pcMuxSel = 2'b01;
                aluop = 1'b1;
                //need write PC+4 to $ra
              end
            `OP1_BGEZAL:
              begin
                alu__sel = `ALU_SUB; //for brcond
-               br = 1'b1;
+               pcMuxSel = 2'b01;
                aluop = 1'b1;
              end
            default:
              ctrl_RI = 1'b1;
          endcase //dcd_rt
        
-       //`OP_J:
-       //`OP_JAL:
+       `OP_J:
+         begin
+           ctrl_we = 1'b0;
+           pcMuxSel = 2'b11;
+           aluop = 1'b0;
+         end
+
+       `OP_JAL:
+         begin
+           ctrl_we = 1'b0;
+           pcMuxSel = 2'b11;
+           aluop = 1'b0;
+           jLink_en = 1'b1;
+         end
        //`OP_BEQ:
        //`OP_BNE:
        //`OP_BLEZ:
