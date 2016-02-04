@@ -61,6 +61,8 @@
 //// hi_en (output) - Enables writing to HI register
 //// lo_en (output) - Enables writing to LO register
 //// load_sel (output) - Selects which load operation for loader to perform
+//// brcond  (output) - Branch condition
+//// store_sel (output) - Selects which store operation for storer to perform
 ////
 
 module mips_decode(/*AUTOARG*/

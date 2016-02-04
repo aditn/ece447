@@ -110,11 +110,11 @@ module mips_core(/*AUTOARG*/
 
    // PC Management
    //register #(32, text_start) PCReg(pc, pcNextFinal, clk, ~internal_halt, rst_b);
-   register #(32, text_start) PCReg(pc, nextpc, clk, ~internal_halt, rst_b);
+   register #(32, text_start) PCReg(pc, newpc, clk, ~internal_halt, rst_b);
    register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
                                        ~internal_halt, rst_b);
    //mux2to1 pickNextPC (pcNextFinal, nextpc, nextnextpc,(pcMuxSel[1]|pcMuxSel[0]));
-   add_const #(4) NextPCAdder(nextnextpc, nextpc);
+   add_const #(4) NextPCAdder(nextpc, pc);
    //add_const #(4) NextPCAdder(nextnextpc, nextpc, pcMuxSel);
    assign        inst_addr = pc[31:2];
 
@@ -301,7 +301,7 @@ module mips_core(/*AUTOARG*/
    storer storer(store_data, mem_write_en, rt_data, store_sel, alu__out);
 
    //Mux for next state PC
-   mux4to1 pcMux(newpc, nextnextpc, br_target, rs_data, j_target, pcMuxSelFinal); //jump/branch
+   mux4to1 pcMux(newpc, pc + 4, br_target, rs_data, j_target, pcMuxSelFinal); //jump/branch
    adder brtarget(br_target, pc + 4, (imm << 2), 1'b0); //no need for signal
    concat conc(j_target, pc, dcd_target);
    muxSpecial choosePcMuxSel(pcMuxSelFinal,pcMuxSel,branchTrue);
