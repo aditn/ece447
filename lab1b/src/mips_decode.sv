@@ -279,6 +279,7 @@ module mips_decode(/*AUTOARG*/
            alu__sel = `ALU_ADD;
            aluop = 1'b1;
            alusrc2 = 1'b1;
+           se = 1'b1;
          end
        `OP_SLTI:
          begin

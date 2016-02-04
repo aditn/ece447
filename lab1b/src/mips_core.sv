@@ -139,7 +139,7 @@ module mips_core(/*AUTOARG*/
    assign        dcd_target = inst[25:0];     // target field
    assign        dcd_code = inst[25:6];       // Breakpoint code
 
-   // synthesis translate_off
+   /*// synthesis translate_off
    always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
@@ -152,9 +152,10 @@ module mips_core(/*AUTOARG*/
        $display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        $display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
        $display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", branchTrue, pcMuxSel, pcMuxSelFinal);
+       $display ("br_target: %x", br_target);
        $display ("");
      end
-   end
+   end*/
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -307,8 +308,8 @@ module mips_core(/*AUTOARG*/
    muxSpecial choosePcMuxSel(pcMuxSelFinal,pcMuxSel,branchTrue);
 
    //Decide wr_data and wr_reg
-   mux2to1 dataToReg(wr_data, wr_dataMem, pc+8, jLink_en);
-   mux2to1 #(5)regNumber(wr_reg, wr_regNum, 5'd31, jLink_en); //how to define decimal?
+   mux2to1 dataToReg(wr_data, wr_dataMem, pc+4, jLink_en);
+   mux2to1 #(31)regNumber(wr_reg, wr_regNum, 5'd31, jLink_en); //how to define decimal?
 
 endmodule // mips_core
 
@@ -337,7 +338,7 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
         alu__out = alu__op1+alu__op2;
       `ALU_SUB:
         begin
-          $display("brcond: %b", brcond);
+          //$display("brcond: %b", brcond);
           case(brcond)
             `BR_BLTZ:
               begin
@@ -351,7 +352,7 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
               end
             `BR_BEQ:
               begin
-                $display("alu__op1: %d, alu__op2:%d", alu__op1, alu__op2);
+                //$display("alu__op1: %d, alu__op2:%d", alu__op1, alu__op2);
                 if (alu__op1 == alu__op2)
                   branchTrue = 1'b1;
               end
@@ -362,12 +363,13 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
               end
             `BR_BLEZ:
               begin
-                if ($signed(alu__op1)<=0)
+                if ($signed(alu__op1)<=$signed(0))
                   branchTrue = 1'b1;
               end
             `BR_BGTZ:
               begin
-                if ($signed(alu__op1)>0)
+                $display("alu__op1: %d, alu__op2:%d", alu__op1, alu__op2);
+                if ($signed(alu__op1)>$signed(0))
                   branchTrue = 1'b1;
               end
             default:
@@ -484,7 +486,7 @@ endmodule // adder
 //// in1 (input)  - data lines
 //// sel (input)  - selects which data to output
 ////
-module mux2to1 #(int width = 32) (
+module mux2to1 #(parameter width = 32) (
       output logic [width - 1:0] out,
       input logic [width - 1:0] in0, in1, 
       input logic sel);
@@ -504,7 +506,7 @@ endmodule
 //// in3 (input)  - data lines
 //// sel (input)  - selects which data to output
 ////
-module mux4to1 #(int width = 32) (
+module mux4to1 #(parameter width = 32) (
       output logic [width - 1:0] out,
       input logic [width - 1:0] in0, in1, in2, in3,
       input logic [1:0] sel);
@@ -523,7 +525,7 @@ endmodule
 //// in3 (input)  - data lines
 //// sel (input)  - selects which data to output
 ////
-module muxSpecial #(int width = 2) (
+module muxSpecial #(parameter width = 2) (
       output logic [width - 1:0] pcMuxSelFinal,
       input logic [width - 1:0] pcMuxSel,
       input logic branchTrue);
