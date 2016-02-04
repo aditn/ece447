@@ -162,7 +162,7 @@ module mips_core(/*AUTOARG*/
    wire regdst;
    wire jmp; 
    wire br; 
-   wire memtoreg;
+   wire [1:0] memtoreg;
    wire aluop;
    wire alusrc1;
    wire alusrc2;
@@ -185,6 +185,8 @@ module mips_core(/*AUTOARG*/
                        .alusrc2         (alusrc2),
                        .se              (se),
                        .mem_write_en    (mem_write_en),
+                       .hi_en           (hi_en),
+                       .lo_en           (lo_en),
                        .load_sel        (load_sel),
 		       // Inputs
 		       .dcd_op		(dcd_op[5:0]),
@@ -242,20 +244,33 @@ module mips_core(/*AUTOARG*/
 
    wire [31:0] br_target; //branch target
    wire [31:0] j_target; //unconditional jump target
+   wire [31:0] hi_out; //HI Register out
+   wire [31:0] lo_out; //LO Register out
+   wire [31:0] hi_in; //HI Register in
+   wire [31:0] lo_in; //LO Register in
+   wire [31:0] hi_en; //HI Register enable
+   wire [31:0] lo_en; //LO Register enable
+
 
    wire [31:0] load_data;
 
    //Register file
    regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, wr_data, ctrl_we, clk, rst_b, halted); //ctrl_we is RegWrite
    
-   //ALU (with placeholder select bits)
+   //HI LO registers
+   register #(32,0) hiReg(hi_out, hi_in, clk, hi_en, rst_b);
+   register #(32,0) loReg(lo_out, lo_in, clk, lo_en, rst_b);
+
+   //ALU
    mux2to1 #(5) regDest(wr_reg, dcd_rt, dcd_rd, regdst); //RegDst
    mux2to1 aluSrc1(alu_in1, rs_data, rt_data, alusrc1); //ALUSrc1
    mux2to1 aluSrc2(alu_in2, rt_data, imm, alusrc2); //ALUSrc2
    mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se); //Signed
 
    //Wirings to memory module
-   mux2to1 memToReg(wr_data, alu__out, load_data, memtoreg); //MemtoReg
+<<<<<<< HEAD
+   //mux2to1 memToReg(wr_data, alu__out, mem_data_out, memtoreg); //MemtoReg
+   mux4to1 memToReg(wr_data,alu__out, load_data, hi_out, lo_out, memtoreg);
    assign instr_addr = newpc[31:2];
    assign mem_addr = alu__out[31:2];
    assign mem_data_in = rt_data;
