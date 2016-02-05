@@ -173,7 +173,6 @@ module mips_core(/*AUTOARG*/
    wire branchTrue;
 
    wire [1:0] memtoreg;
-   wire aluop;
    wire alusrc1;
    wire alusrc2;
    wire se;
@@ -193,7 +192,6 @@ module mips_core(/*AUTOARG*/
                        .pcMuxSel        (pcMuxSel),
                        .jLink_en        (jLink_en),
                        .memtoreg        (memtoreg),
-                       .aluop           (aluop),
                        .alusrc1         (alusrc1),
                        .alusrc2         (alusrc2),
                        .se              (se),
@@ -394,8 +392,6 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
         alu__out = ~(alu__op1 | alu__op2);
       `ALU_SLT://signed compare
         alu__out = (alu__op1 < alu__op2) ? 32'b1 : 32'b0;
-      `ALU_ADDR:
-        alu__out = alu__op1+alu__op2;
 
     endcase
 

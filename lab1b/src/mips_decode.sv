@@ -57,7 +57,6 @@
 ////                    10: picks rsdata for addr in register
 ////                    11: jump to 26 bit imm)
 //// memtoreg(output) - Selects either ALU or memory to write to a register
-//// aluop   (output) - Whether the operation is an ALU operation
 //// alusrc1 (output) - Selects the first input to the ALU (rs_data or rt_data)
 //// alusrc2 (output) - Selects the second input to the ALU (register data or immediate)
 //// se      (output) - Selects whether to sign extend the immediate
@@ -72,7 +71,7 @@
 module mips_decode(/*AUTOARG*/
    // Outputs
    ctrl_we, ctrl_Sys, ctrl_RI, alu__sel, regdst, pcMuxSel, jLink_en,
-   memtoreg, aluop, alusrc1, alusrc2, se, mem_write_en, hi_en,lo_en,
+   memtoreg, alusrc1, alusrc2, se, mem_write_en, hi_en,lo_en,
    load_sel,brcond, store_sel,
 
    // Inputs
@@ -81,7 +80,7 @@ module mips_decode(/*AUTOARG*/
 
    input       [5:0] dcd_op, dcd_funct2;
    input       [4:0] dcd_rt;
-   output reg        ctrl_we, ctrl_Sys, ctrl_RI, regdst, jLink_en, aluop, alusrc1, alusrc2, se, hi_en, lo_en;
+   output reg        ctrl_we, ctrl_Sys, ctrl_RI, regdst, jLink_en, alusrc1, alusrc2, se, hi_en, lo_en;
    output reg  [1:0] memtoreg, pcMuxSel;
    output reg  [3:0] alu__sel, mem_write_en;
    output reg  [2:0] load_sel,brcond;
@@ -99,7 +98,6 @@ module mips_decode(/*AUTOARG*/
      jLink_en = 1'b0; //not linking
 
      memtoreg = 2'b00; //write to reg from ALU, not mem
-     aluop = 1'b0; //not aluop
      alusrc1 = 1'b0; //source is rs_data
      alusrc2 = 1'b0; //source is register
 
@@ -117,7 +115,6 @@ module mips_decode(/*AUTOARG*/
        `OP_OTHER0: // Secondary opcodes (funct2 field; OP_OTHER0)
          begin
            regdst = 1'b1; //destination is Rd
-           aluop = 1'b1;  //is an ALU op
          case(dcd_funct2)
            `OP0_SLL:
              begin
@@ -147,13 +144,11 @@ module mips_decode(/*AUTOARG*/
              begin
                ctrl_we = 1'b0;
                pcMuxSel = 2'b10;
-               aluop = 1'b0;
              end
            `OP0_JALR:
              begin
              //need to get PC+4 into $ra
                pcMuxSel = 2'b10;
-               aluop = 1'b0;
                jLink_en = 1'b1;
                ctrl_we = 1'b1;
              end
@@ -200,7 +195,6 @@ module mips_decode(/*AUTOARG*/
                alu__sel = `ALU_SUB;
                ctrl_we = 1'b0;
                pcMuxSel = 2'b01;
-               aluop = 1'b1;
                brcond = `BR_BLTZ;
              end
            `OP1_BGEZ:
@@ -208,14 +202,12 @@ module mips_decode(/*AUTOARG*/
                alu__sel = `ALU_SUB;
                ctrl_we = 1'b0;
                pcMuxSel = 2'b01;
-               aluop = 1'b1;
                brcond = `BR_BGEZ;
              end
            `OP1_BLTZAL:
              begin
                alu__sel = `ALU_SUB;
                pcMuxSel = 2'b01;
-               aluop = 1'b1;
                jLink_en = 1'b1;
                brcond = `BR_BLTZ;
              end
@@ -223,7 +215,6 @@ module mips_decode(/*AUTOARG*/
              begin
                alu__sel = `ALU_SUB; //for brcond
                pcMuxSel = 2'b01;
-               aluop = 1'b1;
                jLink_en = 1'b1;
                brcond = `BR_BGEZ;
              end
@@ -235,14 +226,12 @@ module mips_decode(/*AUTOARG*/
          begin
            ctrl_we = 1'b0;
            pcMuxSel = 2'b11;
-           aluop = 1'b0;
          end
 
        `OP_JAL:
          begin
            ctrl_we = 1'b1; //need to write to $ra
            pcMuxSel = 2'b11;
-           aluop = 1'b0;
            jLink_en = 1'b1;
          end
        `OP_BEQ:
@@ -280,46 +269,39 @@ module mips_decode(/*AUTOARG*/
        `OP_ADDI:
          begin
            alu__sel = `ALU_ADD;
-           aluop = 1'b1;
            alusrc2 = 1'b1;
            se = 1'b1;
          end
        `OP_ADDIU:
          begin
            alu__sel = `ALU_ADD;
-           aluop = 1'b1;
            alusrc2 = 1'b1;
            se = 1'b1; //need to sign extend to read inputs right
          end
        `OP_SLTI:
          begin
            alu__sel = `ALU_SLT;
-           aluop = 1'b1;
            alusrc2 = 1'b1;
            se = 1'b1;
          end
        `OP_SLTIU:
          begin
            alu__sel = `ALU_SLT;
-           aluop = 1'b1;
            alusrc2 = 1'b1;
          end
        `OP_ANDI:
          begin
            alu__sel = `ALU_AND;
-           aluop = 1'b1;
            alusrc2 = 1'b1;
          end
        `OP_ORI:
          begin
            alu__sel = `ALU_OR;
-           aluop = 1'b1;
            alusrc2 = 1'b1;
          end
        `OP_XORI:
          begin
            alu__sel = `ALU_XOR;
-           aluop = 1'b1;
            alusrc2 = 1'b1;
          end
        `OP_LUI:
@@ -329,7 +311,7 @@ module mips_decode(/*AUTOARG*/
          end
        `OP_LB:
          begin
-           alu__sel = `ALU_ADDR;
+           alu__sel = `ALU_ADD;
            se = 1'b1;
            alusrc2 = 1'b1;
            memtoreg = 1'b1;
@@ -337,7 +319,7 @@ module mips_decode(/*AUTOARG*/
          end
        `OP_LH:
          begin
-           alu__sel = `ALU_ADDR;
+           alu__sel = `ALU_ADD;
            se = 1'b1;
            alusrc2 = 1'b1;
            memtoreg = 1'b1;
@@ -345,7 +327,7 @@ module mips_decode(/*AUTOARG*/
          end
        `OP_LW:
          begin
-           alu__sel = `ALU_ADDR;
+           alu__sel = `ALU_ADD;
            se = 1'b1;
            alusrc2 = 1'b1;
            memtoreg = 1'b1;
@@ -353,7 +335,7 @@ module mips_decode(/*AUTOARG*/
          end
        `OP_LBU:
          begin
-           alu__sel = `ALU_ADDR;
+           alu__sel = `ALU_ADD;
            se = 1'b1;
            alusrc2 = 1'b1;
            memtoreg = 1'b1;
@@ -361,7 +343,7 @@ module mips_decode(/*AUTOARG*/
          end
        `OP_LHU:
          begin
-           alu__sel = `ALU_ADDR;
+           alu__sel = `ALU_ADD;
            se = 1'b1;
            alusrc2 = 1'b1;
            memtoreg = 1'b1;
@@ -370,7 +352,7 @@ module mips_decode(/*AUTOARG*/
        `OP_SB:
          begin
            ctrl_we = 1'b0;
-           alu__sel = `ALU_ADDR;
+           alu__sel = `ALU_ADD;
            alusrc2 = 1'b1;
            se = 1'b1;
            mem_write_en = 4'b1000;
@@ -379,7 +361,7 @@ module mips_decode(/*AUTOARG*/
        `OP_SH:
          begin
            ctrl_we = 1'b0;
-           alu__sel = `ALU_ADDR;
+           alu__sel = `ALU_ADD;
            alusrc2 = 1'b1;
            se = 1'b1;
            mem_write_en = 4'b1100;
@@ -388,7 +370,7 @@ module mips_decode(/*AUTOARG*/
        `OP_SW:
          begin
            ctrl_we = 1'b0;
-           alu__sel = `ALU_ADDR;
+           alu__sel = `ALU_ADD;
            alusrc2 = 1'b1;
            se = 1'b1;
            mem_write_en = 4'b1111;
