@@ -193,7 +193,7 @@ module mips_decode(/*AUTOARG*/
                alu__sel = `ALU_SUB; // for brcond
                ctrl_we = 1'b0;
                pcMuxSel = 2'b01;
-               se = 1'b1;
+               aluop = 1'b1;
                brcond = `BR_BLTZ;
              end
            `OP1_BGEZ:
@@ -201,14 +201,14 @@ module mips_decode(/*AUTOARG*/
                alu__sel = `ALU_SUB; //for brcond
                ctrl_we = 1'b0;
                pcMuxSel = 2'b01;
-               se = 1'b1;
+               aluop = 1'b1;
                brcond = `BR_BGEZ;
              end
            `OP1_BLTZAL:
              begin
                alu__sel = `ALU_SUB;
                pcMuxSel = 2'b01;
-               se = 1'b1;
+               aluop = 1'b1;
                jLink_en = 1'b1;
                brcond = `BR_BLTZ;
              end
@@ -216,7 +216,7 @@ module mips_decode(/*AUTOARG*/
              begin
                alu__sel = `ALU_SUB; //for brcond
                pcMuxSel = 2'b01;
-               se = 1'b1;
+               aluop = 1'b1;
                jLink_en = 1'b1;
                brcond = `BR_BGEZ;
              end
@@ -228,45 +228,47 @@ module mips_decode(/*AUTOARG*/
          begin
            ctrl_we = 1'b0;
            pcMuxSel = 2'b11;
+           aluop = 1'b0;
          end
 
        `OP_JAL:
          begin
            ctrl_we = 1'b1;
            pcMuxSel = 2'b11;
+           aluop = 1'b0;
            jLink_en = 1'b1;
          end
        `OP_BEQ:
          begin
            alu__sel = `ALU_SUB; //for brcond
-           ctrl_we = 1'b0; 
-           se = 1'b1;
+           ctrl_we = 1'b0;
            pcMuxSel = 2'b01;
            brcond = `BR_BEQ;
+           se = 1'b1;
          end
        `OP_BNE:
          begin
            alu__sel = `ALU_SUB; //for brcond
            ctrl_we = 1'b0;
-           se = 1'b1;
            pcMuxSel = 2'b01;
            brcond = `BR_BNE;
+           se = 1'b1;
          end
        `OP_BLEZ:
          begin
            alu__sel = `ALU_SUB; //for brcond
            ctrl_we = 1'b0;
-           se = 1'b1;
            pcMuxSel = 2'b01;
            brcond = `BR_BLEZ;
+           se = 1'b1;
          end
        `OP_BGTZ:
          begin
            alu__sel = `ALU_SUB; //for brcond
            ctrl_we = 1'b0;
-           se = 1'b1;
            pcMuxSel = 2'b01;
            brcond = `BR_BGTZ;
+           se = 1'b1;
          end
 
        `OP_ADDI:
