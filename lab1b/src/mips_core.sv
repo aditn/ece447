@@ -79,11 +79,6 @@ module mips_core(/*AUTOARG*/
    output        halted;
    input         rst_b;
 
-   // Forced interface signals -- required for synthesis to work OK.
-   // This is probably not what you want!
-   /*assign        mem_addr = 0;
-   assign        mem_data_in = mem_data_out;
-   assign        mem_write_en = 4'b0;*/
 
    // Internal signals
    wire [31:0]   pc, nextpc, nextnextpc;
@@ -276,7 +271,8 @@ module mips_core(/*AUTOARG*/
    wire [31:0] store_data;
 
    //Register file
-   regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, wr_data, ctrl_we, clk, rst_b, halted); //ctrl_we is RegWrite
+   regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, wr_data, ctrl_we, clk, rst_b, halted);
+   mux2to1 #(5) regDest(wr_regNum, dcd_rt, dcd_rd, regdst); //register to write to
    
    //HI, LO registers
    register #(32,0) hiReg(hi_out, hi_in, clk, hi_en, rst_b);
@@ -284,32 +280,30 @@ module mips_core(/*AUTOARG*/
    assign hi_in = rs_data;
    assign lo_in = rs_data;
 
-   //ALU
-   mux2to1 #(5) regDest(wr_regNum, dcd_rt, dcd_rd, regdst); //RegDst
+   //Determines inputs to ALU
    mux2to1 aluSrc1(alu_in1, rs_data, rt_data, alusrc1); //ALUSrc1
    mux2to1 aluSrc2(alu_in2, rt_data, imm, alusrc2); //ALUSrc2
-   mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se); //Signed
+   mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se); //Zero extend or sign extend immediate
 
    //Wirings to memory module
-   mux4to1 memToReg(wr_dataMem,alu__out, load_data, hi_out, lo_out, memtoreg);
-   assign instr_addr = newpc[31:2];
-   assign mem_addr = alu__out[31:2];
-   assign mem_data_in = store_data;
-   //assign mem_write_en = 4'b1111; //MemWrite
+   mux4to1 memToReg(wr_dataMem, alu__out, load_data, hi_out, lo_out, memtoreg);
+   assign instr_addr = newpc[31:2]; //address of next instruction
+   assign mem_addr = alu__out[31:2]; //memory address to read/write
+   assign mem_data_in = store_data; //data to store
 
    //To read from / write to memory
-   loader loader(load_data, dcd_imm, mem_data_out, load_sel, alu__out);
-   storer storer(store_data, mem_write_en, rt_data, store_sel, alu__out);
+   loader loader(load_data, dcd_imm, mem_data_out, load_sel, alu__out); //operates on data loaded from memory
+   storer storer(store_data, mem_write_en, rt_data, store_sel, alu__out); //operates on data to write to memory
 
    //Mux for next state PC
-   mux4to1 pcMux(newpc, pc + 4, br_target, rs_data, j_target, pcMuxSelFinal); //jump/branch
-   adder brtarget(br_target, pc + 4, (imm << 2), 1'b0); //no need for signal
-   concat conc(j_target, pc, dcd_target);
-   muxSpecial choosePcMuxSel(pcMuxSelFinal,pcMuxSel,branchTrue);
+   mux4to1 pcMux(newpc, pc + 4, br_target, rs_data, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
+   adder brtarget(br_target, pc + 4, (imm << 2), 1'b0); //get branch target
+   concat conc(j_target, pc, dcd_target); //get jump target
+   muxSpecial choosePcMuxSel(pcMuxSelFinal,pcMuxSel,branchTrue); //chooses PC on whether branch condition is met
 
-   //Decide wr_data and wr_reg
-   mux2to1 dataToReg(wr_data, wr_dataMem, pc+4, jLink_en);
-   mux2to1 #(31)regNumber(wr_reg, wr_regNum, 5'd31, jLink_en); //how to define decimal?
+   //Set wr_data and wr_reg when there is a jump/branch with link
+   mux2to1 dataToReg(wr_data, wr_dataMem, pc+4, jLink_en); 
+   mux2to1 #(31)regNumber(wr_reg, wr_regNum, 5'd31, jLink_en);
 
 endmodule // mips_core
 
@@ -318,6 +312,8 @@ endmodule // mips_core
 //// mips_ALU: Performs all arithmetic and logical operations
 ////
 //// out (output) - Final result
+//// branchTrue (output) - Whether the branch condition is met
+//// brcond (input) - Set if instruction is a branch
 //// in1 (input)  - Operand modified by the operation
 //// in2 (input)  - Operand used (in arithmetic ops) to modify in1
 //// sel (input)  - Selects which operation is to be performed
@@ -337,8 +333,7 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
       `ALU_ADD:
         alu__out = alu__op1+alu__op2;
       `ALU_SUB:
-        begin
-          //$display("brcond: %b", brcond);
+        begin //check if branch condition is met
           case(brcond)
             `BR_BLTZ:
               begin
@@ -352,7 +347,6 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
               end
             `BR_BEQ:
               begin
-                //$display("alu__op1: %d, alu__op2:%d", alu__op1, alu__op2);
                 if (alu__op1 == alu__op2)
                   branchTrue = 1'b1;
               end
@@ -377,15 +371,17 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
           endcase
         end
       `ALU_SLL:
-        alu__out = alu__op1<<{27'b0, alu__op2[10:6]}; //rt << sa
+        //shift by value in bits [10:6] of immediate
+        alu__out = alu__op1<<{27'b0, alu__op2[10:6]};
       `ALU_SRL:
-        alu__out = alu__op1>>{27'b0, alu__op2[10:6]}; //rt >> sa
-      `ALU_SRA://need to check what $signed does
-        alu__out = $signed($signed(alu__op1) >>> {27'b0, alu__op2[10:6]}); //rt >> sa
-      `ALU_SLLV://requires weird inputs
-        alu__out = alu__op2<<alu__op1; //rt << rs
+        alu__out = alu__op1>>{27'b0, alu__op2[10:6]};
+      `ALU_SRA:
+        //signed arithmetic shift
+        alu__out = $signed($signed(alu__op1) >>> {27'b0, alu__op2[10:6]});
+      `ALU_SLLV:
+        alu__out = alu__op2<<alu__op1;
       `ALU_SRLV:
-        alu__out = alu__op2>>alu__op1; //rt >> rs
+        alu__out = alu__op2>>alu__op1;
       `ALU_SRAV:
         alu__out = $signed($signed(alu__op2) >>> alu__op1);
       `ALU_AND:
@@ -516,14 +512,11 @@ module mux4to1 #(parameter width = 32) (
 endmodule
 
 ////
-//// muxSpecial
+//// pcSelector: sets the select bits to choose the next PC
 ////
-//// out (output) - data chosen to be outputted
-//// in0 (input)  - data lines
-//// in1 (input)  - data lines
-//// in2 (input)  - data lines
-//// in3 (input)  - data lines
-//// sel (input)  - selects which data to output
+//// pcMuxSelFinal (output) - select bits
+//// pcMuxSel      (input)  - select bits without considering branch condition
+//// branchTrue    (input)  - whether the branch condition was met
 ////
 module muxSpecial #(parameter width = 2) (
       output logic [width - 1:0] pcMuxSelFinal,
@@ -543,7 +536,8 @@ endmodule
 
 ////
 //// concat: concatenates the top 4 bits of PC and the bottom 26 bits 
-////         of the current instruction for unconditional jumps
+////         of the current instruction for unconditional jumps shifted
+///          left by 2
 ////
 //// j_target (output)  - data chosen to be outputted
 //// cur_pc (input)     - current PC
@@ -565,6 +559,7 @@ endmodule
 //// dcd_imm   (input)  - immediate (for LUI)
 //// mem_data  (input)  - data read from memory
 //// load_sel  (input)  - selects what to output
+//// offset    (input)  - byte offset for writing to memory
 module loader (
       output logic [31:0] load_data,
       input logic [15:0] dcd_imm,
@@ -572,18 +567,17 @@ module loader (
       input logic [2:0] load_sel,
       input logic [31:0] offset);
 
+    //shift the data by the offset number of bytes
     logic [31:0] data;
     assign data = (mem_data << ((offset & 32'h3) * 8));
 
     always_comb begin
       case(load_sel)
-        `LOAD_LUI:
+        `LOAD_LUI: //load upper immediate
           load_data = {dcd_imm, 16'b0};
-        `LOAD_LB:
-          //load_data = {{24{mem_data[31]}}, mem_data[31:24]};
+        `LOAD_LB: //load top portion of shifted data
           load_data = {{24{data[31]}}, data[31:24] };
         `LOAD_LH:
-          //load_data = {{16{mem_data[31]}}, mem_data[31:16]};
           load_data = {{16{data[31]}}, data[31:16]};
         `LOAD_LW:
           load_data = mem_data;
@@ -613,10 +607,9 @@ module storer (
       input logic [1:0] store_sel,
       input logic [31:0] offset);
 
-    
     always_comb begin
       case(store_sel)
-        `ST_SB:
+        `ST_SB: //place data in top bits of word and shift right by offset number of bytes
           begin
             store_data = {rt_data[7:0], 24'b0} >> ((offset & 32'h3) * 8);
             mem_write_en = 4'b0001 << (offset & 32'h3);
