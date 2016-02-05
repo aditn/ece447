@@ -42,16 +42,20 @@
 
 ////
 //// mips_decode: Decode MIPS instructions
+//// Refer to MIPS Instruction Set to see different Instruction formats
 ////
 //// op      (input)  - Instruction opcode
 //// funct2  (input)  - Instruction minor opcode
 //// rt      (input)  - Instruction minor opcode
-//// alu_sel (output) - Selects the ALU function
+//// alu__sel(output) - Selects the ALU function
 //// we      (output) - Write to the register file
 //// Sys     (output) - System call exception
 //// RI      (output) - Reserved instruction exception
 //// regdst  (output) - Selects the destination register (Rt or Rd)
-//// pcMuxSel(output) - Chooses next PC in pcMux
+//// pcMuxSel(output) - Chooses next PC in pcMux (00: pc+4;
+////                    01: conditional branching;
+////                    10: picks rsdata for addr in register
+////                    11: jump to 26 bit imm)
 //// memtoreg(output) - Selects either ALU or memory to write to a register
 //// aluop   (output) - Whether the operation is an ALU operation
 //// alusrc1 (output) - Selects the first input to the ALU (rs_data or rt_data)
@@ -67,7 +71,9 @@
 
 module mips_decode(/*AUTOARG*/
    // Outputs
-   ctrl_we, ctrl_Sys, ctrl_RI, alu__sel, regdst, pcMuxSel, jLink_en, memtoreg, aluop, alusrc1, alusrc2, se, mem_write_en, hi_en,lo_en, load_sel,brcond, store_sel,
+   ctrl_we, ctrl_Sys, ctrl_RI, alu__sel, regdst, pcMuxSel, jLink_en,
+   memtoreg, aluop, alusrc1, alusrc2, se, mem_write_en, hi_en,lo_en,
+   load_sel,brcond, store_sel,
 
    // Inputs
    dcd_op, dcd_funct2, dcd_rt
@@ -83,7 +89,7 @@ module mips_decode(/*AUTOARG*/
  
 
    always_comb begin
-     alu__sel = 4'hx;
+     alu__sel = 4'hx; //no speciic alu operation chosen yet
      ctrl_we = 1'b1; //is reg write
      ctrl_Sys = 1'b0;
      ctrl_RI = 1'b0;
@@ -105,13 +111,13 @@ module mips_decode(/*AUTOARG*/
      hi_en = 1'b0; //HI reg not enabled
      lo_en = 1'b0; //LO reg not enabled
 
-     brcond = 3'b111;
+     brcond = 3'b111; 
 
      case(dcd_op) // Main opcodes (op field)
        `OP_OTHER0: // Secondary opcodes (funct2 field; OP_OTHER0)
          begin
            regdst = 1'b1; //destination is Rd
-           aluop = 1'b1; //is an ALU op
+           aluop = 1'b1;  //is an ALU op
          case(dcd_funct2)
            `OP0_SLL:
              begin
@@ -188,9 +194,10 @@ module mips_decode(/*AUTOARG*/
 
        `OP_OTHER1: // Secondary opcodes (rt field; OP_OTHER1)
          case(dcd_rt)
+            //conditional branching are found in the ALU
            `OP1_BLTZ:
              begin
-               alu__sel = `ALU_SUB; // for brcond
+               alu__sel = `ALU_SUB;
                ctrl_we = 1'b0;
                pcMuxSel = 2'b01;
                aluop = 1'b1;
@@ -198,7 +205,7 @@ module mips_decode(/*AUTOARG*/
              end
            `OP1_BGEZ:
              begin
-               alu__sel = `ALU_SUB; //for brcond
+               alu__sel = `ALU_SUB;
                ctrl_we = 1'b0;
                pcMuxSel = 2'b01;
                aluop = 1'b1;
@@ -233,7 +240,7 @@ module mips_decode(/*AUTOARG*/
 
        `OP_JAL:
          begin
-           ctrl_we = 1'b1;
+           ctrl_we = 1'b1; //need to write to $ra
            pcMuxSel = 2'b11;
            aluop = 1'b0;
            jLink_en = 1'b1;
@@ -244,6 +251,7 @@ module mips_decode(/*AUTOARG*/
            ctrl_we = 1'b0;
            pcMuxSel = 2'b01;
            brcond = `BR_BEQ;
+           se = 1'b1;
          end
        `OP_BNE:
          begin
@@ -251,6 +259,7 @@ module mips_decode(/*AUTOARG*/
            ctrl_we = 1'b0;
            pcMuxSel = 2'b01;
            brcond = `BR_BNE;
+           se = 1'b1;
          end
        `OP_BLEZ:
          begin
@@ -258,6 +267,7 @@ module mips_decode(/*AUTOARG*/
            ctrl_we = 1'b0;
            pcMuxSel = 2'b01;
            brcond = `BR_BLEZ;
+           se = 1'b1;
          end
        `OP_BGTZ:
          begin
@@ -265,8 +275,8 @@ module mips_decode(/*AUTOARG*/
            ctrl_we = 1'b0;
            pcMuxSel = 2'b01;
            brcond = `BR_BGTZ;
+           se = 1'b1;
          end
-
        `OP_ADDI:
          begin
            alu__sel = `ALU_ADD;
@@ -279,7 +289,7 @@ module mips_decode(/*AUTOARG*/
            alu__sel = `ALU_ADD;
            aluop = 1'b1;
            alusrc2 = 1'b1;
-           se = 1'b1;
+           se = 1'b1; //need to sign extend to read inputs right
          end
        `OP_SLTI:
          begin
