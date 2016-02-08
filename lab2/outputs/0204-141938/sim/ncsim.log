@@ -1,0 +1,200 @@
+ncsim: 08.20-s015: (c) Copyright 1995-2009 Cadence Design Systems, Inc.
+ncsim> database -open -shm -default waveforms
+Created default SHM database waveforms
+ncsim> probe -shm -create -depth all -all 
+Created probe 1
+ncsim> run 
+=== Simulation Cycle                  150 ===
+[pc=00400000, inst=2402000a] [op=09, rs= 0, rt= 2, rd= 0, imm=000a, f2=0a] [reset=0, halted=0]
+Store address:          0,          2, Store word:          x, ALUOUT:         10, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 00400004, nextnextpc:00400008
+jLink_en:0, wr_reg:  2, wr_data: 0000000a
+Address: 00000002, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:         10, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+=== Simulation Cycle                  250 ===
+[pc=00400004, inst=24030001] [op=09, rs= 0, rt= 3, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+Store address:          0,          0, Store word:          x, ALUOUT:          1, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 00400008, nextnextpc:0040000c
+jLink_en:0, wr_reg:  3, wr_data: 00000001
+Address: 00000000, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:          1, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+=== Simulation Cycle                  350 ===
+[pc=00400008, inst=2404ffff] [op=09, rs= 0, rt= 4, rd=31, imm=ffff, f2=3f] [reset=0, halted=0]
+Store address:          0,      16383, Store word:          x, ALUOUT:      65535, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 0040000c, nextnextpc:00400010
+jLink_en:0, wr_reg:  4, wr_data: 0000ffff
+Address: 00003fff, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:      65535, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+=== Simulation Cycle                  450 ===
+[pc=0040000c, inst=24051234] [op=09, rs= 0, rt= 5, rd= 2, imm=1234, f2=34] [reset=0, halted=0]
+Store address:          0,       1165, Store word:          x, ALUOUT:       4660, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 00400010, nextnextpc:00400014
+jLink_en:0, wr_reg:  5, wr_data: 00001234
+Address: 0000048d, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:       4660, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+=== Simulation Cycle                  550 ===
+[pc=00400010, inst=08100007] [op=02, rs= 0, rt=16, rd= 0, imm=0007, f2=07] [reset=0, halted=0]
+Store address:          0,          0, Store word:          x, ALUOUT:          0, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 3, nextpc: 00400014, nextnextpc:00400018
+jLink_en:0, wr_reg: 16, wr_data: 00000000
+Address: 00000000, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:          0, brcond: 111
+branchTrue: 0, pcMuxSel: 11, pcMuxSelFinal: 11
+
+=== Simulation Cycle                  650 ===
+[pc=00400014, inst=00bf2821] [op=00, rs= 5, rt=31, rd= 5, imm=2821, f2=21] [reset=0, halted=0]
+Store address:          0,       1165, Store word:          x, ALUOUT:       4660, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 0040001c, nextnextpc:00400020
+jLink_en:0, wr_reg:  5, wr_data: 00001234
+Address: 0000048d, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:       4660, alu_in2:          0, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+=== Simulation Cycle                  750 ===
+[pc=0040001c, inst=24a50007] [op=09, rs= 5, rt= 5, rd= 0, imm=0007, f2=07] [reset=0, halted=0]
+Store address:       4660,       1166, Store word:          x, ALUOUT:       4667, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 00400020, nextnextpc:00400024
+jLink_en:0, wr_reg:  5, wr_data: 0000123b
+Address: 0000048e, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:       4660, alu_in2:          7, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+=== Simulation Cycle                  850 ===
+[pc=00400020, inst=0c100005] [op=03, rs= 0, rt=16, rd= 0, imm=0005, f2=05] [reset=0, halted=0]
+Store address:          0,          0, Store word:          x, ALUOUT:          0, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 3, nextpc: 00400024, nextnextpc:00400028
+jLink_en:1, wr_reg: 31, wr_data: 00400028
+Address: 00000000, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:          0, brcond: 111
+branchTrue: 0, pcMuxSel: 11, pcMuxSelFinal: 11
+
+=== Simulation Cycle                  950 ===
+[pc=00400024, inst=08100016] [op=02, rs= 0, rt=16, rd= 0, imm=0016, f2=16] [reset=0, halted=0]
+Store address:          0,          0, Store word:          x, ALUOUT:          0, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 3, nextpc: 00400014, nextnextpc:00400018
+jLink_en:0, wr_reg: 16, wr_data: 00000000
+Address: 00000000, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:          0, brcond: 111
+branchTrue: 0, pcMuxSel: 11, pcMuxSelFinal: 11
+
+=== Simulation Cycle                 1050 ===
+[pc=00400014, inst=00bf2821] [op=00, rs= 5, rt=31, rd= 5, imm=2821, f2=21] [reset=0, halted=0]
+Store address:    4194344,    1049752, Store word:          x, ALUOUT:    4199011, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 00400058, nextnextpc:0040005c
+jLink_en:0, wr_reg:  5, wr_data: 00401263
+Address: 00100498, Store: xxxxxxxx, Load:deadbeef, en:0000
+alu_in1:       4667, alu_in2:    4194344, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+=== Simulation Cycle                 1150 ===
+[pc=00400058, inst=24a500d7] [op=09, rs= 5, rt= 5, rd= 0, imm=00d7, f2=17] [reset=0, halted=0]
+Store address:    4199011,    1049806, Store word:          x, ALUOUT:    4199226, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 0040005c, nextnextpc:00400060
+jLink_en:0, wr_reg:  5, wr_data: 0040133a
+Address: 001004ce, Store: xxxxxxxx, Load:deadbeef, en:0000
+alu_in1:    4199011, alu_in2:        215, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+=== Simulation Cycle                 1250 ===
+[pc=0040005c, inst=0c10001a] [op=03, rs= 0, rt=16, rd= 0, imm=001a, f2=1a] [reset=0, halted=0]
+Store address:          0,          0, Store word:          x, ALUOUT:          0, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 3, nextpc: 00400060, nextnextpc:00400064
+jLink_en:1, wr_reg: 31, wr_data: 00400064
+Address: 00000000, Store: xxxxxxxx, Load:deadbeef, en:0000
+alu_in1:          0, alu_in2:          0, brcond: 111
+branchTrue: 0, pcMuxSel: 11, pcMuxSelFinal: 11
+
+=== Simulation Cycle                 1350 ===
+[pc=00400060, inst=24a50001] [op=09, rs= 5, rt= 5, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+Store address:    4199226,    1049806, Store word:          x, ALUOUT:    4199227, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 00400068, nextnextpc:0040006c
+jLink_en:0, wr_reg:  5, wr_data: 0040133b
+Address: 001004ce, Store: xxxxxxxx, Load:deadbeef, en:0000
+alu_in1:    4199226, alu_in2:          1, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+=== Simulation Cycle                 1450 ===
+[pc=00400068, inst=00a62821] [op=00, rs= 5, rt= 6, rd= 5, imm=2821, f2=21] [reset=0, halted=0]
+Store address:          0,    1049806, Store word:          x, ALUOUT:    4199227, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 0040006c, nextnextpc:00400070
+jLink_en:0, wr_reg:  5, wr_data: 0040133b
+Address: 001004ce, Store: xxxxxxxx, Load:deadbeef, en:0000
+alu_in1:    4199227, alu_in2:          0, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+brcond: 000
+brcond: 000
+=== Simulation Cycle                 1550 ===
+[pc=0040006c, inst=04900002] [op=01, rs= 4, rt=16, rd= 0, imm=0002, f2=02] [reset=0, halted=0]
+Store address:          0,          0, Store word:          x, ALUOUT:          0, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 1, nextpc: 00400070, nextnextpc:00400074
+jLink_en:1, wr_reg: 31, wr_data: 00400074
+Address: 00000000, Store: xxxxxxxx, Load:deadbeef, en:0000
+alu_in1:      65535, alu_in2:          0, brcond: 000
+branchTrue: 0, pcMuxSel: 01, pcMuxSelFinal: 00
+
+=== Simulation Cycle                 1650 ===
+[pc=00400070, inst=24a50190] [op=09, rs= 5, rt= 5, rd= 0, imm=0190, f2=10] [reset=0, halted=0]
+Store address:    4199227,    1049906, Store word:          x, ALUOUT:    4199627, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 00400074, nextnextpc:00400078
+jLink_en:0, wr_reg:  5, wr_data: 004014cb
+Address: 00100532, Store: xxxxxxxx, Load:deadbeef, en:0000
+alu_in1:    4199227, alu_in2:        400, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+[End of program at 0x00400074]
+=== Simulation Cycle                 1750 ===
+[pc=00400074, inst=0000000c] [op=00, rs= 0, rt= 0, rd= 0, imm=000c, f2=0c] [reset=0, halted=0]
+Store address:          0,          0, Store word:          x, ALUOUT:          0, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 00400078, nextnextpc:0040007c
+jLink_en:0, wr_reg:  0, wr_data: 00000000
+Address: 00000000, Store: xxxxxxxx, Load:deadbeef, en:0000
+alu_in1:          0, alu_in2:          0, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+--- 18-447 Register file dump ---
+=== Simulation Cycle                 1750 ===
+R          0	= 0x00000000	( 0 )
+R          1	= 0x00000000	( 0 )
+R          2	= 0x0000000a	( 10 )
+R          3	= 0x00000001	( 1 )
+R          4	= 0x0000ffff	( 65535 )
+R          5	= 0x004014cb	( 4199627 )
+R          6	= 0x00000000	( 0 )
+R          7	= 0x00000000	( 0 )
+R          8	= 0x00000000	( 0 )
+R          9	= 0x00000000	( 0 )
+R         10	= 0x00000000	( 0 )
+R         11	= 0x00000000	( 0 )
+R         12	= 0x00000000	( 0 )
+R         13	= 0x00000000	( 0 )
+R         14	= 0x00000000	( 0 )
+R         15	= 0x00000000	( 0 )
+R         16	= 0x00000000	( 0 )
+R         17	= 0x00000000	( 0 )
+R         18	= 0x00000000	( 0 )
+R         19	= 0x00000000	( 0 )
+R         20	= 0x00000000	( 0 )
+R         21	= 0x00000000	( 0 )
+R         22	= 0x00000000	( 0 )
+R         23	= 0x00000000	( 0 )
+R         24	= 0x00000000	( 0 )
+R         25	= 0x00000000	( 0 )
+R         26	= 0x00000000	( 0 )
+R         27	= 0x00000000	( 0 )
+R         28	= 0x00000000	( 0 )
+R         29	= 0x00000000	( 0 )
+R         30	= 0x00000000	( 0 )
+R         31	= 0x00400074	( 4194420 )
+--- End register file dump ---
+Simulation complete via $finish(1) at time 1750 NS + 4
+./src/testbench.v:85 	  $finish;
+ncsim> exit 

@@ -1,0 +1,100 @@
+Warning: Design 'mips_core' has '3' unresolved references. For more detailed information, use the "link" command. (UID-341)
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+Design : mips_core
+Version: Z-2007.03-SP5
+Date   : Fri Feb  5 12:09:08 2016
+****************************************
+
+Operating Conditions: typical   Library: typical
+Wire Load Model Mode: top
+
+  Startpoint: inst[28] (input port clocked by clk)
+  Endpoint: mem_addr[29]
+            (output port clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  input external delay                                    0.00       0.00 r
+  inst[28] (in)                                           0.00       0.00 r
+  Decoder/dcd_op[2] (mips_decode)                         0.00       0.00 r
+  Decoder/U109/Y (INVX1)                                  0.03       0.03 f
+  Decoder/U100/Y (NAND2X1)                                0.10       0.13 r
+  Decoder/U20/Y (NOR2X1)                                  0.09       0.22 f
+  Decoder/U29/Y (NAND2X1)                                 0.10       0.32 r
+  Decoder/U11/Y (INVX1)                                   0.21       0.54 f
+  Decoder/U5/Y (NOR4BX1)                                  0.38       0.91 r
+  Decoder/U110/Y (AOI31X1)                                0.07       0.98 f
+  Decoder/se (mips_decode)                                0.00       0.98 f
+  signext/sel (mux2to1_1)                                 0.00       0.98 f
+  signext/U39/Y (INVX1)                                   0.10       1.08 r
+  signext/U15/Y (INVX1)                                   0.03       1.11 f
+  signext/U11/Y (INVX1)                                   0.06       1.17 r
+  signext/U9/Y (INVX1)                                    0.05       1.22 f
+  signext/U1/Y (INVX1)                                    0.32       1.53 r
+  signext/U18/Y (AOI22X1)                                 0.03       1.57 f
+  signext/U17/Y (INVX1)                                   0.12       1.68 r
+  signext/out[0] (mux2to1_1)                              0.00       1.68 r
+  aluSrc2/in1[0] (mux2to1_2)                              0.00       1.68 r
+  aluSrc2/U28/Y (AOI22X1)                                 0.07       1.75 f
+  aluSrc2/U27/Y (INVX1)                                   0.24       1.99 r
+  aluSrc2/out[0] (mux2to1_2)                              0.00       1.99 r
+  ALU/alu__op2[0] (mips_ALU)                              0.00       1.99 r
+  ALU/sub_370/B[0] (mips_ALU_DW01_sub_0)                  0.00       1.99 r
+  ALU/sub_370/U34/Y (INVX1)                               0.05       2.05 f
+  ALU/sub_370/U6/Y (OR2X1)                                0.16       2.20 f
+  ALU/sub_370/U2_1/CO (ADDFX2)                            0.19       2.40 f
+  ALU/sub_370/U2_2/CO (ADDFX2)                            0.20       2.60 f
+  ALU/sub_370/U2_3/CO (ADDFX2)                            0.20       2.80 f
+  ALU/sub_370/U2_4/CO (ADDFX2)                            0.20       3.00 f
+  ALU/sub_370/U2_5/CO (ADDFX2)                            0.20       3.20 f
+  ALU/sub_370/U2_6/CO (ADDFX2)                            0.20       3.40 f
+  ALU/sub_370/U2_7/CO (ADDFX2)                            0.20       3.60 f
+  ALU/sub_370/U2_8/CO (ADDFX2)                            0.20       3.79 f
+  ALU/sub_370/U2_9/CO (ADDFX2)                            0.20       3.99 f
+  ALU/sub_370/U2_10/CO (ADDFX2)                           0.20       4.19 f
+  ALU/sub_370/U2_11/CO (ADDFX2)                           0.20       4.39 f
+  ALU/sub_370/U2_12/CO (ADDFX2)                           0.20       4.59 f
+  ALU/sub_370/U2_13/CO (ADDFX2)                           0.20       4.79 f
+  ALU/sub_370/U2_14/CO (ADDFX2)                           0.20       4.99 f
+  ALU/sub_370/U2_15/CO (ADDFX2)                           0.20       5.19 f
+  ALU/sub_370/U2_16/CO (ADDFX2)                           0.20       5.39 f
+  ALU/sub_370/U2_17/CO (ADDFX2)                           0.20       5.59 f
+  ALU/sub_370/U2_18/CO (ADDFX2)                           0.20       5.79 f
+  ALU/sub_370/U2_19/CO (ADDFX2)                           0.20       5.99 f
+  ALU/sub_370/U2_20/CO (ADDFX2)                           0.20       6.19 f
+  ALU/sub_370/U2_21/CO (ADDFX2)                           0.20       6.39 f
+  ALU/sub_370/U2_22/CO (ADDFX2)                           0.20       6.58 f
+  ALU/sub_370/U2_23/CO (ADDFX2)                           0.20       6.78 f
+  ALU/sub_370/U2_24/CO (ADDFX2)                           0.20       6.98 f
+  ALU/sub_370/U2_25/CO (ADDFX2)                           0.20       7.18 f
+  ALU/sub_370/U2_26/CO (ADDFX2)                           0.20       7.38 f
+  ALU/sub_370/U2_27/CO (ADDFX2)                           0.20       7.58 f
+  ALU/sub_370/U2_28/CO (ADDFX2)                           0.20       7.78 f
+  ALU/sub_370/U2_29/CO (ADDFX2)                           0.20       7.98 f
+  ALU/sub_370/U2_30/CO (ADDFX2)                           0.20       8.18 f
+  ALU/sub_370/U2_31/Y (XOR3X2)                            0.16       8.35 r
+  ALU/sub_370/DIFF[31] (mips_ALU_DW01_sub_0)              0.00       8.35 r
+  ALU/U91/Y (AOI222X1)                                    0.05       8.40 f
+  ALU/U88/Y (NAND4X1)                                     0.20       8.59 r
+  ALU/alu__out[31] (mips_ALU)                             0.00       8.59 r
+  mem_addr[29] (out)                                      0.00       8.59 r
+  data arrival time                                                  8.59
+
+  max_delay                                              25.00      25.00
+  output external delay                                   0.00      25.00
+  data required time                                                25.00
+  --------------------------------------------------------------------------
+  data required time                                                25.00
+  data arrival time                                                 -8.59
+  --------------------------------------------------------------------------
+  slack (MET)                                                       16.41
+
+
+1

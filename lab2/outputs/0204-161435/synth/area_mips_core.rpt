@@ -1,0 +1,53 @@
+Information: Building the design 'exception_unit'. (HDL-193)
+Warning: Can't find the design 'exception_unit'
+	in the library 'WORK'. (LBR-1)
+Information: Building the design 'syscall_unit'. (HDL-193)
+Warning: Can't find the design 'syscall_unit'
+	in the library 'WORK'. (LBR-1)
+Information: Building the design 'regfile'. (HDL-193)
+Warning:  Little argument or return value checking implemented for system task or function '$fopen'. (VER-209)
+Warning:  Little argument or return value checking implemented for system task or function '$time'. (VER-209)
+Warning:  Little argument or return value checking implemented for system task or function '$fdisplay'. (VER-209)
+Warning:  ./447src/regfile.v:69: Invalid escape sequence '\8' in call to '$display'. (VER-941)
+Warning:  ./447src/regfile.v:69: Invalid escape sequence '\0' in call to '$display'. (VER-941)
+Warning:  Little argument or return value checking implemented for system task or function '$fclose'. (VER-209)
+Warning:  ./447src/regfile.v:59: 'rst_b' is being read, but does not appear in the sensitivity list of the block. (ELAB-292)
+Warning:  ./447src/regfile.v:60: '$fopen' is being read, but does not appear in the sensitivity list of the block. (ELAB-292)
+Error:  ./447src/regfile.v:60: the system function named $fopen is not implemented. (ELAB-939)
+*** Presto compilation terminated with 1 errors. ***
+Error: Width mismatch on port 'out' of reference to 'mux2to1' in 'mips_core'. (LINK-3)
+Error: Unable to match ports of cell regDest ('mux2to1') to 'mux2to1_width5'. (LINK-25)
+Error: Width mismatch on port 'out' of reference to 'mux2to1' in 'mips_core'. (LINK-3)
+Error: Width mismatch on port 'in0' of reference to 'mux2to1' in 'mips_core'. (LINK-3)
+Error: Width mismatch on port 'in1' of reference to 'mux2to1' in 'mips_core'. (LINK-3)
+Error: Unable to match ports of cell regNumber ('mux2to1') to 'mux2to1_width31'. (LINK-25)
+Warning: Unable to resolve reference 'exception_unit' in 'mips_core'. (LINK-5)
+Warning: Unable to resolve reference 'syscall_unit' in 'mips_core'. (LINK-5)
+Warning: Unable to resolve reference 'regfile' in 'mips_core'. (LINK-5)
+Information: Updating design information... (UID-85)
+ 
+****************************************
+Report : area
+Design : mips_core
+Version: Z-2007.03-SP5
+Date   : Thu Feb  4 16:15:02 2016
+****************************************
+
+Library(s) Used:
+
+    typical (File: /afs/ece/class/ece341/setup/Artisan/typical.db)
+
+Number of ports:              165
+Number of nets:               734
+Number of cells:               32
+Number of references:          31
+
+Combinational area:       60324.264440
+Noncombinational area:    15697.281738
+Net Interconnect area:      undefined  (No wire load specified)
+
+Total cell area:          76021.546875
+Total area:                 undefined
+
+Information: This design contains black box (unknown) components. (RPT-8)
+1

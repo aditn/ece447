@@ -1,0 +1,86 @@
+ncelab: 08.20-s015: (c) Copyright 1995-2009 Cadence Design Systems, Inc.
+TOOL:	ncelab	08.20-s015: Started on Feb 02, 2016 at 14:05:17 EST
+ncelab
+    +access+rwc
+    -messages
+    worklib.testbench
+
+	Elaborating the design hierarchy:
+		Caching library 'worklib' ....... Done
+   mux2to1 #(5) regDest(dcd_rt, dcd_rd, 1'b0, wr_reg);
+                                        |
+ncelab: *W,CUVMPW (./src/mips_core.sv,238|40): port sizes differ in port connection.
+   mux2to1 #(5) regDest(dcd_rt, dcd_rd, 1'b0, wr_reg);
+                                                   |
+ncelab: *W,CUVMPW (./src/mips_core.sv,238|51): port sizes differ in port connection.
+   mux2to1 aluSrc(rt_data, imm, 1'b1, alu_in);
+                                |
+ncelab: *W,CUVMPW (./src/mips_core.sv,239|32): port sizes differ in port connection.
+   mux2to1 aluSrc(rt_data, imm, 1'b1, alu_in);
+                                           |
+ncelab: *W,CUVMPW (./src/mips_core.sv,239|43): port sizes differ in port connection.
+   mux2to1 se(dcd_e_imm, dcd_se_imm, 1'b1, imm);
+                                     |
+ncelab: *W,CUVMPW (./src/mips_core.sv,240|37): port sizes differ in port connection.
+   mux2to1 se(dcd_e_imm, dcd_se_imm, 1'b1, imm);
+                                             |
+ncelab: *W,CUVMPW (./src/mips_core.sv,240|45): port sizes differ in port connection.
+   mux2to1 memToReg(alu__out, mem_data_out, 1'b0, mem_to_reg);
+                                            |
+ncelab: *W,CUVMPW (./src/mips_core.sv,241|44): port sizes differ in port connection.
+   mux2to1 memToReg(alu__out, mem_data_out, 1'b0, mem_to_reg);
+                                                           |
+ncelab: *W,CUVMPW (./src/mips_core.sv,241|59): port sizes differ in port connection.
+	Building instance overlay tables: .................... Done
+	Generating native compiled code:
+		worklib.add_const:module <0x43eb7ce6>
+			streams:   1, words:   125
+		worklib.adder:module <0x2eb2b5fc>
+			streams:   1, words:   492
+		worklib.clock:module <0x6ce21b37>
+			streams:   2, words:   699
+		worklib.exception_unit:module <0x4ecc7789>
+			streams:   6, words:  5958
+		worklib.mips_core:module <0x17dca429>
+			streams:  38, words:  8132
+		worklib.mips_decode:module <0x189d8126>
+			streams:   1, words:  1485
+		worklib.mips_mem:module <0x4425a300>
+			streams:  92, words: 43999
+		worklib.mux2to1:module <0x1370b10f>
+			streams:   1, words:   347
+		worklib.mux2to1:module <0x27b6cfcf>
+			streams:   1, words:   400
+		worklib.mux2to1:module <0x6d764ce8>
+			streams:   1, words:   362
+		worklib.regfile:module <0x153d4658>
+			streams:   6, words:  6508
+		worklib.register:module <0x08c894ef>
+			streams:   3, words:   734
+		worklib.register:module <0x11ad4c35>
+			streams:   3, words:   716
+		worklib.register:module <0x3e356bf7>
+			streams:   3, words:   716
+		worklib.register:module <0x3e82b362>
+			streams:   3, words:   714
+		worklib.syscall_unit:module <0x7fd85f55>
+			streams:   2, words:   743
+		worklib.testbench:module <0x14077fa9>
+			streams:   8, words:  1861
+	Loading native compiled code:     .................... Done
+	Building instance specific data structures.
+	Design hierarchy summary:
+		               Instances  Unique
+		Modules:              21      13
+		Resolved nets:         3       1
+		Registers:            34      26
+		Scalar wires:        132       -
+		Expanded wires:        4       1
+		Vectored wires:       58       -
+		Named events:          2       2
+		Always blocks:        20      15
+		Initial blocks:        3       3
+		Cont. assignments:    37      34
+		Pseudo assignments:   20      20
+	Writing initial simulation snapshot: worklib.testbench:module
+TOOL:	ncelab	08.20-s015: Exiting on Feb 02, 2016 at 14:05:17 EST  (total: 00:00:00)

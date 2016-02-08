@@ -1,0 +1,86 @@
+ncsim: 08.20-s015: (c) Copyright 1995-2009 Cadence Design Systems, Inc.
+ncsim> database -open -shm -default waveforms
+Created default SHM database waveforms
+ncsim> probe -shm -create -depth all -all 
+Created probe 1
+ncsim> run 
+=== Simulation Cycle                  150 ===
+[pc=00400000, inst=2402000a] [op=09, rs= 0, rt= 2, rd= 0, imm=000a, f2=0a] [reset=0, halted=0]
+Store address:          0,          2, Store word:          0, ALUOUT:         10, en:  0
+HI: 00000000, LO: 00000000
+
+=== Simulation Cycle                  250 ===
+[pc=00400004, inst=24050001] [op=09, rs= 0, rt= 5, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+Store address:          0,          0, Store word:          0, ALUOUT:          1, en:  0
+HI: 00000000, LO: 00000000
+
+[Reserved instruction exception at 0x00400008]
+=== Simulation Cycle                  350 ===
+[pc=00400008, inst=0c100008] [op=03, rs= 0, rt=16, rd= 0, imm=0008, f2=08] [reset=0, halted=0]
+Store address:          0,          0, Store word:          0, ALUOUT:          0, en:  0
+HI: 00000000, LO: 00000000
+
+=== Simulation Cycle                  450 ===
+[pc=0040000c, inst=254a0f00] [op=09, rs=10, rt=10, rd= 1, imm=0f00, f2=00] [reset=0, halted=0]
+Store address:          0,        960, Store word:          0, ALUOUT:       3840, en:  0
+HI: 00000000, LO: 00000000
+
+=== Simulation Cycle                  550 ===
+[pc=00400010, inst=34000000] [op=0d, rs= 0, rt= 0, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+Store address:          0,          0, Store word:          0, ALUOUT:          0, en:  0
+HI: 00000000, LO: 00000000
+
+=== Simulation Cycle                  650 ===
+[pc=00400014, inst=34000000] [op=0d, rs= 0, rt= 0, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+Store address:          0,          0, Store word:          0, ALUOUT:          0, en:  0
+HI: 00000000, LO: 00000000
+
+=== Simulation Cycle                  750 ===
+[pc=00400018, inst=24050064] [op=09, rs= 0, rt= 5, rd= 0, imm=0064, f2=24] [reset=0, halted=0]
+Store address:          1,         25, Store word:          1, ALUOUT:        100, en:  0
+HI: 00000000, LO: 00000000
+
+[End of program at 0x0040001c]
+=== Simulation Cycle                  850 ===
+[pc=0040001c, inst=0000000c] [op=00, rs= 0, rt= 0, rd= 0, imm=000c, f2=0c] [reset=0, halted=0]
+Store address:          0,          0, Store word:          0, ALUOUT:          0, en:  0
+HI: 00000000, LO: 00000000
+
+--- 18-447 Register file dump ---
+=== Simulation Cycle                  850 ===
+R          0	= 0x00000000	( 0 )
+R          1	= 0x00000000	( 0 )
+R          2	= 0x0000000a	( 10 )
+R          3	= 0x00000000	( 0 )
+R          4	= 0x00000000	( 0 )
+R          5	= 0x00000064	( 100 )
+R          6	= 0x00000000	( 0 )
+R          7	= 0x00000000	( 0 )
+R          8	= 0x00000000	( 0 )
+R          9	= 0x00000000	( 0 )
+R         10	= 0x00000f00	( 3840 )
+R         11	= 0x00000000	( 0 )
+R         12	= 0x00000000	( 0 )
+R         13	= 0x00000000	( 0 )
+R         14	= 0x00000000	( 0 )
+R         15	= 0x00000000	( 0 )
+R         16	= 0x00000000	( 0 )
+R         17	= 0x00000000	( 0 )
+R         18	= 0x00000000	( 0 )
+R         19	= 0x00000000	( 0 )
+R         20	= 0x00000000	( 0 )
+R         21	= 0x00000000	( 0 )
+R         22	= 0x00000000	( 0 )
+R         23	= 0x00000000	( 0 )
+R         24	= 0x00000000	( 0 )
+R         25	= 0x00000000	( 0 )
+R         26	= 0x00000000	( 0 )
+R         27	= 0x00000000	( 0 )
+R         28	= 0x00000000	( 0 )
+R         29	= 0x00000000	( 0 )
+R         30	= 0x00000000	( 0 )
+R         31	= 0x00000000	( 0 )
+--- End register file dump ---
+Simulation complete via $finish(1) at time 850 NS + 4
+./src/testbench.v:85 	  $finish;
+ncsim> exit 
