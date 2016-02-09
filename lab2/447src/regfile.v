@@ -4,7 +4,7 @@
  *
  * This product includes software developed by Carnegie Mellon University. 
  *
- * Copyright (c) 2008 James C. Hoe,
+ * Copyright (c) 2016 James C. Hoe,
  * Computer Architecture Lab at Carnegie Mellon (CALCM), 
  * Carnegie Mellon University.
  *
@@ -28,7 +28,7 @@
  * CONTRACT, TORT OR OTHERWISE).
  */
 
-module regfile (/*AUTOARG*/
+module regfile_forward (/*AUTOARG*/
    // Outputs
    rs_data, rt_data,
    // Inputs
@@ -50,9 +50,9 @@ module regfile (/*AUTOARG*/
 		end 
 	end 
 
-	assign rs_data = (rs_num == 0) ? 32'h0 : mem[rs_num];
-	assign rt_data = (rt_num == 0) ? 32'h0 : mem[rt_num];
-	
+	assign rs_data = (rs_num == 0) ? 32'h0 : ((rd_we&&(rd_num==rs_num))?rd_data:mem[rs_num]);
+	assign rt_data = (rt_num == 0) ? 32'h0 : ((rd_we&&(rd_num==rt_num))?rd_data:mem[rt_num]);
+   
 	// synthesis translate_off
 	integer fd;
 	always @(halted) begin
