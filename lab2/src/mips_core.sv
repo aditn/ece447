@@ -303,6 +303,14 @@ module mips_core(/*AUTOARG*/
    mux2to1 dataToReg(wr_data, wr_dataMem, pc+4, jLink_en); 
    mux2to1 #(31)regNumber(wr_reg, wr_regNum, 5'd31, jLink_en);
 
+   //Decode stage registers
+
+   //Execute stage registers
+
+   //Memory stage registers
+
+   //Writeback stage registers
+
 endmodule // mips_core
 
 
