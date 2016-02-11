@@ -332,7 +332,9 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
         alu__out = alu__op1+alu__op2;
       `ALU_SUB:
         begin //check if branch condition is met
-          case(brcond)
+	  alu__out = alu_op1 - alu_op;
+
+          /*case(brcond)
             `BR_BLTZ:
               begin
                 if ($signed(alu__op1)<0)
@@ -366,7 +368,7 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
               end
             default:
               alu__out = alu__op1-alu__op2;
-          endcase
+          endcase*/
         end
       `ALU_SLL:
         //shift by value in bits [10:6] of immediate
