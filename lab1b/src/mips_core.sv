@@ -377,11 +377,11 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
         //signed arithmetic shift
         alu__out = $signed($signed(alu__op1) >>> {27'b0, alu__op2[10:6]});
       `ALU_SLLV:
-        alu__out = alu__op2<<alu__op1;
+        alu__out = alu__op2<<{27'b0, alu__op1[4:0]};
       `ALU_SRLV:
-        alu__out = alu__op2>>alu__op1;
+        alu__out = alu__op2>>{27'b0, alu__op1[4:0]};
       `ALU_SRAV:
-        alu__out = $signed($signed(alu__op2) >>> alu__op1);
+        alu__out = $signed($signed(alu__op2) >>> {27'b0, alu__op1[4:0]});
       `ALU_AND:
         alu__out = alu__op1 & alu__op2;
       `ALU_OR:
@@ -391,6 +391,8 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
       `ALU_NOR:
         alu__out = ~(alu__op1 | alu__op2);
       `ALU_SLT://signed compare
+        alu__out = ($signed(alu__op1) < $signed(alu__op2)) ? 32'b1 : 32'b0;
+      `ALU_SLTU://signed compare
         alu__out = (alu__op1 < alu__op2) ? 32'b1 : 32'b0;
 
     endcase

@@ -181,7 +181,7 @@ module mips_decode(/*AUTOARG*/
            `OP0_SLT:
              alu__sel = `ALU_SLT;
            `OP0_SLTU:
-             alu__sel = `ALU_SLT;
+             alu__sel = `ALU_SLTU;
            default:
              ctrl_RI = 1'b1;
          endcase //funct2
@@ -286,7 +286,7 @@ module mips_decode(/*AUTOARG*/
          end
        `OP_SLTIU:
          begin
-           alu__sel = `ALU_SLT;
+           alu__sel = `ALU_SLTU;
            alusrc2 = 1'b1;
          end
        `OP_ANDI:

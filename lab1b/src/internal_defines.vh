@@ -16,6 +16,7 @@
 `define ALU_XOR      4'b1010
 `define ALU_NOR      4'b1011
 `define ALU_SLT      4'b1100
+`define ALU_SLTU     4'b1101
 
 
 // Load instruction for loader module
