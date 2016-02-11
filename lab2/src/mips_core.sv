@@ -102,6 +102,7 @@ module mips_core(/*AUTOARG*/
 
    wire [31:0] newpc; //mux output for next state PC
    //wire [31:0] pcNextFinal;
+   wire [31:0] inst_ID;
 
    // PC Management
    //register #(32, text_start) PCReg(pc, pcNextFinal, clk, ~internal_halt, rst_b);
@@ -271,7 +272,6 @@ module mips_core(/*AUTOARG*/
    //Decode (ID) stage registers and wirings
    wire IDen; //enable for decode stage
    wire [31:0] pc_ID;
-   wire [31:0] inst_ID;
    register pcD(pc_ID, pc + 4, clk, IDen, rst_b);
    register irD(inst_ID, inst, clk, IDen, rst_b);
 
@@ -303,7 +303,7 @@ module mips_core(/*AUTOARG*/
    register HIwb(HIoutwb, hi_out, clk, wbEn, rst_b); //holds HI val in WB register (may need to have its own en)
    register LOwb(LOoutwb, lo_out, clk, wbEn, rst_b); //holds LO val in WB register (may need to have its own en)
 
-   
+
 
    //Register file
    regfile_forward RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, wr_data, ctrl_we, clk, rst_b, halted);
