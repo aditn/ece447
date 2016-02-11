@@ -187,7 +187,7 @@ module mips_decode(/*AUTOARG*/
          endcase //funct2
          end //OP_OTHER0
 
-       `OP_OTHER1: // Secondary opcodes (rt field; OP_OTHER1)
+       /*`OP_OTHER1: // Secondary opcodes (rt field; OP_OTHER1)
          case(dcd_rt)
             //conditional branching are found in the ALU
            `OP1_BLTZ:
@@ -221,7 +221,7 @@ module mips_decode(/*AUTOARG*/
            default:
              ctrl_RI = 1'b1;
          endcase //dcd_rt
-       
+        
        `OP_J:
          begin
            ctrl_we = 1'b0;
@@ -266,6 +266,8 @@ module mips_decode(/*AUTOARG*/
            brcond = `BR_BGTZ;
            se = 1'b1;
          end
+       */
+
        `OP_ADDI:
          begin
            alu__sel = `ALU_ADD;

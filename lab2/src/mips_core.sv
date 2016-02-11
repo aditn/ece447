@@ -282,7 +282,7 @@ module mips_core(/*AUTOARG*/
    mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se); //Zero extend or sign extend immediate
 
    //Wirings to memory module
-   mux4to1 memToReg(wr_dataMem, alu__out, load_data, hi_out, lo_out, memtoreg);
+   mux4to1 memToReg(wr_dataMem, alu__out_wb, load_data_wb, HIoutwb, LOoutwb, memtoreg);
    assign instr_addr = newpc[31:2]; //address of next instruction
    assign mem_addr = alu__out_MEM[31:2]; //memory address to read/write
    assign mem_data_in = store_data; //data to store
@@ -329,6 +329,12 @@ module mips_core(/*AUTOARG*/
    register rtMEM(rt_data_MEM, rt_data_EX, clk, MEMen, rst_b);
 
    //Writeback stage registers
+   wire wbEn;
+   wire [31:0] HIoutwb, LOoutwb, load_data_wb, alu__out_wb;
+   register MDRw(load_data_wb, load_data, clk, wbEn, rst_b);
+   register Aoutw(alu__out_wb, alu__out, clk, wbEn, rst_b);
+   register HIwb(HIoutwb, hi_out, clk, wbEn, rst_b); //holds HI val in WB register (may need to have its own en)
+   register LOwb(LOoutwb, lo_out, clk, wbEn, rst_b); //holds LO val in WB register (may need to have its own en)
 
 endmodule // mips_core
 
@@ -359,7 +365,9 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
         alu__out = alu__op1+alu__op2;
       `ALU_SUB:
         begin //check if branch condition is met
-          case(brcond)
+	  alu__out = alu_op1 - alu_op;
+
+          /*case(brcond)
             `BR_BLTZ:
               begin
                 if ($signed(alu__op1)<0)
@@ -393,7 +401,7 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
               end
             default:
               alu__out = alu__op1-alu__op2;
-          endcase
+          endcase*/
         end
       `ALU_SLL:
         //shift by value in bits [10:6] of immediate
