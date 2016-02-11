@@ -268,6 +268,43 @@ module mips_core(/*AUTOARG*/
    wire [31:0] load_data;
    wire [31:0] store_data;
 
+   //Decode (ID) stage registers and wirings
+   wire IDen; //enable for decode stage
+   wire [31:0] pc_ID;
+   wire [31:0] inst_ID;
+   register pcD(pc_ID, pc + 4, clk, IDen, rst_b);
+   register irD(inst_ID, inst, clk, IDen, rst_b);
+
+   //Execute (EX) stage registers
+   wire EXen; //enable for execute stage
+   wire [31:0] pc_EX;
+   wire [31:0] rs_data_EX;
+   wire [31:0] rt_data_EX;
+   wire [31:0] imm_EX;
+   register pcEX(pc_Ex, pc_ID, clk, EXen, rst_b);
+   register rsEX(rs_data_EX, rs_data, clk, EXen, rst_b);
+   register rtEX(rt_data_EX, rt_data, clk, EXen, rst_b);
+   register iEX(imm_EX, imm, clk, EXen, rst_b);
+
+   //Memory (MEM) stage registers
+   wire MEMen; //enable for memory stage
+   wire [31:0] pc_MEM;
+   wire [31:0] alu__out_MEM;
+   wire [31:0] rt_data_MEM;
+   register pcMEM(pc_MEM, pc_EX, clk, MEMen, rst_b);
+   register aluMEM(alu__out_MEM, alu__out, clk, MEMen, rst_b);
+   register rtMEM(rt_data_MEM, rt_data_EX, clk, MEMen, rst_b);
+
+   //Writeback stage registers
+   wire wbEn;
+   wire [31:0] HIoutwb, LOoutwb, load_data_wb, alu__out_wb;
+   register MDRw(load_data_wb, load_data, clk, wbEn, rst_b);
+   register Aoutw(alu__out_wb, alu__out_MEM, clk, wbEn, rst_b);
+   register HIwb(HIoutwb, hi_out, clk, wbEn, rst_b); //holds HI val in WB register (may need to have its own en)
+   register LOwb(LOoutwb, lo_out, clk, wbEn, rst_b); //holds LO val in WB register (may need to have its own en)
+
+   
+
    //Register file
    regfile_forward RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, wr_data, ctrl_we, clk, rst_b, halted);
    mux2to1 #(5) regDest(wr_regNum, dcd_rt, dcd_rd, regdst); //register to write to
@@ -301,40 +338,7 @@ module mips_core(/*AUTOARG*/
    mux2to1 dataToReg(wr_data, wr_dataMem, pc+4, jLink_en); 
    mux2to1 #(31)regNumber(wr_reg, wr_regNum, 5'd31, jLink_en);
 
-   //Decode (ID) stage registers and wirings
-   wire IDen; //enable for decode stage
-   wire [31:0] pc_ID;
-   wire [31:0] inst_ID;
-   register pcD(pc_ID, pc + 4, clk, IDen, rst_b);
-   register irD(inst_ID, inst, clk, IDen, rst_b);
-
-   //Execute (EX) stage registers
-   wire EXen; //enable for execute stage
-   wire [31:0] pc_EX;
-   wire [31:0] rs_data_EX;
-   wire [31:0] rt_data_EX;
-   wire [31:0] imm_EX;
-   register pcEX(pc_Ex, pc_ID, clk, EXen, rst_b);
-   register rsEX(rs_data_EX, rs_data, clk, EXen, rst_b);
-   register rtEX(rt_data_EX, rt_data, clk, EXen, rst_b);
-   register iEX(imm_EX, imm, clk, EXen, rst_b);
-
-   //Memory (MEM) stage registers
-   wire MEMen; //enable for memory stage
-   wire [31:0] pc_MEM;
-   wire [31:0] alu__out_MEM;
-   wire [31:0] rt_data_MEM;
-   register pcMEM(pc_MEM, pc_EX, clk, MEMen, rst_b);
-   register aluMEM(alu__out_MEM, alu__out, clk, MEMen, rst_b);
-   register rtMEM(rt_data_MEM, rt_data_EX, clk, MEMen, rst_b);
-
-   //Writeback stage registers
-   wire wbEn;
-   wire [31:0] HIoutwb, LOoutwb, load_data_wb, alu__out_wb;
-   register MDRw(load_data_wb, load_data, clk, wbEn, rst_b);
-   register Aoutw(alu__out_wb, alu__out, clk, wbEn, rst_b);
-   register HIwb(HIoutwb, hi_out, clk, wbEn, rst_b); //holds HI val in WB register (may need to have its own en)
-   register LOwb(LOoutwb, lo_out, clk, wbEn, rst_b); //holds LO val in WB register (may need to have its own en)
+   
 
 endmodule // mips_core
 
