@@ -114,25 +114,25 @@ module mips_core(/*AUTOARG*/
    assign        inst_addr = pc[31:2];
 
    // Instruction decoding
-   assign        dcd_op = inst[31:26];    // Opcode
-   assign        dcd_rs = inst[25:21];    // rs field
-   assign        dcd_rt = inst[20:16];    // rt field
-   assign        dcd_rd = inst[15:11];    // rd field
-   assign        dcd_shamt = inst[10:6];  // Shift amount
-   assign        dcd_bczft = inst[16];    // bczt or bczf?
-   assign        dcd_funct1 = inst[4:0];  // Coprocessor 0 function field
-   assign        dcd_funct2 = inst[5:0];  // funct field; secondary opcode
-   assign        dcd_offset = inst[15:0]; // offset field
+   assign        dcd_op = inst_ID[31:26];    // Opcode
+   assign        dcd_rs = inst_ID[25:21];    // rs field
+   assign        dcd_rt = inst_ID[20:16];    // rt field
+   assign        dcd_rd = inst_ID[15:11];    // rd field
+   assign        dcd_shamt = inst_ID[10:6];  // Shift amount
+   assign        dcd_bczft = inst_ID[16];    // bczt or bczf?
+   assign        dcd_funct1 = inst_ID[4:0];  // Coprocessor 0 function field
+   assign        dcd_funct2 = inst_ID[5:0];  // funct field; secondary opcode
+   assign        dcd_offset = inst_ID[15:0]; // offset field
         // Sign-extended offset for branches
    assign        dcd_se_offset = { {14{dcd_offset[15]}}, dcd_offset, 2'b00 };
         // Sign-extended offset for load/store
    assign        dcd_se_mem_offset = { {16{dcd_offset[15]}}, dcd_offset };
-   assign        dcd_imm = inst[15:0];        // immediate field
+   assign        dcd_imm = inst_ID[15:0];        // immediate field
    assign        dcd_e_imm = { 16'h0, dcd_imm };  // zero-extended immediate
         // Sign-extended immediate
    assign        dcd_se_imm = { {16{dcd_imm[15]}}, dcd_imm };
-   assign        dcd_target = inst[25:0];     // target field
-   assign        dcd_code = inst[25:6];       // Breakpoint code
+   assign        dcd_target = inst_ID[25:0];     // target field
+   assign        dcd_code = inst_ID[25:6];       // Breakpoint code
 
    /*// synthesis translate_off
    always @(posedge clk) begin
@@ -273,25 +273,23 @@ module mips_core(/*AUTOARG*/
    mux2to1 #(5) regDest(wr_regNum, dcd_rt, dcd_rd, regdst); //register to write to
    
    //HI, LO registers
-   register #(32,0) hiReg(hi_out, hi_in, clk, hi_en, rst_b);
-   register #(32,0) loReg(lo_out, lo_in, clk, lo_en, rst_b);
-   assign hi_in = rs_data;
-   assign lo_in = rs_data;
+   register #(32,0) hiReg(hi_out, rs_data_EX, clk, hi_en, rst_b);
+   register #(32,0) loReg(lo_out, rs_data_EX, clk, lo_en, rst_b);
 
    //Determines inputs to ALU
-   mux2to1 aluSrc1(alu_in1, rs_data, rt_data, alusrc1); //ALUSrc1
-   mux2to1 aluSrc2(alu_in2, rt_data, imm, alusrc2); //ALUSrc2
+   mux2to1 aluSrc1(alu_in1, rs_data_EX, rt_data_EX, alusrc1); //ALUSrc1
+   mux2to1 aluSrc2(alu_in2, rt_data_EX, imm_EX, alusrc2); //ALUSrc2
    mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se); //Zero extend or sign extend immediate
 
    //Wirings to memory module
    mux4to1 memToReg(wr_dataMem, alu__out, load_data, hi_out, lo_out, memtoreg);
    assign instr_addr = newpc[31:2]; //address of next instruction
-   assign mem_addr = alu__out[31:2]; //memory address to read/write
+   assign mem_addr = alu__out_MEM[31:2]; //memory address to read/write
    assign mem_data_in = store_data; //data to store
 
    //To read from / write to memory
-   loader loader(load_data, dcd_imm, mem_data_out, load_sel, alu__out); //operates on data loaded from memory
-   storer storer(store_data, mem_write_en, rt_data, store_sel, alu__out); //operates on data to write to memory
+   loader loader(load_data, dcd_imm, mem_data_out, load_sel, alu__out_MEM); //operates on data loaded from memory
+   storer storer(store_data, mem_write_en, rt_data_MEM, store_sel, alu__out_MEM); //operates on data to write to memory
 
    //Mux for next state PC
    mux4to1 pcMux(newpc, pc + 4, br_target, rs_data, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
@@ -303,11 +301,32 @@ module mips_core(/*AUTOARG*/
    mux2to1 dataToReg(wr_data, wr_dataMem, pc+4, jLink_en); 
    mux2to1 #(31)regNumber(wr_reg, wr_regNum, 5'd31, jLink_en);
 
-   //Decode stage registers
+   //Decode (ID) stage registers and wirings
+   wire IDen; //enable for decode stage
+   wire [31:0] pc_ID;
+   wire [31:0] inst_ID;
+   register pcD(pc_ID, pc + 4, clk, IDen, rst_b);
+   register irD(inst_ID, inst, clk, IDen, rst_b);
 
-   //Execute stage registers
+   //Execute (EX) stage registers
+   wire EXen; //enable for execute stage
+   wire [31:0] pc_EX;
+   wire [31:0] rs_data_EX;
+   wire [31:0] rt_data_EX;
+   wire [31:0] imm_EX;
+   register pcEX(pc_Ex, pc_ID, clk, EXen, rst_b);
+   register rsEX(rs_data_EX, rs_data, clk, EXen, rst_b);
+   register rtEX(rt_data_EX, rt_data, clk, EXen, rst_b);
+   register iEX(imm_EX, imm, clk, EXen, rst_b);
 
-   //Memory stage registers
+   //Memory (MEM) stage registers
+   wire MEMen; //enable for memory stage
+   wire [31:0] pc_MEM;
+   wire [31:0] alu__out_MEM;
+   wire [31:0] rt_data_MEM;
+   register pcMEM(pc_MEM, pc_EX, clk, MEMen, rst_b);
+   register aluMEM(alu__out_MEM, alu__out, clk, MEMen, rst_b);
+   register rtMEM(rt_data_MEM, rt_data_EX, clk, MEMen, rst_b);
 
    //Writeback stage registers
 
