@@ -369,7 +369,7 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
         alu__out = alu__op1+alu__op2;
       `ALU_SUB:
         begin //check if branch condition is met
-	  alu__out = alu_op1 - alu_op;
+	  alu__out = alu__op1 - alu__op2;
 
           /*case(brcond)
             `BR_BLTZ:
