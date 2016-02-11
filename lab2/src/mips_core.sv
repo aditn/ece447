@@ -284,7 +284,7 @@ module mips_core(/*AUTOARG*/
    mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se); //Zero extend or sign extend immediate
 
    //Wirings to memory module
-   mux4to1 memToReg(wr_dataMem, alu__out, load_data, hi_out, lo_out, memtoreg);
+   mux4to1 memToReg(wr_dataMem, alu__out_wb, load_data_wb, HIoutwb, LOoutwb, memtoreg);
    assign instr_addr = newpc[31:2]; //address of next instruction
    assign mem_addr = alu__out[31:2]; //memory address to read/write
    assign mem_data_in = store_data; //data to store
@@ -306,10 +306,16 @@ module mips_core(/*AUTOARG*/
    //Decode stage registers
 
    //Execute stage registers
-
+   
    //Memory stage registers
 
    //Writeback stage registers
+   wire wbEn;
+   wire [31:0] HIoutwb, LOoutwb, load_data_wb, alu__out_wb;
+   register MDRw(load_data_wb, load_data, clk, wbEn, rst_b);
+   register Aoutw(alu__out_wb, alu__out, clk, wbEn, rst_b);
+   register HIwb(HIoutwb, hi_out, clk, wbEn, rst_b); //holds HI val in WB register (may need to have its own en)
+   register LOwb(LOoutwb, lo_out, clk, wbEn, rst_b); //holds LO val in WB register (may need to have its own en)
 
 endmodule // mips_core
 
