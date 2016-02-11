@@ -269,7 +269,7 @@ module mips_core(/*AUTOARG*/
    wire [31:0] store_data;
 
    //Register file
-   regfile RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, wr_data, ctrl_we, clk, rst_b, halted);
+   regfile_forward RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, wr_data, ctrl_we, clk, rst_b, halted);
    mux2to1 #(5) regDest(wr_regNum, dcd_rt, dcd_rd, regdst); //register to write to
    
    //HI, LO registers
