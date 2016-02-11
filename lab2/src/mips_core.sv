@@ -135,23 +135,25 @@ module mips_core(/*AUTOARG*/
    assign        dcd_target = inst_ID[25:0];     // target field
    assign        dcd_code = inst_ID[25:6];       // Breakpoint code
 
-   /*// synthesis translate_off
+   // synthesis translate_off
    always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
        $display ( "=== Simulation Cycle %d ===", $time );
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
-                   pc, inst, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
-       $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
-       $display ("HI: %x, LO: %x, pcMuxSel: %d, nextpc: %x, nextnextpc:%x", hi_out, lo_out,pcMuxSel,nextpc,nextnextpc);
-       $display ("jLink_en:%d, wr_reg: %d, wr_data: %x",jLink_en, wr_reg, wr_data);
-       $display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
-       $display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
-       $display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", branchTrue, pcMuxSel, pcMuxSelFinal);
-       $display ("br_target: %x", br_target);
+                   pc, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
+      // $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
+       //$display ("HI: %x, LO: %x, pcMuxSel: %d, nextpc: %x, nextnextpc:%x", hi_out, lo_out,pcMuxSel,nextpc,nextnextpc);
+       $display ("reg1: %x, reg2: %x, wr_reg: %x, wr_regWB: %x, imm: %x, wr_data: %x", dcd_rs, dcd_rt, wr_reg, wr_reg_WB, imm, wr_data);
+       $display ("alu_in1: %x, alu_in2: %x, alu__out: %x", alu_in1, alu_in2, alu__out);
+       $display ("alu__out_wb: %x, wr_reg_WB: %x", alu__out_wb, wr_reg_WB);
+       //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
+       //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
+       //$display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", branchTrue, pcMuxSel, pcMuxSelFinal);
+       //$display ("br_target: %x", br_target);
        $display ("");
      end
-   end*/
+   end
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -272,6 +274,7 @@ module mips_core(/*AUTOARG*/
    //Decode (ID) stage registers and wirings
    wire IDen; //enable for decode stage
    wire [31:0] pc_ID;
+   assign IDen = 1;
    register pcD(pc_ID, pc + 4, clk, IDen, rst_b);
    register irD(inst_ID, inst, clk, IDen, rst_b);
 
@@ -281,58 +284,107 @@ module mips_core(/*AUTOARG*/
    wire [31:0] rs_data_EX;
    wire [31:0] rt_data_EX;
    wire [31:0] imm_EX;
+   wire [4:0] wr_reg_EX;
+   assign EXen = 1;
    register pcEX(pc_Ex, pc_ID, clk, EXen, rst_b);
    register rsEX(rs_data_EX, rs_data, clk, EXen, rst_b);
    register rtEX(rt_data_EX, rt_data, clk, EXen, rst_b);
    register iEX(imm_EX, imm, clk, EXen, rst_b);
+   register wrEX(wr_reg_EX, wr_reg, clk, EXen, rst_b);
+
+   wire ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX;
+   wire alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX; 
+   wire [1:0] memtoreg_EX, pcMuxSel_EX, store_sel_EX;
+   wire [3:0] alu__sel_EX, mem_write_en_EX;
+   wire [2:0] load_sel_EX, brcond_EX;
+   cntlRegister cntlEX(ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_Ex, regdst_EX, jLink_en_EX,
+                       alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, memtoreg_EX, pcMuxSel_EX,
+                       alu__sel_EX, load_sel_EX, brcond_EX, store_sel_EX,
+                       //Inputs
+                       ctrl_we, ctrl_Sys, ctrl_RI, regdst, jLink_en, 
+                       alusrc1, alusrc2, se, hi_en, lo_en, memtoreg, pcMuxSel,
+                       alu__sel, load_sel, brcond, store_sel,
+                       clk, EXen, rst_b);
 
    //Memory (MEM) stage registers
    wire MEMen; //enable for memory stage
    wire [31:0] pc_MEM;
    wire [31:0] alu__out_MEM;
    wire [31:0] rt_data_MEM;
+   wire [4:0] wr_reg_MEM;
+   assign MEMen = 1;
    register pcMEM(pc_MEM, pc_EX, clk, MEMen, rst_b);
    register aluMEM(alu__out_MEM, alu__out, clk, MEMen, rst_b);
    register rtMEM(rt_data_MEM, rt_data_EX, clk, MEMen, rst_b);
+   register wrMEM(wr_reg_MEM, wr_reg_EX, clk, MEMen, rst_b);
+
+   wire ctrl_we_MEM, ctrl_Sys_MEM, ctrl_RI_MEM, regdst_MEM, jLink_en_MEM;
+   wire alusrc1_MEM, alusrc2_MEM, se_MEM, hi_en_MEM, lo_en_MEM;
+   wire [1:0] memtoreg_MEM, pcMuxSel_MEM, store_sel_MEM;
+   wire [3:0] alu__sel_MEM, mem_write_en_MEM;
+   wire [2:0] load_sel_MEM, brcond_MEM;
+   cntlRegister cntlMEM(ctrl_we_MEM, ctrl_Sys_MEM, ctrl_RI_MEM, regdst_MEM, jLink_en_MEM,
+                       alusrc1_MEM, alusrc2_MEM, se_MEM, hi_en_MEM, lo_en_MEM, memtoreg_MEM, pcMuxSel_MEM,
+                       alu__sel_MEM, load_sel_MEM, brcond_MEM, store_sel_MEM,
+                       //Inputs
+                       ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_Ex, regdst_EX, jLink_en_EX,
+                       alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, memtoreg_EX, pcMuxSel_EX,
+                       alu__sel_EX, load_sel_EX, brcond_EX, store_sel_EX,
+                       clk, MEMen, rst_b);
 
    //Writeback stage registers
    wire wbEn;
    wire [31:0] HIoutwb, LOoutwb, load_data_wb, alu__out_wb;
+   wire [4:0] wr_reg_WB;
+   assign wbEN = 1;
    register MDRw(load_data_wb, load_data, clk, wbEn, rst_b);
    register Aoutw(alu__out_wb, alu__out_MEM, clk, wbEn, rst_b);
    register HIwb(HIoutwb, hi_out, clk, wbEn, rst_b); //holds HI val in WB register (may need to have its own en)
    register LOwb(LOoutwb, lo_out, clk, wbEn, rst_b); //holds LO val in WB register (may need to have its own en)
-
+   register wrWB(wr_reg_WB, wr_reg_MEM, clk, wbEn, rst_b);
+   wire ctrl_we_WB, ctrl_Sys_WB, ctrl_RI_WB, regdst_WB, jLink_en_WB;
+   wire alusrc1_WB, alusrc2_WB, se_WB, hi_en_WB, lo_en_WB;
+   wire [1:0] memtoreg_WB, pcMuxSel_WB, store_sel_WB;
+   wire [3:0] alu__sel_WB, mem_write_en_WB;
+   wire [2:0] load_sel_WB, brcond_WB;
+   cntlRegister cntlWB(ctrl_we_WB, ctrl_Sys_WB, ctrl_RI_WB, regdst_WB, jLink_en_WB,
+                       alusrc1_WB, alusrc2_WB, se_WB, hi_en_WB, lo_en_WB, memtoreg_WB, pcMuxSel_WB,
+                       alu__sel_WB, load_sel_WB, brcond_WB, store_sel_WB,
+                       //Inputs
+                       ctrl_we_MEM, ctrl_Sys_MEM, ctrl_RI_MEM, regdst_MEM, jLink_en_MEM,
+                       alusrc1_MEM, alusrc2_MEM, se_MEM, hi_en_MEM, lo_en_MEM, memtoreg_MEM, pcMuxSel_MEM,
+                       alu__sel_MEM, load_sel_MEM, brcond_MEM, store_sel_MEM,
+                       clk, wbEn, rst_b);
 
 
    //Register file
-   regfile_forward RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg, wr_data, ctrl_we, clk, rst_b, halted);
-   mux2to1 #(5) regDest(wr_regNum, dcd_rt, dcd_rd, regdst); //register to write to
+   regfile_forward RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg_WB, wr_data, ctrl_we_WB, clk, rst_b, halted);
+   mux2to1 #(5) regDest(wr_regNum, dcd_rt, dcd_rd, regdst_WB); //register to write to
    
    //HI, LO registers
-   register #(32,0) hiReg(hi_out, rs_data_EX, clk, hi_en, rst_b);
-   register #(32,0) loReg(lo_out, rs_data_EX, clk, lo_en, rst_b);
+   register #(32,0) hiReg(hi_out, rs_data_EX, clk, hi_en_WB, rst_b);
+   register #(32,0) loReg(lo_out, rs_data_EX, clk, lo_en_WB, rst_b);
 
    //Determines inputs to ALU
-   mux2to1 aluSrc1(alu_in1, rs_data_EX, rt_data_EX, alusrc1); //ALUSrc1
-   mux2to1 aluSrc2(alu_in2, rt_data_EX, imm_EX, alusrc2); //ALUSrc2
-   mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se); //Zero extend or sign extend immediate
+   mux2to1 aluSrc1(alu_in1, rs_data_EX, rt_data_EX, alusrc1_EX); //ALUSrc1
+   mux2to1 aluSrc2(alu_in2, rt_data_EX, imm_EX, alusrc2_EX); //ALUSrc2
+   mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se_EX); //Zero extend or sign extend immediate
 
    //Wirings to memory module
-   mux4to1 memToReg(wr_dataMem, alu__out_wb, load_data_wb, HIoutwb, LOoutwb, memtoreg);
+   mux4to1 memToReg(wr_dataMem, alu__out_wb, load_data_wb, HIoutwb, LOoutwb, memtoreg_WB);
    assign instr_addr = newpc[31:2]; //address of next instruction
    assign mem_addr = alu__out_MEM[31:2]; //memory address to read/write
    assign mem_data_in = store_data; //data to store
 
    //To read from / write to memory
-   loader loader(load_data, dcd_imm, mem_data_out, load_sel, alu__out_MEM); //operates on data loaded from memory
-   storer storer(store_data, mem_write_en, rt_data_MEM, store_sel, alu__out_MEM); //operates on data to write to memory
+   loader loader(load_data, dcd_imm, mem_data_out, load_sel_MEM, alu__out_MEM); //operates on data loaded from memory
+   storer storer(store_data, mem_write_en, rt_data_MEM, store_sel_MEM, alu__out_MEM); //operates on data to write to memory
 
    //Mux for next state PC
    mux4to1 pcMux(newpc, pc + 4, br_target, rs_data, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
    adder brtarget(br_target, pc + 4, (imm << 2), 1'b0); //get branch target
    concat conc(j_target, pc, dcd_target); //get jump target
-   muxSpecial choosePcMuxSel(pcMuxSelFinal,pcMuxSel,branchTrue); //chooses PC on whether branch condition is met
+   pcSelector choosePcMuxSel(pcMuxSelFinal,pcMuxSel,branchTrue); //chooses PC on whether branch condition is met
 
    //Set wr_data and wr_reg when there is a jump/branch with link
    mux2to1 dataToReg(wr_data, wr_dataMem, pc+4, jLink_en); 
@@ -369,7 +421,7 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
         alu__out = alu__op1+alu__op2;
       `ALU_SUB:
         begin //check if branch condition is met
-	  alu__out = alu_op1 - alu_op;
+	  alu__out = alu__op1 - alu__op2;
 
           /*case(brcond)
             `BR_BLTZ:
@@ -466,6 +518,68 @@ module register(q, d, clk, enable, rst_b);
 
 endmodule // register
 
+//// cntlRegister: A register for propagating control signals.
+////
+//// All outputs are values of control signals at current stage.
+//// All inputs (excluding clk, enable, and reset) are values of control signals at previous stage.
+//// clk (input)     - Clock (positive edge-sensitive)
+//// enable (input)  - Load new value?
+//// reset  (input)  - System reset
+////
+module cntlRegister (
+   output logic ctrl_we, ctrl_Sys, ctrl_RI, regdst, jLink_en, alusrc1, alusrc2, se, hi_en, lo_en,
+   output logic [1:0] memtoreg, pcMuxSel,
+   output logic [3:0] alu__sel,
+   output logic [2:0] load_sel,brcond,
+   output logic [1:0] store_sel,
+   input logic ctrl_we_in, ctrl_Sys_in, ctrl_RI_in, regdst_in, jLink_en_in, alusrc1_in, alusrc2_in, se_in, hi_en_in, lo_en_in,
+   input logic [1:0] memtoreg_in, pcMuxSel_in,
+   input logic [3:0] alu__sel_in,
+   input logic [2:0] load_sel_in, brcond_in,
+   input logic [1:0] store_sel_in,
+   input logic clk, enable, rst_b);
+
+   always_ff @(posedge clk or negedge rst_b)
+     if (~rst_b)
+       begin
+         ctrl_we <= 1'b0;
+         ctrl_Sys <= 1'b0;
+         ctrl_RI <= 1'b0;
+         regdst <= 1'b0;
+         jLink_en <= 1'b0;
+         alusrc1 <= 1'b0;
+         alusrc2 <= 1'b0; 
+         se <= 1'b0;
+         hi_en <= 1'b0;
+         lo_en <= 1'b0;
+         memtoreg <= 2'b0; 
+         pcMuxSel <= 2'b0;
+         alu__sel <= 4'b0; 
+         load_sel <= 3'b0;
+         brcond <= 3'b0;
+         store_sel <= 2'b0;
+       end
+     else if (enable)
+       begin
+         ctrl_we <= ctrl_we_in; 
+         ctrl_Sys <= ctrl_Sys_in; 
+         ctrl_RI <= ctrl_RI_in; 
+         regdst <= regdst_in;
+         jLink_en <= jLink_en_in;
+         alusrc1 <= alusrc1_in; 
+         alusrc2 <= alusrc2_in; 
+         se <= se_in; 
+         hi_en <= hi_en_in;
+         lo_en <= lo_en_in;
+         memtoreg <= memtoreg_in; 
+         pcMuxSel <= pcMuxSel_in;
+         alu__sel <= alu__sel_in;      
+         load_sel <= load_sel;
+         brcond <= brcond_in;
+         store_sel <= store_sel_in;
+       end
+
+endmodule
 
 ////
 //// adder
@@ -553,7 +667,7 @@ endmodule
 //// pcMuxSel      (input)  - select bits without considering branch condition
 //// branchTrue    (input)  - whether the branch condition was met
 ////
-module muxSpecial #(parameter width = 2) (
+module pcSelector #(parameter width = 2) (
       output logic [width - 1:0] pcMuxSelFinal,
       input logic [width - 1:0] pcMuxSel,
       input logic branchTrue);
