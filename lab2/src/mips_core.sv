@@ -585,6 +585,33 @@ module cntlRegister (
 
 endmodule
 
+//// stallDetector: module for enabling stalls if RAW hazard
+////
+//// wr_reg_EX, wr_reg_MEM, wr_reg_WB (inputs) - are reg numbers at different stages
+//// wrEXen, (output) - enables propogation of reg number
+//// regMemWen (output) - writeMem,writeReg enabled
+//// pcAdderEn (output) - lets PC go to next instruction
+////
+module stallDetector(
+  input logic [4:0] wr_reg_EX, wr_reg_MEM, wr_reg_WB, dcd_rt, dcd_rs,
+  output logic wrEXen,regMemWen,pcAdderEn);
+
+  always_comb begin
+    regWRen = 1'b1;
+    pcAdderEn = 1'b1;
+    wrEXen = 1'b1;
+    if ((dcd_rt == wr_reg_EX) || (dcd_rt == wr_reg_MEM) || (dcd_rt == wr_reg_WB)
+        || (dcd_rs == wr_reg_EX) || (dcd_rs == wr_reg_MEM) || (dcd_rs == wr_reg_WB))
+      begin
+        //RAW hazard
+        regWRen = 1'b0;
+        pcAdderEn = 1'b0;
+        wrEXen = 1'b0;
+      end
+  end
+
+endmodule
+
 ////
 //// adder
 ////
