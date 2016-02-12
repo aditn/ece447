@@ -146,8 +146,8 @@ module mips_core(/*AUTOARG*/
        //$display ("HI: %x, LO: %x, pcMuxSel: %d, nextpc: %x, nextnextpc:%x", hi_out, lo_out,pcMuxSel,nextpc,nextnextpc);
        $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x", wr_reg, wr_data, dcd_rs, dcd_rt, imm);
        $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x", wr_reg_EX, alu_in1, alu_in2, alu__out);
-       $display ("M: wr_reg_MEM: %x, alu__outMEM: %x", wr_reg_MEM, alu__out_MEM);
-       $display ("W: wr_reg_WB: %x, alu__out_wb: %x", wr_reg_MEM, alu__out_wb);
+       $display ("M: wr_reg_MEM: %x, alu__outMEM: %x ctrl_Sys_MEM: %x, ctrl_we_MEM: %x", wr_reg_MEM, alu__out_MEM, ctrl_Sys_MEM, ctrl_we_MEM);
+       $display ("W: wr_reg_WB: %x, alu__out_wb: %x ctrl_Sys_WB: %x, ctrl_we_WB: %x", wr_reg_WB, alu__out_wb, ctrl_Sys_WB, ctrl_we_WB);
        //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
        //$display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", branchTrue, pcMuxSel, pcMuxSelFinal);

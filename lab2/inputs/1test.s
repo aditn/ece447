@@ -1,10 +1,5 @@
 		.text
 
 __start:        addiu $t0, $zero, 10
-                nop
-                nop
-                nop
-                nop
-                addiu $t1, $zero, 0xb
-                nop
+                addiu $t1, $zero, 0x1
                 syscall
