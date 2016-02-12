@@ -144,10 +144,10 @@ module mips_core(/*AUTOARG*/
                    pc, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
       // $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
        //$display ("HI: %x, LO: %x, pcMuxSel: %d, nextpc: %x, nextnextpc:%x", hi_out, lo_out,pcMuxSel,nextpc,nextnextpc);
-       $display ("D: reg1: %x, reg2: %x, wr_reg: %x, imm: %x, wr_data: %x", dcd_rs, dcd_rt, wr_reg, imm, wr_data);
-       $display ("E: alu_in1: %x, alu_in2: %x, alu__out: %x, wr_reg_EX: %x", alu_in1, alu_in2, alu__out, wr_reg_EX);
-       $display ("M: alu__outMEM: %x, wr_reg_MEM: %x", alu__out_MEM, wr_reg_MEM);
-       $display ("W: alu__out_wb: %x, wr_reg_WB: %x", alu__out_wb, wr_reg_WB);
+       $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x", wr_reg, wr_data, dcd_rs, dcd_rt, imm);
+       $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x", wr_reg_EX, alu_in1, alu_in2, alu__out);
+       $display ("M: wr_reg_MEM: %x, alu__outMEM: %x", wr_reg_MEM, alu__out_MEM);
+       $display ("W: wr_reg_WB: %x, alu__out_wb: %x", wr_reg_MEM, alu__out_wb);
        //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
        //$display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", branchTrue, pcMuxSel, pcMuxSelFinal);
@@ -246,7 +246,8 @@ module mips_core(/*AUTOARG*/
                          // you should read the syscall
                          // argument from $v0 of the register file 
 
-   syscall_unit SU(.syscall_halt(syscall_halt), .pc(pc), .clk(clk), .Sys(ctrl_Sys),
+   wire ctrl_Sys_WB; //syscall signal propagated to WB stage
+   syscall_unit SU(.syscall_halt(syscall_halt), .pc(pc), .clk(clk), .Sys(ctrl_Sys_WB),
                    .r_v0(r_v0), .rst_b(rst_b));
    assign        internal_halt = exception_halt | syscall_halt;
    register #(1, 0) Halt(halted, internal_halt, clk, 1'b1, rst_b);
@@ -261,7 +262,7 @@ module mips_core(/*AUTOARG*/
    wire [31:0] imm; //signed or unsigned immediate
    wire [31:0] wr_data; //data to write to register file
    wire [31:0] wr_dataMem; //intermediate data to write to register file
-   wire [31:0] wr_regNum;//intermediate reg to write to 
+   wire [4:0] wr_regNum;//intermediate reg to write to 
 
    wire [31:0] br_target; //branch target
    wire [31:0] j_target; //unconditional jump target
@@ -287,11 +288,11 @@ module mips_core(/*AUTOARG*/
    wire [31:0] imm_EX;
    wire [4:0] wr_reg_EX;
    assign EXen = 1;
-   register pcEX(pc_Ex, pc_ID, clk, EXen, rst_b);
+   register pcEX(pc_EX, pc_ID, clk, EXen, rst_b);
    register rsEX(rs_data_EX, rs_data, clk, EXen, rst_b);
    register rtEX(rt_data_EX, rt_data, clk, EXen, rst_b);
    register iEX(imm_EX, imm, clk, EXen, rst_b);
-   register wrEX(wr_reg_EX, wr_reg, clk, EXen, rst_b);
+   register #(5) wrEX(wr_reg_EX, wr_reg, clk, EXen, rst_b);
 
    wire ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX;
    wire alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX; 
@@ -317,7 +318,7 @@ module mips_core(/*AUTOARG*/
    register pcMEM(pc_MEM, pc_EX, clk, MEMen, rst_b);
    register aluMEM(alu__out_MEM, alu__out, clk, MEMen, rst_b);
    register rtMEM(rt_data_MEM, rt_data_EX, clk, MEMen, rst_b);
-   register wrMEM(wr_reg_MEM, wr_reg_EX, clk, MEMen, rst_b);
+   register #(5) wrMEM(wr_reg_MEM, wr_reg_EX, clk, MEMen, rst_b);
 
    wire ctrl_we_MEM, ctrl_Sys_MEM, ctrl_RI_MEM, regdst_MEM, jLink_en_MEM;
    wire alusrc1_MEM, alusrc2_MEM, se_MEM, hi_en_MEM, lo_en_MEM;
@@ -342,8 +343,8 @@ module mips_core(/*AUTOARG*/
    register Aoutw(alu__out_wb, alu__out_MEM, clk, wbEn, rst_b);
    register HIwb(HIoutwb, hi_out, clk, wbEn, rst_b); //holds HI val in WB register (may need to have its own en)
    register LOwb(LOoutwb, lo_out, clk, wbEn, rst_b); //holds LO val in WB register (may need to have its own en)
-   register wrWB(wr_reg_WB, wr_reg_MEM, clk, wbEn, rst_b);
-   wire ctrl_we_WB, ctrl_Sys_WB, ctrl_RI_WB, regdst_WB, jLink_en_WB;
+   register #(5) wrWB(wr_reg_WB, wr_reg_MEM, clk, wbEn, rst_b);
+   wire ctrl_we_WB, ctrl_RI_WB, regdst_WB, jLink_en_WB;
    wire alusrc1_WB, alusrc2_WB, se_WB, hi_en_WB, lo_en_WB;
    wire [1:0] memtoreg_WB, pcMuxSel_WB, store_sel_WB;
    wire [3:0] alu__sel_WB, mem_write_en_WB;
@@ -360,7 +361,7 @@ module mips_core(/*AUTOARG*/
 
    //Register file
    regfile_forward RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg_WB, wr_data, ctrl_we_WB, clk, rst_b, halted);
-   mux2to1 #(5) regDest(wr_regNum, dcd_rt, dcd_rd, regdst_ID); //register to write to
+   mux2to1 #(5) regDest(wr_regNum, dcd_rt, dcd_rd, regdst); //register to write to
    
    //HI, LO registers
    register #(32,0) hiReg(hi_out, rs_data_EX, clk, hi_en_WB, rst_b);
@@ -389,7 +390,7 @@ module mips_core(/*AUTOARG*/
 
    //Set wr_data and wr_reg when there is a jump/branch with link
    mux2to1 dataToReg(wr_data, wr_dataMem, pc+4, jLink_en_WB); 
-   mux2to1 #(31)regNumber(wr_reg, wr_regNum, 5'd31, jLink_en_WB);
+   mux2to1 #(5)regNumber(wr_reg, wr_regNum, 5'd31, jLink_en_WB);
 
    
 
