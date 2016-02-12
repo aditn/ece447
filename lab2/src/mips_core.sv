@@ -218,13 +218,13 @@ module mips_core(/*AUTOARG*/
  
    wire [31:0] alu_in1; // mux output of rs_data and rt_data
    wire [31:0] alu_in2; // mux output of rt_data and signed/unsigned imm to ALU
-
+   wire [3:0] alu__sel_EX; //alu__sel at EX stage of pipeline
    // Execute
    mips_ALU ALU(.alu__out(alu__out),
                 .branchTrue(branchTrue), 
                 .alu__op1(alu_in1),
                 .alu__op2(alu_in2),
-                .alu__sel(alu__sel),
+                .alu__sel(alu__sel_EX),
                 .brcond(brcond));
  
    // Miscellaneous stuff (Exceptions, syscalls, and halt)
@@ -297,7 +297,7 @@ module mips_core(/*AUTOARG*/
    wire ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX;
    wire alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX; 
    wire [1:0] memtoreg_EX, pcMuxSel_EX, store_sel_EX;
-   wire [3:0] alu__sel_EX, mem_write_en_EX;
+   wire [3:0] mem_write_en_EX;
    wire [2:0] load_sel_EX, brcond_EX;
    cntlRegister cntlEX(ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_Ex, regdst_EX, jLink_en_EX,
                        alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, memtoreg_EX, pcMuxSel_EX,
