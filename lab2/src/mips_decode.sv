@@ -72,7 +72,7 @@ module mips_decode(/*AUTOARG*/
    // Outputs
    ctrl_we, ctrl_Sys, ctrl_RI, alu__sel, regdst, pcMuxSel, jLink_en,
    memtoreg, alusrc1, alusrc2, se, mem_write_en, hi_en,lo_en,
-   load_sel,brcond, store_sel,
+   load_sel, brcond, store_sel,
 
    // Inputs
    dcd_op, dcd_funct2, dcd_rt
