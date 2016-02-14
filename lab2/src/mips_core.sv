@@ -148,6 +148,7 @@ module mips_core(/*AUTOARG*/
        $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x", wr_reg_EX, alu_in1, alu_in2, alu__out);
        $display ("M: wr_reg_MEM: %x, alu__outMEM: %x ctrl_Sys_MEM: %x, ctrl_we_MEM: %x", wr_reg_MEM, alu__out_MEM, ctrl_Sys_MEM, ctrl_we_MEM);
        $display ("W: wr_reg_WB: %x, alu__out_wb: %x ctrl_Sys_WB: %x, ctrl_we_WB: %x", wr_reg_WB, alu__out_WB, ctrl_Sys_WB, ctrl_we_WB);
+       $display ("stallDetecRst: %x, CDen: %xx", stallDetecRst, CDen);
        //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
        //$display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", branchTrue, pcMuxSel, pcMuxSelFinal);
@@ -327,6 +328,7 @@ module mips_core(/*AUTOARG*/
    //check for RAW hazard and Stall
    wire stallDetecRst, rst_cd;
    wire [2:0] CDAmt;
+   assign stallDetecRst = 1'b1;
    stallDetector sD(wr_reg_EX,wr_reg_MEM,wr_reg_WB,dcd_rt,dcd_rs,
                     stallDetecRst,
                     EXen,IDen, CDen, rst_cd,
@@ -618,13 +620,13 @@ module stallDetector(
   input logic stallDetecRst,
   output logic wrEXen,pcAdderEn, CDen, rst_cd,
   output logic [2:0] CDAmt);
-
+  
   always_comb begin
     pcAdderEn = 1'b1;
     wrEXen = 1'b1;
-    CDen = 1'b0;
-    rst_cd = 1'b0;
-    if (stallDetecRst) begin
+    if (stallDetecRst == 1'b1) begin
+      CDen = 1'b0;
+      rst_cd = 1'b0;
       if ((dcd_rt == wr_reg_MEM)|| (dcd_rs == wr_reg_MEM)) begin
         //RAW hazard
         CDen = 1'b1;
