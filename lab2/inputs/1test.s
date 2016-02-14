@@ -1,5 +1,8 @@
 		.text
 
-__start:        addiu $t0, $zero, 10
-                addiu $t1, $zero, 0x1
+__start:        addiu $9, $zero, 10
+
+				
+                addiu $10, $9, 0x1
+               
                 syscall
