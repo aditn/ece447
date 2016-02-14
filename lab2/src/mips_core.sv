@@ -148,7 +148,7 @@ module mips_core(/*AUTOARG*/
        $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x", wr_reg_EX, alu_in1, alu_in2, alu__out);
        $display ("M: wr_reg_MEM: %x, alu__outMEM: %x ctrl_Sys_MEM: %x, ctrl_we_MEM: %x", wr_reg_MEM, alu__out_MEM, ctrl_Sys_MEM, ctrl_we_MEM);
        $display ("W: wr_reg_WB: %x, alu__out_wb: %x ctrl_Sys_WB: %x, ctrl_we_WB: %x", wr_reg_WB, alu__out_WB, ctrl_Sys_WB, ctrl_we_WB);
-       $display ("stallDetecRst: %x, CDen: %xx", stallDetecRst, CDen);
+       $display ("stallDetecRst: %x, CDen: %x", stallDetecRst, CDen);
        //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
        //$display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", branchTrue, pcMuxSel, pcMuxSelFinal);
@@ -320,9 +320,11 @@ module mips_core(/*AUTOARG*/
                        clk, WBen, rst_b);
 
    //check for RAW hazard and Stall
-   wire stallDetecRst, rst_cd;
+   wire stallDetecRst, rst_cd, CDen;
    wire [2:0] CDAmt;
    assign stallDetecRst = 1'b1;
+   assign CDen = 1'b0;
+   assign rst_cd = 1'b0;
    stallDetector sD(wr_reg_EX,wr_reg_MEM,wr_reg_WB,dcd_rt,dcd_rs,
                     stallDetecRst,
                     EXen,IDen, CDen, rst_cd,
@@ -618,8 +620,14 @@ module stallDetector(
   always_comb begin
     pcAdderEn = 1'b1;
     wrEXen = 1'b1;
+    $display("");
+    $display("hi");
+    $display("");
     if (stallDetecRst == 1'b1) begin
-      CDen = 1'b0;
+      $display("");
+      $display("hi");
+      $display("");
+      CDen = 1'b1;
       rst_cd = 1'b0;
       if ((dcd_rt == wr_reg_MEM)|| (dcd_rs == wr_reg_MEM)) begin
         //RAW hazard
@@ -658,14 +666,17 @@ module countdownReg #(parameter reset_value = 0) (
   output logic stallDetecRst);
   
   logic [2:0] CDAmtq; 
+  assign CDAmtq = 3'd0;
 
   always_ff @(posedge clk or negedge rst_b)
-    if (rst_cd || ~rst_b)
+    if (rst_cd || ~rst_b) begin
       CDAmtq <= CDAmt;
+    end
     else if (CDen) begin
       CDAmtq <= CDAmtq-1;
-      if (CDAmtq == 0)
-        stallDetecRst <= 1'b1;
+    end
+    if (CDAmtq == 3'd0) begin
+      stallDetecRst <= 1'b1;
     end
 
 
