@@ -234,11 +234,17 @@ module mips_core(/*AUTOARG*/
    wire [31:0] load_data;
    wire [31:0] store_data;
 
+   //Fetch (IF) stage for pc register
+   wire IFen;
+   wire [31:0] stallpc;
+   assign IFen = 1;
+   mux2to1 stallMux(stallpc, pc, pc+4, IFen);
+
    //Decode (ID) stage registers and wirings
    wire IDen; //enable for decode stage
    wire [31:0] pc_ID;
    //assign IDen = 1;
-   register pcD(pc_ID, pc + 4, clk, IDen, rst_b);
+   register pcD(pc_ID, pc + 4, clk, 1'b0, rst_b);
    register irD(inst_ID, inst, clk, IDen, rst_b);
 
    //Execute (EX) stage registers
@@ -359,7 +365,7 @@ module mips_core(/*AUTOARG*/
    storer storer(store_data, mem_en, rt_data_MEM, store_sel_MEM, alu__out_MEM, mem_write_en_WB); //operates on data to write to memory
 
    //Mux for next state PC
-   mux4to1 pcMux(newpc, pc + 4, br_target, rs_data, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
+   mux4to1 pcMux(newpc, stallpc, br_target, rs_data, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
    adder brtarget(br_target, pc + 4, (imm << 2), 1'b0); //get branch target
    concat conc(j_target, pc, dcd_target); //get jump target
    pcSelector choosePcMuxSel(pcMuxSelFinal,pcMuxSel,branchTrue); //chooses PC on whether branch condition is met
