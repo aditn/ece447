@@ -672,19 +672,16 @@ module countdownReg #(parameter reset_value = 0) (
   output logic stallDetecRst);
   
   logic [2:0] CDAmtq; 
-  assign CDAmtq = 3'd0;
+  //assign CDAmtq = 3'd0;
+  assign stallDetecRst = (CDAmtq == 3'd0) ? 1'b1: 1'b0;
 
   always_ff @(posedge clk or negedge rst_b)
-    if (rst_cd || ~rst_b) begin
+    if (rst_cd || ~rst_b)
       CDAmtq <= CDAmt;
-    end
-    else if (CDen) begin
+    else if (CDen)
       CDAmtq <= CDAmtq-1;
-    end
-    if (CDAmtq == 3'd0) begin
-      stallDetecRst <= 1'b1;
-    end
-
+    else 
+      CDAmtq <= 3'd0;
 
 endmodule
 
