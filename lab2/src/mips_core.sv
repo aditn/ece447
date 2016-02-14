@@ -319,8 +319,15 @@ module mips_core(/*AUTOARG*/
                        clk, WBen, rst_b);
 
    //check for RAW hazard and Stall
+   wire stallDetecRst, rst_cd;
+   wire [2:0] CDAmt;
    stallDetector sD(wr_reg_EX,wr_reg_MEM,wr_reg_WB,dcd_rt,dcd_rs,
-                  EXen,IDen);
+                    stallDetecRst,
+                    EXen,IDen, CDen, rst_cd,
+                    CDAmt);
+   countdownReg cdReg(CDen, clk, rst_b, rst_cd,
+                      CDAmt,
+                      stallDetecRst);
 
    //Register file
    regfile_forward RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg_WB, wr_data, ctrl_we_WB, clk, rst_b, halted);
@@ -593,6 +600,7 @@ module cntlRegister (
 
 endmodule
 
+////
 //// stallDetector: module for enabling stalls if RAW hazard
 ////
 //// wr_reg_EX, wr_reg_MEM, wr_reg_WB (inputs) - are reg numbers at different stages
@@ -601,21 +609,66 @@ endmodule
 ////
 module stallDetector(
   input logic [4:0] wr_reg_EX, wr_reg_MEM, wr_reg_WB, dcd_rt, dcd_rs,
-  output logic wrEXen,pcAdderEn);
+  input logic stallDetecRst,
+  output logic wrEXen,pcAdderEn, CDen, rst_cd,
+  output logic [2:0] CDAmt);
 
   always_comb begin
     pcAdderEn = 1'b1;
     wrEXen = 1'b1;
-    if ((dcd_rt == wr_reg_EX) || (dcd_rt == wr_reg_MEM) || (dcd_rt == wr_reg_WB)
-        || (dcd_rs == wr_reg_EX) || (dcd_rs == wr_reg_MEM) || (dcd_rs == wr_reg_WB))
-      begin
+    CDen = 1'b0;
+    rst_cd = 1'b0;
+    if (stallDetecRst) begin
+      if ((dcd_rt == wr_reg_MEM)|| (dcd_rs == wr_reg_MEM)) begin
         //RAW hazard
+        CDen = 1'b1;
+        rst_cd = 1'b1;
         pcAdderEn = 1'b0;
         wrEXen = 1'b0;
+        CDAmt = 3'd2;
       end
+      else if (dcd_rt == wr_reg_WB)|| (dcd_rs == wr_reg_WB)) begin
+        //RAW hazard
+        CDen = 1'b1;
+        rst_cd = 1'b1;
+        pcAdderEn = 1'b0;
+        wrEXen = 1'b0;
+        CDAmt = 3'd3;
+      end
+    end
+
   end
 
 endmodule
+
+////
+//// countdownReg: keeps track of distance when hazard detected
+////
+//// CDen (input)    - enable bit for countdown
+//// CDAmt (input)   - distance to countdown by
+//// clk (input)     - Clock (positive edge-sensitive)
+//// reset  (input)  - System reset
+//// stallDetecRst (output) - enable/disable stallDetector
+////
+module countdownReg #(parameter reset_value = 0) (
+  input logic CDen,clk, rst_b, rst_cd,
+  input logic [2:0] CDAmt,
+  output logic stallDetecRst);
+  
+  logic [2:0] CDAmtq; 
+
+  always_ff (posedge clk or negedge rst_b)
+    if (rst_cd || ~rst_b)
+      CDAmtq <= CDAmt;
+    else if (CDen) begin
+      CDAmtq <= CDAmtq-1;
+      if (CDAmtq == 0)
+        stallDetecRst <= 1'b1;
+    end
+
+
+endmodule
+
 
 ////
 //// adder
