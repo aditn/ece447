@@ -627,7 +627,7 @@ module stallDetector(
         wrEXen = 1'b0;
         CDAmt = 3'd2;
       end
-      else if (dcd_rt == wr_reg_WB)|| (dcd_rs == wr_reg_WB)) begin
+      else if ((dcd_rt == wr_reg_WB)|| (dcd_rs == wr_reg_WB)) begin
         //RAW hazard
         CDen = 1'b1;
         rst_cd = 1'b1;
@@ -657,7 +657,7 @@ module countdownReg #(parameter reset_value = 0) (
   
   logic [2:0] CDAmtq; 
 
-  always_ff (posedge clk or negedge rst_b)
+  always_ff @(posedge clk or negedge rst_b)
     if (rst_cd || ~rst_b)
       CDAmtq <= CDAmt;
     else if (CDen) begin
