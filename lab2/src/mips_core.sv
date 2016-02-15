@@ -145,10 +145,10 @@ module mips_core(/*AUTOARG*/
       // $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
        //$display ("HI: %x, LO: %x, pcMuxSel: %d, nextpc: %x, nextnextpc:%x", hi_out, lo_out,pcMuxSel,nextpc,nextnextpc);
        $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x", wr_reg, wr_data, dcd_rs, dcd_rt, imm);
-       $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x", wr_reg_EX, alu_in1, alu_in2, alu__out);
-       $display ("M: wr_reg_MEM: %x, alu__outMEM: %x ctrl_Sys_MEM: %x, ctrl_we_MEM: %x", wr_reg_MEM, alu__out_MEM, ctrl_Sys_MEM, ctrl_we_MEM);
-       $display ("W: wr_reg_WB: %x, alu__out_wb: %x ctrl_Sys_WB: %x, ctrl_we_WB: %x", wr_reg_WB, alu__out_WB, ctrl_Sys_WB, ctrl_we_WB);
-       $display ("stallDetecRst: %x, CDen: %x", stallDetecRst, CDen);
+       $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", wr_reg_EX, alu_in1, alu_in2, alu__out, ctrl_we_EX, mem_write_en_EX);
+       $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, ctrl_we_MEM, mem_write_en_MEM);
+       $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", wr_reg_WB, alu__out_WB, ctrl_we_WB, mem_write_en_WB);
+       $display ("stall: %x, CDen: %x", stall, CDen);
        //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
        //$display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", branchTrue, pcMuxSel, pcMuxSelFinal);
@@ -237,7 +237,6 @@ module mips_core(/*AUTOARG*/
    //Fetch (IF) stage for pc register
    wire IFen;
    wire [31:0] stallpc;
-   assign IFen = 1;
    mux2to1 stallMux(stallpc, pc, pc+4, IFen);
 
    //Decode (ID) stage registers and wirings
@@ -326,18 +325,16 @@ module mips_core(/*AUTOARG*/
                        clk, WBen, rst_b);
 
    //check for RAW hazard and Stall
-   wire stallDetecRst, rst_cd, CDen;
+   wire stall, CDen;
    wire [2:0] CDAmt;
-   assign stallDetecRst = 1'b1;
-   assign CDen = 1'b0;
-   assign rst_cd = 1'b0;
    stallDetector sD(wr_reg_EX,wr_reg_MEM,wr_reg_WB,dcd_rt,dcd_rs,
-                    stallDetecRst,
-                    EXen,IDen, CDen, rst_cd,
-                    CDAmt);
-   countdownReg cdReg(CDen, clk, rst_b, rst_cd,
+                    mem_write_en_EX, mem_write_en_MEM, mem_write_en, 
+                    ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, stall,
+                    EXen, IDen, IFen, 
+                    CDen, CDAmt);
+   countdownReg cdReg(CDen, clk, rst_b,
                       CDAmt,
-                      stallDetecRst);
+                      stall);
 
    //Register file
    regfile_forward RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg_WB, wr_data, ctrl_we_WB, clk, rst_b, halted);
@@ -607,6 +604,26 @@ module cntlRegister (
          brcond <= brcond_in;
          store_sel <= store_sel_in;
        end
+     else if (~enable)
+       begin
+         ctrl_we <= 1'b0;
+         ctrl_Sys <= ctrl_Sys_in;
+         ctrl_RI <= ctrl_RI_in;
+         regdst <= regdst_in;
+         jLink_en <= jLink_en_in;
+         alusrc1 <= alusrc1_in;
+         alusrc2 <= alusrc2_in;
+         se <= se_in;
+         hi_en <= hi_en_in;
+         lo_en <= lo_en_in;
+         memtoreg <= memtoreg_in;
+         pcMuxSel <= pcMuxSel_in;
+         alu__sel <= alu__sel_in;
+         mem_write_en <= 1'b0;
+         load_sel <= load_sel;
+         brcond <= brcond_in;
+         store_sel <= store_sel_in;
+       end
 
 endmodule
 
@@ -614,42 +631,54 @@ endmodule
 //// stallDetector: module for enabling stalls if RAW hazard
 ////
 //// wr_reg_EX, wr_reg_MEM, wr_reg_WB (inputs) - are reg numbers at different stages
-//// wrEXen, (output) - enables propogation of reg number
-//// pcAdderEn (output) - lets PC go to next instruction
+//// dcd_rs, dcd_rt (inputs) - the registers the next instruction is reading
+//// mem_write_en_EX, mem_write_en_MEM, mem_write_en (inputs) - the memory write enable bits at different stages
+//// ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB (inputs) - register write enable bits at different stages
+//// stall (input) - signal that indicates an instruction is currently being stalled
+//// IFen, IDen, EXen, (output) - register enable bits at the IF, ID, and EX stages
+//// CDAmt (output) - number of clock cycles to stall
 ////
 module stallDetector(
   input logic [4:0] wr_reg_EX, wr_reg_MEM, wr_reg_WB, dcd_rt, dcd_rs,
-  input logic stallDetecRst,
-  output logic wrEXen,pcAdderEn, CDen, rst_cd,
+  input logic [3:0] mem_write_en_EX, mem_write_en_MEM, mem_write_en,
+  input logic ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, stall,
+  output logic wrEXen, IDen, IFen, CDen,
   output logic [2:0] CDAmt);
   
   always_comb begin
-    pcAdderEn = 1'b1;
+    IFen = 1'b1;
+    IDen = 1'b1;
     wrEXen = 1'b1;
-    $display("");
-    $display("hi");
-    $display("");
-    if (stallDetecRst == 1'b1) begin
-      $display("");
-      $display("hi");
-      $display("");
-      CDen = 1'b1;
-      rst_cd = 1'b0;
-      if ((dcd_rt == wr_reg_MEM)|| (dcd_rs == wr_reg_MEM)) begin
-        //RAW hazard
+    CDen = 1'b0;
+    CDAmt = 3'b0;
+    if (stall == 1'b1) begin
+      IFen = 1'b0;
+      IDen = 1'b0;
+      wrEXen = 1'b0;
+    end
+    else begin
+      if ((ctrl_we_EX != 0 || mem_write_en_EX != 0) && (((dcd_rt != 0) && (dcd_rt == wr_reg_EX)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_EX)))) begin
         CDen = 1'b1;
-        rst_cd = 1'b1;
-        pcAdderEn = 1'b0;
-        wrEXen = 1'b0;
-        CDAmt = 3'd2;
-      end
-      else if ((dcd_rt == wr_reg_WB)|| (dcd_rs == wr_reg_WB)) begin
-        //RAW hazard
-        CDen = 1'b1;
-        rst_cd = 1'b1;
-        pcAdderEn = 1'b0;
-        wrEXen = 1'b0;
         CDAmt = 3'd3;
+        IFen = 1'b0;
+        IDen = 1'b0;
+        wrEXen = 1'b0;
+      end
+      else if ((ctrl_we_MEM != 0 || mem_write_en_MEM != 0) && (((dcd_rt != 0) && (dcd_rt == wr_reg_MEM)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_MEM)))) begin
+        //RAW hazard
+        CDen = 1'b1;
+        CDAmt = 3'd2;
+        IFen = 1'b0;
+        IDen = 1'b0;
+        wrEXen = 1'b0;
+      end
+      else if ((ctrl_we_WB != 0 || mem_write_en != 0) && (((dcd_rt != 0) && (dcd_rt == wr_reg_WB)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_WB)))) begin
+        //RAW hazard
+        CDen = 1'b1;
+        CDAmt = 3'd1;
+        IFen = 1'b0;
+        IDen = 1'b0;
+        wrEXen = 1'b0;
       end
     end
 
@@ -664,24 +693,27 @@ endmodule
 //// CDAmt (input)   - distance to countdown by
 //// clk (input)     - Clock (positive edge-sensitive)
 //// reset  (input)  - System reset
-//// stallDetecRst (output) - enable/disable stallDetector
+//// stall (output) - signal that an instruction is currently being stalled
 ////
 module countdownReg #(parameter reset_value = 0) (
-  input logic CDen,clk, rst_b, rst_cd,
+  input logic CDen, clk, rst_b,
   input logic [2:0] CDAmt,
-  output logic stallDetecRst);
+  output logic stall);
   
   logic [2:0] CDAmtq; 
-  //assign CDAmtq = 3'd0;
-  assign stallDetecRst = (CDAmtq == 3'd0) ? 1'b1: 1'b0;
+  assign stall = (CDAmtq == 3'd0) ? 1'b0: 1'b1;
 
-  always_ff @(posedge clk or negedge rst_b)
-    if (rst_cd || ~rst_b)
+  always_ff @(posedge clk or negedge rst_b) begin
+    if (~rst_b) begin
+      CDAmtq <= 3'b0;
+    end
+    else if (CDen) begin
       CDAmtq <= CDAmt;
-    else if (CDen)
+    end
+    else if (CDAmtq != 3'd0) begin
       CDAmtq <= CDAmtq-1;
-    else 
-      CDAmtq <= 3'd0;
+    end
+  end
 
 endmodule
 
