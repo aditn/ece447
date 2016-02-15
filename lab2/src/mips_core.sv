@@ -144,9 +144,10 @@ module mips_core(/*AUTOARG*/
                    pc, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
       // $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
        //$display ("HI: %x, LO: %x, pcMuxSel: %d, nextpc: %x, nextnextpc:%x", hi_out, lo_out,pcMuxSel,nextpc,nextnextpc);
-       $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x", wr_reg, wr_data, dcd_rs, dcd_rt, imm);
+       $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x", wr_reg, wr_data, dcd_rs, dcd_rt, imm, mem_en);
        $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", wr_reg_EX, alu_in1, alu_in2, alu__out, ctrl_we_EX, mem_write_en_EX);
        $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, ctrl_we_MEM, mem_write_en_MEM);
+       $display("mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
        $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", wr_reg_WB, alu__out_WB, ctrl_we_WB, mem_write_en_WB);
        $display ("stall: %x, CDen: %x", stall, CDen);
        //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
@@ -279,11 +280,13 @@ module mips_core(/*AUTOARG*/
    wire [31:0] pc_MEM;
    wire [31:0] alu__out_MEM;
    wire [31:0] rt_data_MEM;
+   wire [31:0] imm_MEM;
    wire [4:0] wr_reg_MEM;
    assign MEMen = 1;
    register pcMEM(pc_MEM, pc_EX, clk, MEMen, rst_b);
    register aluMEM(alu__out_MEM, alu__out, clk, MEMen, rst_b);
    register rtMEM(rt_data_MEM, rt_data_EX, clk, MEMen, rst_b);
+   register iMEM(imm_MEM, imm_EX, clk, MEMen, rst_b);
    register #(5) wrMEM(wr_reg_MEM, wr_reg_EX, clk, MEMen, rst_b);
 
    wire ctrl_we_MEM, ctrl_Sys_MEM, ctrl_RI_MEM, regdst_MEM, jLink_en_MEM;
@@ -310,14 +313,15 @@ module mips_core(/*AUTOARG*/
    register HIwb(HIout_WB, hi_out, clk, WBen, rst_b); //holds HI val in WB register (may need to have its own en)
    register LOwb(LOout_WB, lo_out, clk, WBen, rst_b); //holds LO val in WB register (may need to have its own en)
    register #(5) wrWB(wr_reg_WB, wr_reg_MEM, clk, WBen, rst_b);
+
    wire ctrl_we_WB, ctrl_Sys_WB, ctrl_RI_WB, regdst_WB, jLink_en_WB;
    wire alusrc1_WB, alusrc2_WB, se_WB, hi_en_WB, lo_en_WB;
    wire [1:0] memtoreg_WB, pcMuxSel_WB, store_sel_WB;
-   wire [3:0] alu__sel_WB; //mem_write_en_WB;
+   wire [3:0] alu__sel_WB, mem_write_en_WB;
    wire [2:0] load_sel_WB, brcond_WB;
    cntlRegister cntlWB(ctrl_we_WB, ctrl_Sys_WB, ctrl_RI_WB, regdst_WB, jLink_en_WB,
                        alusrc1_WB, alusrc2_WB, se_WB, hi_en_WB, lo_en_WB, memtoreg_WB, pcMuxSel_WB,
-                       alu__sel_WB, mem_write_en, load_sel_WB, brcond_WB, store_sel_WB,
+                       alu__sel_WB, mem_write_en_WB, load_sel_WB, brcond_WB, store_sel_WB,
                        //Inputs
                        ctrl_we_MEM, ctrl_Sys_MEM, ctrl_RI_MEM, regdst_MEM, jLink_en_MEM,
                        alusrc1_MEM, alusrc2_MEM, se_MEM, hi_en_MEM, lo_en_MEM, memtoreg_MEM, pcMuxSel_MEM,
@@ -358,8 +362,8 @@ module mips_core(/*AUTOARG*/
    assign mem_data_in = store_data; //data to store
 
    //To read from / write to memory
-   loader loader(load_data, dcd_imm, mem_data_out, load_sel_MEM, alu__out_MEM); //operates on data loaded from memory
-   storer storer(store_data, mem_en, rt_data_MEM, store_sel_MEM, alu__out_MEM, mem_write_en_WB); //operates on data to write to memory
+   loader loader(load_data, imm_MEM, mem_data_out, load_sel_MEM, alu__out_MEM); //operates on data loaded from memory
+   storer storer(store_data, mem_write_en, rt_data_MEM, store_sel_MEM, alu__out_MEM, mem_write_en_MEM); //operates on data to write to memory
 
    //Mux for next state PC
    mux4to1 pcMux(newpc, stallpc, br_target, rs_data, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
@@ -600,7 +604,7 @@ module cntlRegister (
          pcMuxSel <= pcMuxSel_in;
          alu__sel <= alu__sel_in;
          mem_write_en <= mem_write_en_in;      
-         load_sel <= load_sel;
+         load_sel <= load_sel_in;
          brcond <= brcond_in;
          store_sel <= store_sel_in;
        end
@@ -620,7 +624,7 @@ module cntlRegister (
          pcMuxSel <= pcMuxSel_in;
          alu__sel <= alu__sel_in;
          mem_write_en <= 1'b0;
-         load_sel <= load_sel;
+         load_sel <= load_sel_in;
          brcond <= brcond_in;
          store_sel <= store_sel_in;
        end
@@ -890,33 +894,33 @@ endmodule
 ////
 module storer (
       output logic [31:0] store_data,
-      output logic [3:0] mem_en,
+      output logic [3:0] mem_write_en,
       input logic [31:0] rt_data,
       input logic [1:0] store_sel,
       input logic [31:0] offset,
-      input logic [3:0] mem_write_en);
+      input logic [3:0] mem_en);
 
     always_comb begin
       case(store_sel)
         `ST_SB: //place data in top bits of word and shift right by offset number of bytes
           begin
             store_data = {24'b0, rt_data[7:0]} << ((offset & 32'h3) * 8);
-            mem_en = mem_write_en >> (offset & 32'h3);
+            mem_write_en = mem_en >> (offset & 32'h3);
           end
         `ST_SH:
           begin
             store_data = {16'b0, rt_data[15:0]} << ((offset & 32'h3) * 8);
-            mem_en = mem_write_en >> (offset & 32'h3);
+            mem_write_en = mem_en >> (offset & 32'h3);
           end
         `ST_SW:
           begin
             store_data = rt_data;
-            mem_en = mem_write_en;
+            mem_write_en = mem_en;
           end
         default:
           begin
             store_data = 32'hxxxx;
-            mem_en = 4'b0000;
+            mem_write_en = 4'b0000;
           end
       endcase
     end
