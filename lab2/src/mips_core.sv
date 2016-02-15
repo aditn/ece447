@@ -143,7 +143,7 @@ module mips_core(/*AUTOARG*/
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    pc, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
       // $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
-       //$display ("HI: %x, LO: %x, pcMuxSel: %d, nextpc: %x, nextnextpc:%x", hi_out, lo_out,pcMuxSel,nextpc,nextnextpc);
+       $display ("HI: %x, LO: %x, hi_en_EX: %x, hi_en_WB:%x", hi_out, lo_out,hi_en_EX,hi_en_WB);
        $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x", wr_reg, wr_data, dcd_rs, dcd_rt, imm, mem_en);
        $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", wr_reg_EX, alu_in1, alu_in2, alu__out, ctrl_we_EX, mem_write_en_EX);
        $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, ctrl_we_MEM, mem_write_en_MEM);
@@ -345,8 +345,8 @@ module mips_core(/*AUTOARG*/
    mux2to1 #(5) regDest(wr_regNum, dcd_rt, dcd_rd, regdst); //register to write to
    
    //HI, LO registers
-   register #(32,0) hiReg(hi_out, rs_data_EX, clk, hi_en_WB, rst_b);
-   register #(32,0) loReg(lo_out, rs_data_EX, clk, lo_en_WB, rst_b);
+   register #(32,0) hiReg(hi_out, rs_data_EX, clk, hi_en_EX, rst_b);
+   register #(32,0) loReg(lo_out, rs_data_EX, clk, lo_en_EX, rst_b);
 
    //Determines inputs to ALU
    wire [31:0] alu_in1; //mux output of rs_data and rt_data
@@ -618,8 +618,8 @@ module cntlRegister (
          alusrc1 <= alusrc1_in;
          alusrc2 <= alusrc2_in;
          se <= se_in;
-         hi_en <= hi_en_in;
-         lo_en <= lo_en_in;
+         hi_en <= 1'b0;
+         lo_en <= 1'b0;
          memtoreg <= memtoreg_in;
          pcMuxSel <= pcMuxSel_in;
          alu__sel <= alu__sel_in;
