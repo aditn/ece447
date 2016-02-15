@@ -567,22 +567,22 @@ module loader (
 
     //shift the data by the offset number of bytes
     logic [31:0] data;
-    assign data = (mem_data << ((offset & 32'h3) * 8));
+    assign data = (mem_data >> ((offset & 32'h3) * 8));
 
     always_comb begin
       case(load_sel)
         `LOAD_LUI: //load upper immediate
           load_data = {dcd_imm, 16'b0};
         `LOAD_LB: //load top portion of shifted data
-          load_data = {{24{data[31]}}, data[31:24] };
+          load_data = {{24{data[7]}}, data[7:0] };
         `LOAD_LH:
-          load_data = {{16{data[31]}}, data[31:16]};
+          load_data = {{16{data[15]}}, data[15:0]};
         `LOAD_LW:
           load_data = mem_data;
         `LOAD_LBU:
-          load_data = {24'b0, data[31:24]};
+          load_data = {24'b0, data[7:0]};
         `LOAD_LHU:
-          load_data = {16'b0, data[31:16]};
+          load_data = {16'b0, data[15:0]};
         default:
           load_data = 32'hxxxx;
       endcase
@@ -609,13 +609,13 @@ module storer (
       case(store_sel)
         `ST_SB: //place data in top bits of word and shift right by offset number of bytes
           begin
-            store_data = {rt_data[7:0], 24'b0} >> ((offset & 32'h3) * 8);
-            mem_write_en = 4'b0001 << (offset & 32'h3);
+            store_data = {24'b0, rt_data[7:0]} << ((offset & 32'h3) * 8);
+            mem_write_en = 4'b1000 >> (offset & 32'h3);
           end
         `ST_SH:
           begin
-            store_data = {rt_data[15:0], 16'b0} >> ((offset & 32'h3) * 8);
-            mem_write_en = 4'b0011 << (offset & 32'h3);
+            store_data = {16'b0, rt_data[15:0]} << ((offset & 32'h3) * 8);
+            mem_write_en = 4'b1100 >> (offset & 32'h3);
           end
         `ST_SW:
           begin
