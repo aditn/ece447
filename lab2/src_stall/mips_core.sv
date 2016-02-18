@@ -136,7 +136,7 @@ module mips_core(/*AUTOARG*/
    assign        dcd_code = inst_ID[25:6];       // Breakpoint code
 
    // synthesis translate_off
-   always @(posedge clk) begin
+   /*always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
        $display ( "=== Simulation Cycle %d ===", $time );
@@ -158,7 +158,7 @@ module mips_core(/*AUTOARG*/
        //$display ("br_target: %x", br_target);
        $display ("");
      end
-   end
+   end*/
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -269,7 +269,7 @@ module mips_core(/*AUTOARG*/
    wire [1:0] memtoreg_EX, pcMuxSel_EX, store_sel_EX;
    wire [3:0] alu__sel_EX, mem_write_en_EX;
    wire [2:0] load_sel_EX, brcond_EX;
-   cntlRegister cntlEX(ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_Ex, regdst_EX, jLink_en_EX,
+   cntlRegister cntlEX(ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX,
                        alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, memtoreg_EX, pcMuxSel_EX,
                        alu__sel_EX, mem_write_en_EX, load_sel_EX, brcond_EX, store_sel_EX,
                        //Inputs
@@ -301,7 +301,7 @@ module mips_core(/*AUTOARG*/
                        alusrc1_MEM, alusrc2_MEM, se_MEM, hi_en_MEM, lo_en_MEM, memtoreg_MEM, pcMuxSel_MEM,
                        alu__sel_MEM, mem_write_en_MEM, load_sel_MEM, brcond_MEM, store_sel_MEM,
                        //Inputs
-                       ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_Ex, regdst_EX, jLink_en_EX,
+                       ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX,
                        alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, memtoreg_EX, pcMuxSel_EX,
                        alu__sel_EX, mem_write_en_EX, load_sel_EX, brcond_EX, store_sel_EX,
                        clk, MEMen, rst_b);
@@ -309,7 +309,7 @@ module mips_core(/*AUTOARG*/
    //Writeback stage registers
    wire WBen;
    wire [31:0] HIout_WB, LOout_WB, load_data_WB, alu__out_WB;
-   wire [4:0] rt_data_WB;
+   wire [31:0] rt_data_WB;
    wire [4:0] wr_reg_WB;
    assign WBen = 1;
    register MDRw(load_data_WB, load_data, clk, WBen, rst_b);
@@ -363,7 +363,7 @@ module mips_core(/*AUTOARG*/
 
    //Wirings to memory module
    mux4to1 memToReg(wr_dataMem, alu__out_WB, load_data_WB, HIout_WB, LOout_WB, memtoreg_WB);
-   assign instr_addr = newpc[31:2]; //address of next instruction
+   //assign instr_addr = newpc[31:2]; //address of next instruction
    assign mem_addr = alu__out_MEM[31:2]; //memory address to read/write
    assign mem_data_in = store_data; //data to store
 
