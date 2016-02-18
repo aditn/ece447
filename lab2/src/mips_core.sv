@@ -143,7 +143,7 @@ module mips_core(/*AUTOARG*/
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    pc, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
       // $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
-       $display ("HI: %x, LO: %x, hi_en_EX: %x, hi_en_WB:%x", hi_out, lo_out,hi_en_EX,hi_en_WB);
+       $display ("HI: %x, LO: %x, hi_en_EX: %x, hi_en_WB:%x, lo_en_EX: %x, lo_en_WB: %x", hi_out, lo_out,hi_en_EX,hi_en_WB,lo_en_EX, lo_en_WB);
        $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x", wr_reg, wr_data, dcd_rs, dcd_rt, imm, mem_en);
        $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", wr_reg_EX, alu_in1, alu_in2, alu__out, ctrl_we_EX, mem_write_en_EX);
        $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, ctrl_we_MEM, mem_write_en_MEM);
@@ -338,7 +338,7 @@ module mips_core(/*AUTOARG*/
    wire [2:0] CDAmt;
    stallDetector sD(wr_reg_EX,wr_reg_MEM,wr_reg_WB,rt_regNum,dcd_rs,
                     mem_write_en_EX, mem_write_en_MEM, mem_write_en, 
-                    ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, stall,
+                    ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, regdst, stall,
                     EXen, IDen, IFen, 
                     CDen, CDAmt);
    countdownReg cdReg(CDen, clk, rst_b,
@@ -407,9 +407,7 @@ module mips_core(/*AUTOARG*/
                      .AdES(1'b0),
                      .CpU(1'b0));
 
-   assign r_v0 = rt_data_WB; // Good enough for now. To support syscall for real,
-                         // you should read the syscall
-                         // argument from $v0 of the register file 
+   assign r_v0 = rt_data_WB; // rt_data for syscall is data from $v0
 
    syscall_unit SU(.syscall_halt(syscall_halt), .pc(pc), .clk(clk), .Sys(ctrl_Sys_WB),
                    .r_v0(r_v0), .rst_b(rst_b));
@@ -648,44 +646,44 @@ endmodule
 module stallDetector(
   input logic [4:0] wr_reg_EX, wr_reg_MEM, wr_reg_WB, dcd_rt, dcd_rs,
   input logic [3:0] mem_write_en_EX, mem_write_en_MEM, mem_write_en,
-  input logic ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, stall,
-  output logic wrEXen, IDen, IFen, CDen,
+  input logic ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, regdst, stall,
+  output logic EXen, IDen, IFen, CDen,
   output logic [2:0] CDAmt);
   
   always_comb begin
     IFen = 1'b1;
     IDen = 1'b1;
-    wrEXen = 1'b1;
+    EXen = 1'b1;
     CDen = 1'b0;
     CDAmt = 3'b0;
     if (stall == 1'b1) begin
       IFen = 1'b0;
       IDen = 1'b0;
-      wrEXen = 1'b0;
+      EXen = 1'b0;
     end
     else begin
-      if ((ctrl_we_EX != 0 || mem_write_en_EX != 0) && (((dcd_rt != 0) && (dcd_rt == wr_reg_EX)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_EX)))) begin
-        CDen = 1'b1;
-        CDAmt = 3'd3;
-        IFen = 1'b0;
-        IDen = 1'b0;
-        wrEXen = 1'b0;
-      end
-      else if ((ctrl_we_MEM != 0 || mem_write_en_MEM != 0) && (((dcd_rt != 0) && (dcd_rt == wr_reg_MEM)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_MEM)))) begin
-        //RAW hazard
+      if ((ctrl_we_EX != 0 || mem_write_en_EX != 0) && (((regdst == 1) && (dcd_rt != 0) && (dcd_rt == wr_reg_EX)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_EX)))) begin
         CDen = 1'b1;
         CDAmt = 3'd2;
         IFen = 1'b0;
         IDen = 1'b0;
-        wrEXen = 1'b0;
+        EXen = 1'b0;
       end
-      else if ((ctrl_we_WB != 0 || mem_write_en != 0) && (((dcd_rt != 0) && (dcd_rt == wr_reg_WB)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_WB)))) begin
+      else if ((ctrl_we_MEM != 0 || mem_write_en_MEM != 0) && (((regdst == 1) && (dcd_rt != 0) && (dcd_rt == wr_reg_MEM)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_MEM)))) begin
         //RAW hazard
         CDen = 1'b1;
         CDAmt = 3'd1;
         IFen = 1'b0;
         IDen = 1'b0;
-        wrEXen = 1'b0;
+        EXen = 1'b0;
+      end
+      else if ((ctrl_we_WB != 0 || mem_write_en != 0) && (((regdst == 1) && (dcd_rt != 0) && (dcd_rt == wr_reg_WB)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_WB)))) begin
+        //RAW hazard
+        CDen = 1'b1;
+        CDAmt = 3'd0;
+        IFen = 1'b0;
+        IDen = 1'b0;
+        EXen = 1'b0;
       end
     end
 
