@@ -149,6 +149,8 @@ module mips_core(/*AUTOARG*/
        $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, ctrl_we_MEM, mem_write_en_MEM);
        $display("mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
        $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", wr_reg_WB, alu__out_WB, ctrl_we_WB, mem_write_en_WB);
+       $display ("sys: %x, rt_data: %x", ctrl_Sys, rt_data);
+       $display ("sys_WB: %x, rt_data: %x", ctrl_Sys_WB, rt_data_WB);
        $display ("stall: %x, CDen: %x", stall, CDen);
        //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
@@ -225,6 +227,7 @@ module mips_core(/*AUTOARG*/
    wire [31:0] wr_data; //data to write to register file
    wire [31:0] wr_dataMem; //intermediate data to write to register file
    wire [4:0] wr_regNum;//intermediate reg to write to 
+   wire [4:0] rt_regNum;//rt register to read from
 
    wire [31:0] br_target; //branch target
    wire [31:0] j_target; //unconditional jump target
@@ -306,12 +309,14 @@ module mips_core(/*AUTOARG*/
    //Writeback stage registers
    wire WBen;
    wire [31:0] HIout_WB, LOout_WB, load_data_WB, alu__out_WB;
+   wire [4:0] rt_data_WB;
    wire [4:0] wr_reg_WB;
    assign WBen = 1;
    register MDRw(load_data_WB, load_data, clk, WBen, rst_b);
    register Aoutw(alu__out_WB, alu__out_MEM, clk, WBen, rst_b);
    register HIwb(HIout_WB, hi_out, clk, WBen, rst_b); //holds HI val in WB register (may need to have its own en)
    register LOwb(LOout_WB, lo_out, clk, WBen, rst_b); //holds LO val in WB register (may need to have its own en)
+   register rtWB(rt_data_WB, rt_data_MEM, clk, WBen, rst_b);
    register #(5) wrWB(wr_reg_WB, wr_reg_MEM, clk, WBen, rst_b);
 
    wire ctrl_we_WB, ctrl_Sys_WB, ctrl_RI_WB, regdst_WB, jLink_en_WB;
@@ -331,7 +336,7 @@ module mips_core(/*AUTOARG*/
    //check for RAW hazard and Stall
    wire stall, CDen;
    wire [2:0] CDAmt;
-   stallDetector sD(wr_reg_EX,wr_reg_MEM,wr_reg_WB,dcd_rt,dcd_rs,
+   stallDetector sD(wr_reg_EX,wr_reg_MEM,wr_reg_WB,rt_regNum,dcd_rs,
                     mem_write_en_EX, mem_write_en_MEM, mem_write_en, 
                     ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, stall,
                     EXen, IDen, IFen, 
@@ -341,9 +346,10 @@ module mips_core(/*AUTOARG*/
                       stall);
 
    //Register file
-   regfile_forward RegFile(rs_data, rt_data, dcd_rs, dcd_rt, wr_reg_WB, wr_data, ctrl_we_WB, clk, rst_b, halted);
+   regfile_forward RegFile(rs_data, rt_data, dcd_rs, rt_regNum, wr_reg_WB, wr_data, ctrl_we_WB, clk, rst_b, halted);
    mux2to1 #(5) regDest(wr_regNum, dcd_rt, dcd_rd, regdst); //register to write to
-   
+   mux2to1 #(5) regRt(rt_regNum, dcd_rt, 5'd2, ctrl_Sys); //rt reg to read from (for syscalls)   
+
    //HI, LO registers
    register #(32,0) hiReg(hi_out, rs_data_EX, clk, hi_en_EX, rst_b);
    register #(32,0) loReg(lo_out, rs_data_EX, clk, lo_en_EX, rst_b);
@@ -375,9 +381,6 @@ module mips_core(/*AUTOARG*/
    mux2to1 dataToReg(wr_data, wr_dataMem, pc+4, jLink_en_WB); 
    mux2to1 #(5)regNumber(wr_reg, wr_regNum, 5'd31, jLink_en_WB);
 
-
-
-
 /*****************************************************************************/
 
 
@@ -404,7 +407,7 @@ module mips_core(/*AUTOARG*/
                      .AdES(1'b0),
                      .CpU(1'b0));
 
-   assign r_v0 = 32'h0a; // Good enough for now. To support syscall for real,
+   assign r_v0 = rt_data_WB; // Good enough for now. To support syscall for real,
                          // you should read the syscall
                          // argument from $v0 of the register file 
 
