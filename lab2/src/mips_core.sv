@@ -254,7 +254,6 @@ module mips_core(/*AUTOARG*/
    wire [31:0] rt_data_EX;
    wire [31:0] imm_EX;
    wire [4:0] wr_reg_EX;
-   //assign EXen = 1;
    register pcEX(pc_EX, pc_ID, clk, EXen, rst_b);
    register rsEX(rs_data_EX, rs_data, clk, EXen, rst_b);
    register rtEX(rt_data_EX, rt_data, clk, EXen, rst_b);
