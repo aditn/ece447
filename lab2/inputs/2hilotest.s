@@ -1,6 +1,7 @@
             .text
 
 __start:    addi $3, $zero, 1
+            addiu $2, $zero, 0xa
 			mthi $3
 			mfhi $4
 			addiu $4, $4, 10
