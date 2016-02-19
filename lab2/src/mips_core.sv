@@ -136,7 +136,7 @@ module mips_core(/*AUTOARG*/
    assign        dcd_code = inst_ID[25:6];       // Breakpoint code
 
    // synthesis translate_off
-   /*always @(posedge clk) begin
+   always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
        $display ( "=== Simulation Cycle %d ===", $time );
@@ -148,7 +148,7 @@ module mips_core(/*AUTOARG*/
        $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", wr_reg_EX, alu_in1, alu_in2, alu__out, ctrl_we_EX, mem_write_en_EX);
        $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, ctrl_we_MEM, mem_write_en_MEM);
        $display("mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
-       $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", wr_reg_WB, alu__out_WB, ctrl_we_WB, mem_write_en_WB);
+       $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x, LO_out_WB: %x", wr_reg_WB, alu__out_WB, ctrl_we_WB, mem_write_en_WB, LOout_WB);
        $display ("sys: %x, rt_data: %x", ctrl_Sys, rt_data);
        $display ("sys_WB: %x, rt_data: %x", ctrl_Sys_WB, rt_data_WB);
        $display ("stall: %x, CDen: %x", stall, CDen);
@@ -158,7 +158,7 @@ module mips_core(/*AUTOARG*/
        //$display ("br_target: %x", br_target);
        $display ("");
      end
-   end*/
+   end
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example

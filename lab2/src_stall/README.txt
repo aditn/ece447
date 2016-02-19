@@ -1,17 +1,15 @@
-In our design, we left the majority the handling of control signals to our 
-mips_decoder module, such as enabling registers, selecting inputs and 
-outputs for muxes, and selecting operations for our own modules to perform.
-For wires with multiple different inputs, we used muxes that were controlled
-by the mips_decoder. For load and store operations, we created special loader
-and storer modules to handle storing and loading bytes and halfwords. Also,
-our ALU handled branch conditions. For our HI and LO registers, we simply used
-normal registers that were enabled by the decoder.
+In our design, we added clusters of registers in order to separate data values
+between each of the five stages. The registers propagate the necessary data 
+used in each of the stages in the pipeline such as control signals and 
+register data. To facilitate stalling, we implemented a stall detector to
+detect hazards and activate a  countdown register which stalls for the 
+appropriate number of clock cycles until there is no longer a hazard.
 
-The critical path of our synthesized is through the decoder, the sign extend
-mux for immediates, the mux to choose between the second input for the ALU
-(either Rt data or the immediate), then the ALU, and finally the output for
-the memory address to read/write from.
-The minimum clock cycle is 8.59 ns.
+Hazard Distance Analysis:
+ALU R/I then any instruction: RAW hazard distance = 3
+LW then any instruction: RAW hazard distance = 3
+MF then any instruction (except MT): RAW hazard distance = 3
+No other hazards
 
-We spent approximately 1 hour planning the design, 18 hours capturing the 
-design, 6 hours testing the design, and 4 hours debugging.
+We spent approximately 2 hours planning the design, 10 hours capturing the 
+design, 3 hours testing the design, and 3 hours debugging.
