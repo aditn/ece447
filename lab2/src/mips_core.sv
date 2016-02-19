@@ -136,7 +136,7 @@ module mips_core(/*AUTOARG*/
    assign        dcd_code = inst_ID[25:6];       // Breakpoint code
 
    // synthesis translate_off
-   always @(posedge clk) begin
+   /*always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
        $display ( "=== Simulation Cycle %d ===", $time );
@@ -148,7 +148,7 @@ module mips_core(/*AUTOARG*/
        $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", wr_reg_EX, alu_in1, alu_in2, alu__out, ctrl_we_EX, mem_write_en_EX);
        $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, ctrl_we_MEM, mem_write_en_MEM);
        $display("mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
-       $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x, LO_out_WB: %x", wr_reg_WB, alu__out_WB, ctrl_we_WB, mem_write_en_WB, LOout_WB);
+       $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", wr_reg_WB, alu__out_WB, ctrl_we_WB, mem_write_en_WB);
        $display ("sys: %x, rt_data: %x", ctrl_Sys, rt_data);
        $display ("sys_WB: %x, rt_data: %x", ctrl_Sys_WB, rt_data_WB);
        $display ("stall: %x, CDen: %x", stall, CDen);
@@ -158,7 +158,7 @@ module mips_core(/*AUTOARG*/
        //$display ("br_target: %x", br_target);
        $display ("");
      end
-   end
+   end*/
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -187,6 +187,7 @@ module mips_core(/*AUTOARG*/
    wire hi_en;
    wire lo_en;
    wire [1:0] store_sel;
+   wire load_stall;
 
    // Generate control signals
    mips_decode Decoder(/*AUTOINST*/
@@ -208,6 +209,7 @@ module mips_core(/*AUTOARG*/
                        .load_sel        (load_sel),
                        .brcond          (brcond),
                        .store_sel       (store_sel),
+                       .load_stall      (load_stall),
 		       // Inputs
 		       .dcd_op		(dcd_op[5:0]),
 		       .dcd_funct2	(dcd_funct2[5:0]),
@@ -264,17 +266,17 @@ module mips_core(/*AUTOARG*/
    register #(5) wrEX(wr_reg_EX, wr_reg, clk, EXen, rst_b);
 
    wire ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX;
-   wire alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX; 
+   wire alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, load_stall_EX; 
    wire [1:0] memtoreg_EX, pcMuxSel_EX, store_sel_EX;
    wire [3:0] alu__sel_EX, mem_write_en_EX;
    wire [2:0] load_sel_EX, brcond_EX;
    cntlRegister cntlEX(ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX,
                        alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, memtoreg_EX, pcMuxSel_EX,
-                       alu__sel_EX, mem_write_en_EX, load_sel_EX, brcond_EX, store_sel_EX,
+                       alu__sel_EX, mem_write_en_EX, load_sel_EX, brcond_EX, store_sel_EX, load_stall_EX
                        //Inputs
                        ctrl_we, ctrl_Sys, ctrl_RI, regdst, jLink_en, 
                        alusrc1, alusrc2, se, hi_en, lo_en, memtoreg, pcMuxSel,
-                       alu__sel, mem_en, load_sel, brcond, store_sel,
+                       alu__sel, mem_en, load_sel, brcond, store_sel,load_stall
                        clk, EXen, rst_b);
 
    //Memory (MEM) stage registers
@@ -292,17 +294,17 @@ module mips_core(/*AUTOARG*/
    register #(5) wrMEM(wr_reg_MEM, wr_reg_EX, clk, MEMen, rst_b);
 
    wire ctrl_we_MEM, ctrl_Sys_MEM, ctrl_RI_MEM, regdst_MEM, jLink_en_MEM;
-   wire alusrc1_MEM, alusrc2_MEM, se_MEM, hi_en_MEM, lo_en_MEM;
+   wire alusrc1_MEM, alusrc2_MEM, se_MEM, hi_en_MEM, lo_en_MEM, load_stall_MEM;
    wire [1:0] memtoreg_MEM, pcMuxSel_MEM, store_sel_MEM;
    wire [3:0] alu__sel_MEM, mem_write_en_MEM;
    wire [2:0] load_sel_MEM, brcond_MEM;
    cntlRegister cntlMEM(ctrl_we_MEM, ctrl_Sys_MEM, ctrl_RI_MEM, regdst_MEM, jLink_en_MEM,
                        alusrc1_MEM, alusrc2_MEM, se_MEM, hi_en_MEM, lo_en_MEM, memtoreg_MEM, pcMuxSel_MEM,
-                       alu__sel_MEM, mem_write_en_MEM, load_sel_MEM, brcond_MEM, store_sel_MEM,
+                       alu__sel_MEM, mem_write_en_MEM, load_sel_MEM, brcond_MEM, store_sel_MEM,load_stall_MEM
                        //Inputs
                        ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX,
                        alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, memtoreg_EX, pcMuxSel_EX,
-                       alu__sel_EX, mem_write_en_EX, load_sel_EX, brcond_EX, store_sel_EX,
+                       alu__sel_EX, mem_write_en_EX, load_sel_EX, brcond_EX, store_sel_EX,load_stall_EX
                        clk, MEMen, rst_b);
 
    //Writeback stage registers
@@ -319,17 +321,17 @@ module mips_core(/*AUTOARG*/
    register #(5) wrWB(wr_reg_WB, wr_reg_MEM, clk, WBen, rst_b);
 
    wire ctrl_we_WB, ctrl_Sys_WB, ctrl_RI_WB, regdst_WB, jLink_en_WB;
-   wire alusrc1_WB, alusrc2_WB, se_WB, hi_en_WB, lo_en_WB;
+   wire alusrc1_WB, alusrc2_WB, se_WB, hi_en_WB, lo_en_WB, load_stall_WB;
    wire [1:0] memtoreg_WB, pcMuxSel_WB, store_sel_WB;
    wire [3:0] alu__sel_WB, mem_write_en_WB;
    wire [2:0] load_sel_WB, brcond_WB;
    cntlRegister cntlWB(ctrl_we_WB, ctrl_Sys_WB, ctrl_RI_WB, regdst_WB, jLink_en_WB,
                        alusrc1_WB, alusrc2_WB, se_WB, hi_en_WB, lo_en_WB, memtoreg_WB, pcMuxSel_WB,
-                       alu__sel_WB, mem_write_en_WB, load_sel_WB, brcond_WB, store_sel_WB,
+                       alu__sel_WB, mem_write_en_WB, load_sel_WB, brcond_WB, store_sel_WB,load_stall_WB
                        //Inputs
                        ctrl_we_MEM, ctrl_Sys_MEM, ctrl_RI_MEM, regdst_MEM, jLink_en_MEM,
                        alusrc1_MEM, alusrc2_MEM, se_MEM, hi_en_MEM, lo_en_MEM, memtoreg_MEM, pcMuxSel_MEM,
-                       alu__sel_MEM, mem_write_en_MEM, load_sel_MEM, brcond_MEM, store_sel_MEM,
+                       alu__sel_MEM, mem_write_en_MEM, load_sel_MEM, brcond_MEM, store_sel_MEM, load_stall_MEM
                        clk, WBen, rst_b);
 
    //check for RAW hazard and Stall
@@ -338,6 +340,7 @@ module mips_core(/*AUTOARG*/
    stallDetector sD(wr_reg_EX,wr_reg_MEM,wr_reg_WB,rt_regNum,dcd_rs,
                     mem_write_en_EX, mem_write_en_MEM, mem_write_en, 
                     ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, regdst, stall,
+                    load_stall_EX,
                     EXen, IDen, IFen, 
                     CDen, CDAmt);
    countdownReg cdReg(CDen, clk, rst_b,
@@ -566,11 +569,13 @@ module cntlRegister (
    output logic [3:0] alu__sel, mem_write_en,
    output logic [2:0] load_sel,brcond,
    output logic [1:0] store_sel,
+   output logic       load_stall,
    input logic ctrl_we_in, ctrl_Sys_in, ctrl_RI_in, regdst_in, jLink_en_in, alusrc1_in, alusrc2_in, se_in, hi_en_in, lo_en_in,
    input logic [1:0] memtoreg_in, pcMuxSel_in,
    input logic [3:0] alu__sel_in, mem_write_en_in,
    input logic [2:0] load_sel_in, brcond_in,
    input logic [1:0] store_sel_in,
+   input logic       load_stall_in,
    input logic clk, enable, rst_b);
 
    always_ff @(posedge clk or negedge rst_b)
@@ -593,6 +598,7 @@ module cntlRegister (
          load_sel <= 3'b0;
          brcond <= 3'b0;
          store_sel <= 2'b0;
+         load_stall <= 1'b0;
        end
      else if (enable)
        begin
@@ -613,6 +619,7 @@ module cntlRegister (
          load_sel <= load_sel_in;
          brcond <= brcond_in;
          store_sel <= store_sel_in;
+         load_stall <= load_stall_in;
        end
      else if (~enable)
        begin
@@ -633,6 +640,7 @@ module cntlRegister (
          load_sel <= load_sel_in;
          brcond <= brcond_in;
          store_sel <= store_sel_in;
+         load_stall <=load_stall_in;
        end
 
 endmodule
@@ -660,6 +668,7 @@ module stallDetector(
   input logic [4:0] wr_reg_EX, wr_reg_MEM, wr_reg_WB, dcd_rt, dcd_rs,
   input logic [3:0] mem_write_en_EX, mem_write_en_MEM, mem_write_en,
   input logic ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, regdst, stall,
+  input logic load_stall_EX,
   output logic EXen, IDen, IFen, CDen,
   output logic [2:0] CDAmt);
   
@@ -674,30 +683,30 @@ module stallDetector(
       IDen = 1'b0;
       EXen = 1'b0;
     end
-    else begin
+    else if(stall == 1'b0 && load_stall_EX == 1'b1) begin
       if ((ctrl_we_EX != 0 || mem_write_en_EX != 0) && (((regdst == 1) && (dcd_rt != 0) && (dcd_rt == wr_reg_EX)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_EX)))) begin
-        CDen = 1'b1;
-        CDAmt = 3'd2;
-        IFen = 1'b0;
-        IDen = 1'b0;
-        EXen = 1'b0;
-      end
-      else if ((ctrl_we_MEM != 0 || mem_write_en_MEM != 0) && (((regdst == 1) && (dcd_rt != 0) && (dcd_rt == wr_reg_MEM)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_MEM)))) begin
-        //RAW hazard
-        CDen = 1'b1;
-        CDAmt = 3'd1;
-        IFen = 1'b0;
-        IDen = 1'b0;
-        EXen = 1'b0;
-      end
-      else if ((ctrl_we_WB != 0 || mem_write_en != 0) && (((regdst == 1) && (dcd_rt != 0) && (dcd_rt == wr_reg_WB)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_WB)))) begin
-        //RAW hazard
         CDen = 1'b1;
         CDAmt = 3'd0;
         IFen = 1'b0;
         IDen = 1'b0;
         EXen = 1'b0;
       end
+      /*else if ((ctrl_we_MEM != 0 || mem_write_en_MEM != 0) && (((regdst == 1) && (dcd_rt != 0) && (dcd_rt == wr_reg_MEM)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_MEM)))) begin
+        //RAW hazard
+        CDen = 1'b1;
+        CDAmt = 3'd0;
+        IFen = 1'b0;
+        IDen = 1'b0;
+        EXen = 1'b0;
+      end*/
+      /*else if ((ctrl_we_WB != 0 || mem_write_en != 0) && (((regdst == 1) && (dcd_rt != 0) && (dcd_rt == wr_reg_WB)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_WB)))) begin
+        //RAW hazard
+        CDen = 1'b1;
+        CDAmt = 3'd0;
+        IFen = 1'b0;
+        IDen = 1'b0;
+        EXen = 1'b0;
+      end*/
     end
 
   end
