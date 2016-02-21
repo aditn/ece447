@@ -363,6 +363,12 @@ module mips_core(/*AUTOARG*/
    mux2to1 aluSrc2(alu_in2, rt_data_EX, imm_EX, alusrc2_EX); //ALUSrc2
    mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se_EX); //Zero extend or sign extend immediate
 
+   //Forwarding to ALU
+   wire [31:0] alu_fwd1;
+   wire [31:0] alu_fwd2;
+   mux4to1 fwd1(alu_fwd1, alu_in1, alu__out_MEM, wr_dataMem, alu_in1, 2'b0);
+   mux4to1 fwd2(alu_fwd2, alu_in2, alu__out_MEM, wr_dataMem, alu_in2, 2'b0);
+
    //Wirings to memory module
    mux4to1 memToReg(wr_dataMem, alu__out_WB, load_data_WB, HIout_WB, LOout_WB, memtoreg_WB);
    //assign instr_addr = newpc[31:2]; //address of next instruction
@@ -389,8 +395,8 @@ module mips_core(/*AUTOARG*/
    // Execute
    mips_ALU ALU(.alu__out(alu__out),
                 .branchTrue(branchTrue), 
-                .alu__op1(alu_in1),
-                .alu__op2(alu_in2),
+                .alu__op1(alu_fwd1),
+                .alu__op2(alu_fwd2),
                 .alu__sel(alu__sel_EX),
                 .brcond(brcond));
  
@@ -638,6 +644,14 @@ module cntlRegister (
        end
 
 endmodule
+
+/*module forwardData(
+  input logic [4:0] wr_reg_EX, wr_reg_MEM, wr_reg_WB, dcd_rt, dcd_rs,
+  input logic [3:0] mem_write_en_EX, mem_write_en_MEM, mem_write_en,
+  input logic ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, regdst, stall,
+  output logic f1, f2);
+
+endmodule*/
 
 ////
 //// stallDetector: module for enabling stalls if RAW hazard
