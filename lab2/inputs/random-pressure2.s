@@ -1,0 +1,40 @@
+ addiu   $t0 , $t2 , 4077655692 
+ andi   $t0 , $t1 , 3856998484 
+ andi   $t0 , $t1 , 3687764062 
+ or   $t2 , $t1 , $t2 
+ and   $t1 , $t2 , $t2 
+ ori   $t1 , $t1 , 2817200678 
+ ori   $t0 , $t0 , 1114691652 
+ addu   $t1 , $t0 , $t2 
+ ori   $t0 , $t1 , 227431497 
+ addu   $t2 , $t0 , $t1 
+ andi   $t2 , $t0 , 582226201 
+ addiu   $t0 , $t0 , 484829441 
+ andi   $t2 , $t2 , 2337055046 
+ or   $t0 , $t1 , $t0 
+ addu   $t2 , $t0 , $t1 
+ andi   $t0 , $t2 , 701005416 
+ and   $t1 , $t2 , $t1 
+ ori   $t0 , $t1 , 2271154702 
+ ori   $t1 , $t2 , 2927396379 
+ addu   $t0 , $t1 , $t2 
+ andi   $t2 , $t0 , 3188784673 
+ addiu   $t1 , $t0 , 642452717 
+ ori   $t1 , $t1 , 3609903735 
+ addu   $t1 , $t0 , $t1 
+ addiu   $t1 , $t1 , 2911192990 
+ xori   $t0 , $t1 , 3295311002 
+ addu   $t0 , $t2 , $t1 
+ andi   $t0 , $t0 , 3023396296 
+ addu   $t2 , $t1 , $t2 
+ and   $t0 , $t0 , $t0 
+ addu   $t0 , $t2 , $t1 
+ xor   $t2 , $t0 , $t1 
+ addu   $t1 , $t1 , $t1 
+ or   $t0 , $t0 , $t0 
+ xor   $t1 , $t1 , $t2 
+ addu   $t0 , $t1 , $t1 
+ andi   $t1 , $t0 , 811843588 
+ addiu $v0, $0, 10
+ syscall
+

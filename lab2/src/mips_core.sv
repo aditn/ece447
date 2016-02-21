@@ -272,11 +272,11 @@ module mips_core(/*AUTOARG*/
    wire [2:0] load_sel_EX, brcond_EX;
    cntlRegister cntlEX(ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX,
                        alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, memtoreg_EX, pcMuxSel_EX,
-                       alu__sel_EX, mem_write_en_EX, load_sel_EX, brcond_EX, store_sel_EX, load_stall_EX
+                       alu__sel_EX, mem_write_en_EX, load_sel_EX, brcond_EX, store_sel_EX, load_stall_EX,
                        //Inputs
                        ctrl_we, ctrl_Sys, ctrl_RI, regdst, jLink_en, 
                        alusrc1, alusrc2, se, hi_en, lo_en, memtoreg, pcMuxSel,
-                       alu__sel, mem_en, load_sel, brcond, store_sel,load_stall
+                       alu__sel, mem_en, load_sel, brcond, store_sel,load_stall,
                        clk, EXen, rst_b);
 
    //Memory (MEM) stage registers
@@ -300,11 +300,11 @@ module mips_core(/*AUTOARG*/
    wire [2:0] load_sel_MEM, brcond_MEM;
    cntlRegister cntlMEM(ctrl_we_MEM, ctrl_Sys_MEM, ctrl_RI_MEM, regdst_MEM, jLink_en_MEM,
                        alusrc1_MEM, alusrc2_MEM, se_MEM, hi_en_MEM, lo_en_MEM, memtoreg_MEM, pcMuxSel_MEM,
-                       alu__sel_MEM, mem_write_en_MEM, load_sel_MEM, brcond_MEM, store_sel_MEM,load_stall_MEM
+                       alu__sel_MEM, mem_write_en_MEM, load_sel_MEM, brcond_MEM, store_sel_MEM,load_stall_MEM,
                        //Inputs
                        ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX,
                        alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, memtoreg_EX, pcMuxSel_EX,
-                       alu__sel_EX, mem_write_en_EX, load_sel_EX, brcond_EX, store_sel_EX,load_stall_EX
+                       alu__sel_EX, mem_write_en_EX, load_sel_EX, brcond_EX, store_sel_EX,load_stall_EX,
                        clk, MEMen, rst_b);
 
    //Writeback stage registers
@@ -327,11 +327,11 @@ module mips_core(/*AUTOARG*/
    wire [2:0] load_sel_WB, brcond_WB;
    cntlRegister cntlWB(ctrl_we_WB, ctrl_Sys_WB, ctrl_RI_WB, regdst_WB, jLink_en_WB,
                        alusrc1_WB, alusrc2_WB, se_WB, hi_en_WB, lo_en_WB, memtoreg_WB, pcMuxSel_WB,
-                       alu__sel_WB, mem_write_en_WB, load_sel_WB, brcond_WB, store_sel_WB,load_stall_WB
+                       alu__sel_WB, mem_write_en_WB, load_sel_WB, brcond_WB, store_sel_WB,load_stall_WB,
                        //Inputs
                        ctrl_we_MEM, ctrl_Sys_MEM, ctrl_RI_MEM, regdst_MEM, jLink_en_MEM,
                        alusrc1_MEM, alusrc2_MEM, se_MEM, hi_en_MEM, lo_en_MEM, memtoreg_MEM, pcMuxSel_MEM,
-                       alu__sel_MEM, mem_write_en_MEM, load_sel_MEM, brcond_MEM, store_sel_MEM, load_stall_MEM
+                       alu__sel_MEM, mem_write_en_MEM, load_sel_MEM, brcond_MEM, store_sel_MEM, load_stall_MEM,
                        clk, WBen, rst_b);
 
    //check for RAW hazard and Stall
