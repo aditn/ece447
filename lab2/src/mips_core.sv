@@ -136,7 +136,7 @@ module mips_core(/*AUTOARG*/
    assign        dcd_code = inst_ID[25:6];       // Breakpoint code
 
    // synthesis translate_off
-   /*always @(posedge clk) begin
+   always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
        $display ( "=== Simulation Cycle %d ===", $time );
@@ -145,9 +145,10 @@ module mips_core(/*AUTOARG*/
       // $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
        $display ("HI: %x, LO: %x, hi_en_EX: %x, hi_en_WB:%x, lo_en_EX: %x, lo_en_WB: %x", hi_out, lo_out,hi_en_EX,hi_en_WB,lo_en_EX, lo_en_WB);
        $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x", wr_reg, wr_data, dcd_rs, dcd_rt, imm, mem_en);
+       $display ("   fwd_rs_en: %x, fwd_rt_en: %x", fwd_rs_en, fwd_rt_en);
        $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", wr_reg_EX, alu_in1, alu_in2, alu__out, ctrl_we_EX, mem_write_en_EX);
        $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, ctrl_we_MEM, mem_write_en_MEM);
-       $display("mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
+       $display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
        $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", wr_reg_WB, alu__out_WB, ctrl_we_WB, mem_write_en_WB);
        $display ("sys: %x, rt_data: %x", ctrl_Sys, rt_data);
        $display ("sys_WB: %x, rt_data: %x", ctrl_Sys_WB, rt_data_WB);
@@ -158,7 +159,7 @@ module mips_core(/*AUTOARG*/
        //$display ("br_target: %x", br_target);
        $display ("");
      end
-   end*/
+   end
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -239,7 +240,11 @@ module mips_core(/*AUTOARG*/
    wire [31:0] lo_in; //LO Register in
    wire [31:0] load_data;
    wire [31:0] store_data;
-
+   
+   wire [31:0] alu_in1; //mux output of rs_data and rt_data
+   wire [31:0] alu_in2; //mux output of rt_data and signed/unsigned imm to ALU
+   wire [31:0] rs_fwd;
+   wire [31:0] rt_fwd;
    wire [1:0] fwd_rs_en, fwd_rt_en; //select bits for forwarding rs and rt
 
    //Fetch (IF) stage for pc register
@@ -294,7 +299,7 @@ module mips_core(/*AUTOARG*/
    assign MEMen = 1;
    register pcMEM(pc_MEM, pc_EX, clk, MEMen, rst_b);
    register aluMEM(alu__out_MEM, alu__out, clk, MEMen, rst_b);
-   register rtMEM(rt_data_MEM, rt_data_EX, clk, MEMen, rst_b);
+   register rtMEM(rt_data_MEM, rt_fwd, clk, MEMen, rst_b);
    register iMEM(imm_MEM, imm_EX, clk, MEMen, rst_b);
    register #(5) wrMEM(wr_reg_MEM, wr_reg_EX, clk, MEMen, rst_b);
 
@@ -362,10 +367,6 @@ module mips_core(/*AUTOARG*/
    register #(32,0) loReg(lo_out, rs_data_EX, clk, lo_en_EX, rst_b);
 
    //Determines inputs to ALU
-   wire [31:0] alu_in1; //mux output of rs_data and rt_data
-   wire [31:0] alu_in2; //mux output of rt_data and signed/unsigned imm to ALU
-   wire [31:0] rs_fwd;
-   wire [31:0] rt_fwd;
    mux2to1 aluSrc1(alu_in1, rs_fwd, rt_fwd, alusrc1_EX); //ALUSrc1
    mux2to1 aluSrc2(alu_in2, rt_fwd, imm_EX, alusrc2_EX); //ALUSrc2
    mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se_EX); //Zero extend or sign extend immediate
@@ -376,7 +377,7 @@ module mips_core(/*AUTOARG*/
    forwardData fwd(wr_reg_EX, wr_reg_MEM, wr_reg_WB, rt_regNum, dcd_rs,
                    mem_write_en_EX, mem_write_en_MEM, mem_write_en,
                    ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB,
-                   rs_fwd_en, rt_fwd_en);
+                   fwd_rs_en, fwd_rt_en);
 
    //Wirings to memory module
    mux4to1 memToReg(wr_dataMem, alu__out_WB, load_data_WB, HIout_WB, LOout_WB, memtoreg_WB);
@@ -654,6 +655,16 @@ module cntlRegister (
 
 endmodule
 
+////
+//// forwardData: module for forwarding data to prevent RAW hazards
+////
+//// wr_reg_EX, wr_reg_MEM, wr_reg_WB (inputs) - are reg numbers at different stages
+//// dcd_rs, dcd_rt (inputs) - the registers the next instruction is reading
+//// mem_write_en_EX, mem_write_en_MEM, mem_write_en (inputs) - the memory write enable bits at different stages
+//// ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB (inputs) - register write enable bits at different stages
+//// rsfwd, rtfwd (output) - selects what data to forward to rs and rt data outputs
+////
+
 module forwardData(
   input logic [4:0] wr_reg_EX, wr_reg_MEM, wr_reg_WB, dcd_rt, dcd_rs,
   input logic [3:0] mem_write_en_EX, mem_write_en_MEM, mem_write_en,
@@ -663,20 +674,20 @@ module forwardData(
   always_comb begin
     rsfwd = 2'b0;
     rtfwd = 2'b0;
+    if (ctrl_we_MEM != 0) begin
+      if ((dcd_rs != 0) && (dcd_rs == wr_reg_MEM)) begin
+        rsfwd = 2'b10;
+      end
+      if ((dcd_rt != 0) && (dcd_rt == wr_reg_MEM)) begin
+        rtfwd = 2'b10;
+      end
+    end
     if (ctrl_we_EX != 0) begin
       if ((dcd_rs != 0) && (dcd_rs == wr_reg_EX)) begin
         rsfwd = 2'b01;
       end
-      else if ((dcd_rt != 0) && (dcd_rt == wr_reg_EX)) begin
+      if ((dcd_rt != 0) && (dcd_rt == wr_reg_EX)) begin
         rtfwd = 2'b01;
-      end
-    end
-    else if (ctrl_we_MEM != 0) begin
-      if ((dcd_rs != 0) && (dcd_rs == wr_reg_MEM)) begin
-        rsfwd = 2'b10;
-      end
-      else if ((dcd_rt != 0) && (dcd_rt == wr_reg_MEM)) begin
-        rtfwd = 2'b10;
       end
     end
 
