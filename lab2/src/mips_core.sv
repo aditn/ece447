@@ -240,6 +240,8 @@ module mips_core(/*AUTOARG*/
    wire [31:0] load_data;
    wire [31:0] store_data;
 
+   wire [1:0] fwd_rs_en, fwd_rt_en; //select bits for forwarding rs and rt
+
    //Fetch (IF) stage for pc register
    wire IFen;
    wire [31:0] stallpc;
@@ -259,11 +261,14 @@ module mips_core(/*AUTOARG*/
    wire [31:0] rt_data_EX;
    wire [31:0] imm_EX;
    wire [4:0] wr_reg_EX;
+   wire [1:0] fwd_rs_en_EX, fwd_rt_en_EX;
    register pcEX(pc_EX, pc_ID, clk, EXen, rst_b);
    register rsEX(rs_data_EX, rs_data, clk, EXen, rst_b);
    register rtEX(rt_data_EX, rt_data, clk, EXen, rst_b);
    register iEX(imm_EX, imm, clk, EXen, rst_b);
    register #(5) wrEX(wr_reg_EX, wr_reg, clk, EXen, rst_b);
+   register #(2) fwdrsEX(fwd_rs_en_EX, fwd_rs_en, clk, EXen, rst_b);
+   register #(2) fwdrtEX(fwd_rt_en_EX, fwd_rt_en, clk, EXen, rst_b);
 
    wire ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX;
    wire alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, load_stall_EX; 
@@ -359,15 +364,19 @@ module mips_core(/*AUTOARG*/
    //Determines inputs to ALU
    wire [31:0] alu_in1; //mux output of rs_data and rt_data
    wire [31:0] alu_in2; //mux output of rt_data and signed/unsigned imm to ALU
-   mux2to1 aluSrc1(alu_in1, rs_data_EX, rt_data_EX, alusrc1_EX); //ALUSrc1
-   mux2to1 aluSrc2(alu_in2, rt_data_EX, imm_EX, alusrc2_EX); //ALUSrc2
+   wire [31:0] rs_fwd;
+   wire [31:0] rt_fwd;
+   mux2to1 aluSrc1(alu_in1, rs_fwd, rt_fwd, alusrc1_EX); //ALUSrc1
+   mux2to1 aluSrc2(alu_in2, rt_fwd, imm_EX, alusrc2_EX); //ALUSrc2
    mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se_EX); //Zero extend or sign extend immediate
 
    //Forwarding to ALU
-   wire [31:0] alu_fwd1;
-   wire [31:0] alu_fwd2;
-   mux4to1 fwd1(alu_fwd1, alu_in1, alu__out_MEM, wr_dataMem, alu_in1, 2'b0);
-   mux4to1 fwd2(alu_fwd2, alu_in2, alu__out_MEM, wr_dataMem, alu_in2, 2'b0);
+   mux4to1 fwdrs(rs_fwd, rs_data_EX, alu__out_MEM, wr_dataMem, , fwd_rs_en_EX);
+   mux4to1 fwdrt(rt_fwd, rt_data_EX, alu__out_MEM, wr_dataMem, , fwd_rt_en_EX);
+   forwardData fwd(wr_reg_EX, wr_reg_MEM, wr_reg_WB, rt_regNum, dcd_rs,
+                   mem_write_en_EX, mem_write_en_MEM, mem_write_en,
+                   ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB,
+                   rs_fwd_en, rt_fwd_en);
 
    //Wirings to memory module
    mux4to1 memToReg(wr_dataMem, alu__out_WB, load_data_WB, HIout_WB, LOout_WB, memtoreg_WB);
@@ -395,8 +404,8 @@ module mips_core(/*AUTOARG*/
    // Execute
    mips_ALU ALU(.alu__out(alu__out),
                 .branchTrue(branchTrue), 
-                .alu__op1(alu_fwd1),
-                .alu__op2(alu_fwd2),
+                .alu__op1(alu_in1),
+                .alu__op2(alu_in2),
                 .alu__sel(alu__sel_EX),
                 .brcond(brcond));
  
@@ -645,13 +654,35 @@ module cntlRegister (
 
 endmodule
 
-/*module forwardData(
+module forwardData(
   input logic [4:0] wr_reg_EX, wr_reg_MEM, wr_reg_WB, dcd_rt, dcd_rs,
   input logic [3:0] mem_write_en_EX, mem_write_en_MEM, mem_write_en,
-  input logic ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, regdst, stall,
-  output logic f1, f2);
+  input logic ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB,
+  output logic [1:0] rsfwd, rtfwd);
 
-endmodule*/
+  always_comb begin
+    rsfwd = 2'b0;
+    rtfwd = 2'b0;
+    if (ctrl_we_EX != 0) begin
+      if ((dcd_rs != 0) && (dcd_rs == wr_reg_EX)) begin
+        rsfwd = 2'b01;
+      end
+      else if ((dcd_rt != 0) && (dcd_rt == wr_reg_EX)) begin
+        rtfwd = 2'b01;
+      end
+    end
+    else if (ctrl_we_MEM != 0) begin
+      if ((dcd_rs != 0) && (dcd_rs == wr_reg_MEM)) begin
+        rsfwd = 2'b10;
+      end
+      else if ((dcd_rt != 0) && (dcd_rt == wr_reg_MEM)) begin
+        rtfwd = 2'b10;
+      end
+    end
+
+  end
+
+endmodule
 
 ////
 //// stallDetector: module for enabling stalls if RAW hazard
