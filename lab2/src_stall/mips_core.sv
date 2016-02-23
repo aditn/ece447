@@ -183,10 +183,10 @@ module mips_core(/*AUTOARG*/
    wire alusrc2;
    wire se;
    wire [3:0] mem_en;
-   wire [2:0] load_sel;
+   wire [2:0] load_sel; //selects load operation for loader to perform
    wire hi_en;
    wire lo_en;
-   wire [1:0] store_sel;
+   wire [1:0] store_sel; //selects store operation for storer to perform
 
    // Generate control signals
    mips_decode Decoder(/*AUTOINST*/
@@ -235,11 +235,11 @@ module mips_core(/*AUTOARG*/
    wire [31:0] lo_out; //LO Register out
    wire [31:0] hi_in; //HI Register in
    wire [31:0] lo_in; //LO Register in
-   wire [31:0] load_data;
-   wire [31:0] store_data;
+   wire [31:0] load_data; //data loaded from memory
+   wire [31:0] store_data; //data to store to memory
 
    //Fetch (IF) stage for pc register
-   wire IFen;
+   wire IFen; //enable for IF stage
    wire [31:0] stallpc;
    mux2to1 stallMux(stallpc, pc, pc+4, IFen);
 
@@ -251,7 +251,7 @@ module mips_core(/*AUTOARG*/
    register irD(inst_ID, inst, clk, IDen, rst_b);
 
    //Execute (EX) stage registers
-   wire EXen; //enable for execute stage
+   wire EXen; //enable for EX stage
    wire [31:0] pc_EX;
    wire [31:0] rs_data_EX;
    wire [31:0] rt_data_EX;
@@ -279,7 +279,7 @@ module mips_core(/*AUTOARG*/
                        clk, EXen, rst_b);
 
    //Memory (MEM) stage registers
-   wire MEMen; //enable for memory stage
+   wire MEMen; //enable for MEM stage
    wire [31:0] pc_MEM;
    wire [31:0] alu__out_MEM;
    wire [31:0] rt_data_MEM;
@@ -307,7 +307,7 @@ module mips_core(/*AUTOARG*/
                        clk, MEMen, rst_b);
 
    //Writeback stage registers
-   wire WBen;
+   wire WBen; //enable for WB stage
    wire [31:0] HIout_WB, LOout_WB, load_data_WB, alu__out_WB;
    wire [31:0] rt_data_WB;
    wire [4:0] wr_reg_WB;
