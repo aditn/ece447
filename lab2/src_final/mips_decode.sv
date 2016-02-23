@@ -66,6 +66,7 @@
 //// load_sel (output) - Selects which load operation for loader to perform
 //// brcond  (output) - Branch condition
 //// store_sel (output) - Selects which store operation for storer to perform
+//// load_stall (output) - Signals that the instruction is a load or MF type instruction
 ////
 
 module mips_decode(/*AUTOARG*/
@@ -73,6 +74,7 @@ module mips_decode(/*AUTOARG*/
    ctrl_we, ctrl_Sys, ctrl_RI, alu__sel, regdst, pcMuxSel, jLink_en,
    memtoreg, alusrc1, alusrc2, se, mem_write_en, hi_en,lo_en,
    load_sel, brcond, store_sel,
+   load_stall,
 
    // Inputs
    dcd_op, dcd_funct2, dcd_rt
@@ -85,6 +87,7 @@ module mips_decode(/*AUTOARG*/
    output reg  [3:0] alu__sel, mem_write_en;
    output reg  [2:0] load_sel,brcond;
    output reg  [1:0] store_sel;
+   output reg        load_stall;
  
 
    always_comb begin
@@ -106,8 +109,10 @@ module mips_decode(/*AUTOARG*/
      mem_write_en = 4'b0; //no mem write
      load_sel = 3'bx;
      store_sel = 2'bx;
+     load_stall = 1'b0; //not currently performing a load instruction
      hi_en = 1'b0; //HI reg not enabled
      lo_en = 1'b0; //LO reg not enabled
+
 
      brcond = 3'b111; 
 
@@ -155,11 +160,17 @@ module mips_decode(/*AUTOARG*/
            `OP0_SYSCALL:
              ctrl_Sys = 1'b1;
            `OP0_MFHI: //read from HI reg
-             memtoreg=2'b10;
+             begin
+               memtoreg=2'b10;
+               load_stall=1'b1;
+             end
            `OP0_MTHI: //write to HI reg
              hi_en = 1'b1;
            `OP0_MFLO: //read from LO reg
-             memtoreg=2'b11;
+             begin
+               memtoreg=2'b11;
+               load_stall=1'b1;
+             end
            `OP0_MTLO: //write to LO reg
              lo_en = 1'b1;
            `OP0_ADD: 
@@ -307,10 +318,12 @@ module mips_decode(/*AUTOARG*/
        `OP_LUI:
          begin
            memtoreg = 2'b01;
+           load_stall = 1'b1;
            load_sel = `LOAD_LUI;
          end
        `OP_LB:
          begin
+           load_stall = 1'b1;
            alu__sel = `ALU_ADD;
            se = 1'b1;
            alusrc2 = 1'b1;
@@ -319,6 +332,7 @@ module mips_decode(/*AUTOARG*/
          end
        `OP_LH:
          begin
+           load_stall = 1'b1;
            alu__sel = `ALU_ADD;
            se = 1'b1;
            alusrc2 = 1'b1;
@@ -327,6 +341,7 @@ module mips_decode(/*AUTOARG*/
          end
        `OP_LW:
          begin
+           load_stall = 1'b1;
            alu__sel = `ALU_ADD;
            se = 1'b1;
            alusrc2 = 1'b1;
@@ -335,6 +350,7 @@ module mips_decode(/*AUTOARG*/
          end
        `OP_LBU:
          begin
+           load_stall = 1'b1;
            alu__sel = `ALU_ADD;
            se = 1'b1;
            alusrc2 = 1'b1;
@@ -343,6 +359,7 @@ module mips_decode(/*AUTOARG*/
          end
        `OP_LHU:
          begin
+           load_stall = 1'b1;
            alu__sel = `ALU_ADD;
            se = 1'b1;
            alusrc2 = 1'b1;

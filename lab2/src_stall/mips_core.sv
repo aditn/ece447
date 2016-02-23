@@ -664,7 +664,7 @@ module stallDetector(
     else begin
       if ((ctrl_we_EX != 0 || mem_write_en_EX != 0) && (((regdst == 1) && (dcd_rt != 0) && (dcd_rt == wr_reg_EX)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_EX)))) begin
         CDen = 1'b1;
-        CDAmt = 3'd2;
+        CDAmt = 3'd1;
         IFen = 1'b0;
         IDen = 1'b0;
         EXen = 1'b0;
@@ -672,19 +672,19 @@ module stallDetector(
       else if ((ctrl_we_MEM != 0 || mem_write_en_MEM != 0) && (((regdst == 1) && (dcd_rt != 0) && (dcd_rt == wr_reg_MEM)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_MEM)))) begin
         //RAW hazard
         CDen = 1'b1;
-        CDAmt = 3'd1;
+        CDAmt = 3'd0;
         IFen = 1'b0;
         IDen = 1'b0;
         EXen = 1'b0;
       end
-      else if ((ctrl_we_WB != 0 || mem_write_en != 0) && (((regdst == 1) && (dcd_rt != 0) && (dcd_rt == wr_reg_WB)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_WB)))) begin
+      /*else if ((ctrl_we_WB != 0 || mem_write_en != 0) && (((regdst == 1) && (dcd_rt != 0) && (dcd_rt == wr_reg_WB)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_WB)))) begin
         //RAW hazard
         CDen = 1'b1;
         CDAmt = 3'd0;
         IFen = 1'b0;
         IDen = 1'b0;
         EXen = 1'b0;
-      end
+      end*/
     end
 
   end
