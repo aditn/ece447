@@ -1,17 +1,17 @@
-In our design, we left the majority the handling of control signals to our 
-mips_decoder module, such as enabling registers, selecting inputs and 
-outputs for muxes, and selecting operations for our own modules to perform.
-For wires with multiple different inputs, we used muxes that were controlled
-by the mips_decoder. For load and store operations, we created special loader
-and storer modules to handle storing and loading bytes and halfwords. Also,
-our ALU handled branch conditions. For our HI and LO registers, we simply used
-normal registers that were enabled by the decoder.
+This design is very similar to the stalling design in that we first split
+the design into the 5 stages (IF,ID,EX,MEM,WB) by having registers at 
+each stage to store necessary value. Most control bits were also propogated
+throughout the stages EX, MEM, and WB. We kept out stalling checking/
+enabling module nearly intact, however we only allowed a stall for RAW 
+hazards on load instructions that were at the time in the EX stage. The 
+forwarding module was then added to pass the calculated value from the
+beginning of the MEM stage or the beginning of the WB stage to the EX
+stage for the instruction that is causing a RAW hazard.
 
-The critical path of our synthesized is through the decoder, the sign extend
-mux for immediates, the mux to choose between the second input for the ALU
-(either Rt data or the immediate), then the ALU, and finally the output for
-the memory address to read/write from.
-The minimum clock cycle is 8.59 ns.
+The critical path is through the output of the ALU in the MEM stage, then
+through the forwarding module, then through the ALU inputs, through the
+ALU and ending at the output of the ALU in the MEM stage again.
+The minimum clock cycle is 9.07 ns.
 
-We spent approximately 1 hour planning the design, 18 hours capturing the 
-design, 6 hours testing the design, and 4 hours debugging.
+We spent about 1 hr on planning the design, 1 hr capturing the design, 30
+min for testing the design and 1 hr for debugging.
