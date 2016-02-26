@@ -12,6 +12,7 @@ __start:    #addi $3, $zero, 1
 
             addiu $t0, $zero, 0x5
             addiu $t1, $t0, 0x1
+            nop
             mtlo $t0
             #addiu $t1, $zero, 0x1
             mflo $t2
