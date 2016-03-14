@@ -259,7 +259,7 @@ module mips_core(/*AUTOARG*/
    wire IDen; //enable for decode stage
    wire [31:0] pc_ID;
    register pcID(pc_ID, pc, clk, IDen, rst_b);
-   register irD(inst_ID, inst, clk, IDen, rst_b);
+   resetregister irD(inst_ID, inst, clk, IDen, rst_b);
 
    //Execute (EX) stage registers
    wire EXen; //enable for execute stage
@@ -540,6 +540,36 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
 
 endmodule
 
+//// resetregister: A register which may be reset to an arbirary value and is set to 0 if disabled.
+////
+//// q      (output) - Current value of register
+//// d      (input)  - Next value of register
+//// clk    (input)  - Clock (positive edge-sensitive)
+//// enable (input)  - Load new value?
+//// reset  (input)  - System reset
+////
+module resetregister(q, d, clk, enable, rst_b);
+
+   parameter
+            width = 32,
+            reset_value = 0;
+
+   output [(width-1):0] q;
+   reg [(width-1):0]    q;
+   input [(width-1):0]  d;
+   input                 clk, enable, rst_b;
+
+   always @(posedge clk or negedge rst_b)
+     if (~rst_b)
+       q <= reset_value;
+     else if (enable)
+       q <= d;
+     else if (~enable)
+       q <= 32'b0;
+
+endmodule // register
+
+
 //// register: A register which may be reset to an arbirary value
 ////
 //// q      (output) - Current value of register
@@ -737,8 +767,6 @@ module stallDetector(
       end 
     end
     else if(stall == 1'b0 && branchTrue == 1'b1) begin
-      CDen = 1'b1;
-      CDAmt = 3'd2;
       EXen = 1'b0;
       IDen = 1'b0;
     end
