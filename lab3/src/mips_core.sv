@@ -391,7 +391,7 @@ module mips_core(/*AUTOARG*/
 
    //Mux for next state PC
    mux4to1 pcMux(newpc, stallpc, br_target, rs_data, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
-   adder brtarget(br_target, pc + 4, (imm << 2), 1'b0); //get branch target
+   adder brtarget(br_target, pc_EX + 4, (imm_EX << 2), 1'b0); //get branch target
    concat conc(j_target, pc, dcd_target); //get jump target
    pcSelector choosePcMuxSel(pcMuxSelFinal,pcMuxSel,branchTrue); //chooses PC on whether branch condition is met
 
@@ -468,7 +468,7 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
         begin //check if branch condition is met
 	  alu__out = alu__op1 - alu__op2;
 
-          /*case(brcond)
+          case(brcond)
             `BR_BLTZ:
               begin
                 if ($signed(alu__op1)<0)
@@ -502,7 +502,7 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
               end
             default:
               alu__out = alu__op1-alu__op2;
-          endcase*/
+          endcase
         end
       `ALU_SLL:
         //shift by value in bits [10:6] of immediate
