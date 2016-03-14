@@ -352,7 +352,7 @@ module mips_core(/*AUTOARG*/
    stallDetector sD(wr_reg_EX,wr_reg_MEM,wr_reg_WB,rt_regNum,dcd_rs,
                     mem_write_en_EX, mem_write_en_MEM, mem_write_en, 
                     ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, regdst, stall,
-                    load_stall_EX,
+                    load_stall_EX, branchTrue,
                     EXen, IDen, IFen, 
                     CDen, CDAmt);
    countdownReg cdReg(CDen, clk, rst_b,
@@ -712,7 +712,7 @@ module stallDetector(
   input logic [4:0] wr_reg_EX, wr_reg_MEM, wr_reg_WB, dcd_rt, dcd_rs,
   input logic [3:0] mem_write_en_EX, mem_write_en_MEM, mem_write_en,
   input logic ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, regdst, stall,
-  input logic load_stall_EX,
+  input logic load_stall_EX, branchTrue,
   output logic EXen, IDen, IFen, CDen,
   output logic [2:0] CDAmt);
   
@@ -735,6 +735,12 @@ module stallDetector(
         IDen = 1'b0;
         EXen = 1'b0;
       end 
+    end
+    else if(stall == 1'b0 && branchTrue == 1'b1) begin
+      CDen = 1'b1;
+      CDAmt = 3'd2;
+      EXen = 1'b0;
+      IDen = 1'b0;
     end
   end
 
