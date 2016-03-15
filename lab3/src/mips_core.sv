@@ -69,7 +69,7 @@ module mips_core(/*AUTOARG*/
    
    parameter text_start  = 32'h00400000; /* Initial value of $pc */
 
-   // Core Interface
+   // Core Interfae
    input         clk, inst_excpt, mem_excpt;
    output [29:0] inst_addr;
    output [29:0] mem_addr;
@@ -90,7 +90,7 @@ module mips_core(/*AUTOARG*/
 
    // Decode signals
    wire [31:0]   dcd_se_imm, dcd_se_offset, dcd_e_imm, dcd_se_mem_offset;
-   wire [5:0]    dcd_op, dcd_funct2 ;
+   wire [5:0]    dcd_op, dcd_funct2;
    wire [4:0]    dcd_rs, dcd_funct1, dcd_rt, dcd_rd, dcd_shamt;
    wire [15:0]   dcd_offset, dcd_imm;
    wire [25:0]   dcd_target;
@@ -142,23 +142,24 @@ module mips_core(/*AUTOARG*/
      if (rst_b) begin
        $display ( "=== Simulation Cycle %d ===", $time );
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
-                   pc, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
+                   pc_ID, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
       // $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
-       $display ("HI: %x, LO: %x, hi_en_EX: %x, hi_en_WB:%x, lo_en_EX: %x, lo_en_WB: %x", hi_out, lo_out,hi_en_EX,hi_en_WB,lo_en_EX, lo_en_WB);
-       $display ("HIWB: %x, LOWB: %x", HIout_WB, LOout_WB);
-       $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x", wr_reg, wr_data, dcd_rs, dcd_rt, imm, mem_en);
+       //$display ("HI: %x, LO: %x, hi_en_EX: %x, hi_en_WB:%x, lo_en_EX: %x, lo_en_WB: %x", hi_out, lo_out,hi_en_EX,hi_en_WB,lo_en_EX, lo_en_WB);
+       //$display ("HIWB: %x, LOWB: %x", HIout_WB, LOout_WB);
+       $display ("F: pc: %x, inst_addr: %x", pc, inst_addr);
+       $display ("D: IDen: %x, wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x", IDen, wr_reg, wr_data, dcd_rs, dcd_rt, imm, mem_en);
        $display ("   fwd_rs_en: %x, fwd_rt_en: %x", fwd_rs_sel, fwd_rt_sel);
-       $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", wr_reg_EX, alu_in1, alu_in2, alu__out, ctrl_we_EX, mem_write_en_EX);
+       $display ("E: EXen, %x, wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", EXen, wr_reg_EX, alu_in1, alu_in2, alu__out, ctrl_we_EX, mem_write_en_EX);
        $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, ctrl_we_MEM, mem_write_en_MEM);
        $display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
        $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", wr_reg_WB, alu__out_WB, ctrl_we_WB, mem_write_en_WB);
        //$display ("sys: %x, rt_data: %x", ctrl_Sys, rt_data);
        //$display ("sys_WB: %x, rt_data: %x", ctrl_Sys_WB, rt_data_WB);
-       //$display ("stall: %x, CDen: %x", stall, CDen);
+       $display ("stall: %x, CDen: %x", stall, CDen);
        //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
        $display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", branchTrue, pcMuxSel, pcMuxSelFinal);
-       $display ("br_target: %x, pc_EX: %x, imm_EX: %x", br_target, pc_EX, imm_EX);
+       $display ("j_target: %x, br_target: %x, pc_EX: %x, imm_EX: %x", j_target, br_target, pc_EX, imm_EX);
        $display ("brcond_EX: %b", brcond_EX);
        $display ("");
      end
@@ -257,9 +258,10 @@ module mips_core(/*AUTOARG*/
 
    //Decode (ID) stage registers and wirings
    wire IDen; //enable for decode stage
+   wire IDflush;
    wire [31:0] pc_ID;
    register pcID(pc_ID, pc, clk, IDen, rst_b);
-   resetregister irD(inst_ID, inst, clk, IDen, rst_b);
+   resetregister irD(inst_ID, inst, clk, IDen, IDflush, rst_b);
 
    //Execute (EX) stage registers
    wire EXen; //enable for execute stage
@@ -269,6 +271,7 @@ module mips_core(/*AUTOARG*/
    wire [31:0] imm_EX;
    wire [4:0] wr_reg_EX;
    wire [1:0] fwd_rs_sel_EX, fwd_rt_sel_EX;
+   wire [25:0] dcd_target_EX;
    register pcEX(pc_EX, pc_ID, clk, EXen, rst_b);
    register rsEX(rs_data_EX, rs_data, clk, EXen, rst_b);
    register rtEX(rt_data_EX, rt_data, clk, EXen, rst_b);
@@ -276,6 +279,7 @@ module mips_core(/*AUTOARG*/
    register #(5) wrEX(wr_reg_EX, wr_reg, clk, EXen, rst_b);
    register #(2) fwdrsEX(fwd_rs_sel_EX, fwd_rs_sel, clk, EXen, rst_b);
    register #(2) fwdrtEX(fwd_rt_sel_EX, fwd_rt_sel, clk, EXen, rst_b);
+   register #(26) targetEX(dcd_target_EX, dcd_target, clk, EXen, rst_b);
 
    wire ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX;
    wire alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, load_stall_EX; 
@@ -350,9 +354,10 @@ module mips_core(/*AUTOARG*/
    wire stall, CDen;
    wire [2:0] CDAmt;
    stallDetector sD(wr_reg_EX,wr_reg_MEM,wr_reg_WB,rt_regNum,dcd_rs,
-                    mem_write_en_EX, mem_write_en_MEM, mem_write_en, 
+                    mem_write_en_EX, mem_write_en_MEM, mem_write_en,
+                    pcMuxSelFinal, 
                     ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, regdst, stall,
-                    load_stall_EX, branchTrue,
+                    load_stall_EX,
                     EXen, IDen, IFen, 
                     CDen, CDAmt);
    countdownReg cdReg(CDen, clk, rst_b,
@@ -392,9 +397,9 @@ module mips_core(/*AUTOARG*/
    storer storer(store_data, mem_write_en, rt_data_MEM, store_sel_MEM, alu__out_MEM, mem_write_en_MEM); //operates on data to write to memory
 
    //Mux for next state PC
-   mux4to1 pcMux(newpc, stallpc, br_target, rs_data, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
+   mux4to1 pcMux(newpc, stallpc, br_target, rs_data_EX, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
    adder brtarget(br_target, pc_EX + 4, (imm_EX << 2), 1'b0); //get branch target
-   concat conc(j_target, pc, dcd_target); //get jump target
+   concat conc(j_target, pc_EX, dcd_target_EX); //get jump target
    pcSelector choosePcMuxSel(pcMuxSelFinal, pcMuxSel_EX, branchTrue); //chooses PC on whether branch condition is met
 
    //Set wr_data and wr_reg when there is a jump/branch with link
@@ -548,7 +553,7 @@ endmodule
 //// enable (input)  - Load new value?
 //// reset  (input)  - System reset
 ////
-module resetregister(q, d, clk, enable, rst_b);
+module resetregister(q, d, clk, enable, clear, rst_b);
 
    parameter
             width = 32,
@@ -557,15 +562,15 @@ module resetregister(q, d, clk, enable, rst_b);
    output [(width-1):0] q;
    reg [(width-1):0]    q;
    input [(width-1):0]  d;
-   input                 clk, enable, rst_b;
+   input                 clk, enable, clear, rst_b;
 
    always @(posedge clk or negedge rst_b)
      if (~rst_b)
        q <= reset_value;
+     else if (clear)
+       q <= 32'b0;
      else if (enable)
        q <= d;
-     else if (~enable)
-       q <= 32'b0;
 
 endmodule // register
 
@@ -741,9 +746,10 @@ endmodule
 module stallDetector(
   input logic [4:0] wr_reg_EX, wr_reg_MEM, wr_reg_WB, dcd_rt, dcd_rs,
   input logic [3:0] mem_write_en_EX, mem_write_en_MEM, mem_write_en,
+  input logic [1:0] pcMuxSelFinal,
   input logic ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, regdst, stall,
-  input logic load_stall_EX, branchTrue,
-  output logic EXen, IDen, IFen, CDen,
+  input logic load_stall_EX,
+  output logic EXen, IDen, IFen, CDen, IDflush,
   output logic [2:0] CDAmt);
   
   always_comb begin
@@ -752,6 +758,7 @@ module stallDetector(
     EXen = 1'b1;
     CDen = 1'b0;
     CDAmt = 3'b0;
+    IDflush = 1'b0;
     if (stall == 1'b1) begin
       IFen = 1'b0;
       IDen = 1'b0;
@@ -766,9 +773,9 @@ module stallDetector(
         EXen = 1'b0;
       end 
     end
-    else if(stall == 1'b0 && branchTrue == 1'b1) begin
+    else if(stall == 1'b0 && pcMuxSelFinal != 2'b0) begin
       EXen = 1'b0;
-      IDen = 1'b0;
+      IDflush = 1'b1;
     end
   end
 
