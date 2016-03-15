@@ -326,10 +326,12 @@ module mips_core(/*AUTOARG*/
 
    //Writeback stage registers
    wire WBen; //enable for WB stage
+   wire [31:0] pc_WB;
    wire [31:0] HIout_WB, LOout_WB, load_data_WB, alu__out_WB;
    wire [31:0] rt_data_WB;
    wire [4:0] wr_reg_WB;
    assign WBen = 1; //WB stage never disabled
+   register pcWB(pc_WB, pc_MEM, clk, WBen, rst_b);
    register MDRw(load_data_WB, load_data, clk, WBen, rst_b);
    register Aoutw(alu__out_WB, alu__out_MEM, clk, WBen, rst_b);
    register HIwb(HIout_WB, hi_out, clk, WBen, rst_b); //holds HI val in WB register (may need to have its own en)
@@ -400,14 +402,14 @@ module mips_core(/*AUTOARG*/
 
    //Mux for next state PC
    mux4to1 pcMux(newpc, stallpc, br_target, rs_data_EX, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
-   adder brtarget(br_target, pc_EX + 4, (imm_EX << 2), 1'b0); //get branch target
+   adder brtarget(br_target, pc_EX+4, (imm_EX << 2), 1'b0); //get branch target
    concat conc(j_target, pc_EX, dcd_target_EX); //get jump target
    pcSelector choosePcMuxSel(pcMuxSelFinal, pcMuxSel_EX, branchTrue); //chooses PC on whether branch condition is met
 
-   register #(2) pcMuxSelFinal1(pcMuxSelFinalProp,pcMuxSelFinal,clk,1,rst_b);
+   register #(2) pcMuxSelFinal1(pcMuxSelFinalProp, pcMuxSelFinal, clk, 1, rst_b);
 
    //Set wr_data and wr_reg when there is a jump/branch with link
-   mux2to1 dataToReg(wr_data, wr_dataMem, pc+4, jLink_en_WB); 
+   mux2to1 dataToReg(wr_data, wr_dataMem, pc_WB+4, jLink_en_WB); 
    mux2to1 #(5)regNumber(wr_reg, wr_regNum, 5'd31, jLink_en_WB);
 
 /*****************************************************************************/
