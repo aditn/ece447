@@ -1,30 +1,26 @@
- # Advanced branch test
         .text
 
-        # J, JR, JAL, JALR, BEQ, BNE, BLEZ, BGTZ, BLTZ, BGEZ, BLTZAL, BGEZAL
-        # BLTZAL, BGEZAL
 main:
         addiu $v0, $zero, 0xa
-
-        # Set up some comparison values in registers
         addiu $3, $zero, 1
         addiu $4, $zero, -1
-
-        # Checksum register
-        #addiu $5, $zero, 0x1234
-
-        # Test jump
-        j l_1
+        jal l_1
+        syscall
 l_0:
-        addiu $5, $zero, 1
-        #addu $5, $5, $ra
-        beq   $zero, $zero, l_2
-l_1:
-        addiu $6, $zero, 2
-        #addiu $5, $5, 7
-        #jal l_0
-        #j l_8
-l_2:
-        addiu $7, $zero, 3
-        #addiu $5, $5, 9
+        addiu $10, $10, 0xb
+        j l_2
+        #addiu $10, $10, 0xb
+        #addiu $11, $zero, 0xc
+        #addiu $12, $zero, 0xd
+
+l_1:	addiu $13, $zero, 0xe
+        nop
+        nop
+        nop
+        jr $31
+        #should not get here
+        addiu $13, $13, 0x1
+        syscall
+
+l_2:    addiu $14, $zero 0xf
         syscall
