@@ -361,7 +361,7 @@ module mips_core(/*AUTOARG*/
                     load_stall_EX,
                     EXenStall, IDen, IFen, 
                     CDen, CDAmt);
-   countdownReg cdReg(CDen, clk, rst_b,
+   countdownReg cdsDReg(CDen, clk, rst_b,
                       CDAmt,
                       stall);
 
@@ -376,7 +376,6 @@ module mips_core(/*AUTOARG*/
                            flush);
 
    assign EXen = (EXenFlush & EXenStall);
-   //mux2to12bit EXchoose(EXen, EXenStall, EXenFlush, {stall,flush});
 
    //Register file
    regfile_forward RegFile(rs_data, rt_data, dcd_rs, rt_regNum, wr_reg_WB, wr_data, ctrl_we_WB, clk, rst_b, halted);
@@ -416,7 +415,6 @@ module mips_core(/*AUTOARG*/
    concat conc(j_target, pc_EX, dcd_target_EX); //get jump target
    pcSelector choosePcMuxSel(pcMuxSelFinal, pcMuxSel_EX, branchTrue); //chooses PC on whether branch condition is met
 
-   //register #(2) pcMuxSelFinal1(pcMuxSelFinalProp,pcMuxSelFinal,clk,1,rst_b);
 
    //Set wr_data and wr_reg when there is a jump/branch with link
    mux2to1 dataToReg(wr_data, wr_dataMem, pc+4, jLink_en_WB); 
@@ -462,18 +460,7 @@ module mips_core(/*AUTOARG*/
 
 endmodule // mips_core
 
-/*module mux2to12bit(
-  output logic EXen,
-  input logic EXenStall, EXenFlush,
-  input [1:0] chooseVal);
-  always_comb begin
-    EXen = 1'b1;
-    if (chooseVal ==2'b10)
-      EXen = EXenStall;
-    else if (chooseVal == 2'b01)
-      EXen = EXenFlush;
-  end
-endmodule*/
+
 ////
 //// mips_ALU: Performs all arithmetic and logical operations
 ////
@@ -793,7 +780,7 @@ always_comb begin
     CDFlushen = 1'b1;
     EXen = 1'b0;
     IDflush = 1'b1;
-    CDFlushAmt = 3'd2;
+    CDFlushAmt = 3'd1;
   end
 end
 
