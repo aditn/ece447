@@ -146,9 +146,8 @@ module mips_core(/*AUTOARG*/
       // $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
        //$display ("HI: %x, LO: %x, hi_en_EX: %x, hi_en_WB:%x, lo_en_EX: %x, lo_en_WB: %x", hi_out, lo_out,hi_en_EX,hi_en_WB,lo_en_EX, lo_en_WB);
        //$display ("HIWB: %x, LOWB: %x", HIout_WB, LOout_WB);
-       //$display ("F: pc: %x, inst_addr: %x", pc, inst_addr);
-       $display ("D: IDen: %x, wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x", IDen, wr_regNum, wr_data, dcd_rs, dcd_rt, imm, mem_en);
-       $display ("jLink_en_WB: %x", jLink_en_WB);
+       $display ("F: pc: %x, inst_addr: %x", pc, inst_addr);
+       $display ("D: IDen: %x, wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x", IDen, wr_reg, wr_data, dcd_rs, dcd_rt, imm, mem_en);
        //$display ("   fwd_rs_en: %x, fwd_rt_en: %x", fwd_rs_sel, fwd_rt_sel);
        $display ("E: EXen, %x, wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", EXen, wr_reg_EX, alu_in1, alu_in2, alu__out, ctrl_we_EX, mem_write_en_EX);
        $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, ctrl_we_MEM, mem_write_en_MEM);
@@ -161,6 +160,8 @@ module mips_core(/*AUTOARG*/
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
        $display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", branchTrue, pcMuxSel, pcMuxSelFinal);
        $display ("j_target: %x, br_target: %x, pc_EX: %x, imm_EX: %x", j_target, br_target, pc_EX, imm_EX);
+       $display ("jLink_en_WB: %x, wr_data: %x, wr_reg: %x", jLink_en_WB, wr_data, wr_reg);
+       $display ("pcMuxSel_EX: %x", pcMuxSel_EX);
        $display ("brcond_EX: %b", brcond_EX);
        $display ("");
      end
@@ -379,7 +380,7 @@ module mips_core(/*AUTOARG*/
    assign EXen = (EXenFlush & EXenStall);
 
    //Register file
-   regfile_forward RegFile(rs_data, rt_data, dcd_rs, rt_regNum, wr_reg_WB, wr_data, ctrl_we_WB, clk, rst_b, halted);
+   regfile_forward RegFile(rs_data, rt_data, dcd_rs, rt_regNum, wr_reg, wr_data, ctrl_we_WB, clk, rst_b, halted);
    mux2to1 #(5) regDest(wr_regNum, dcd_rt, dcd_rd, regdst); //register to write to
    mux2to1 #(5) regRt(rt_regNum, dcd_rt, 5'd2, ctrl_Sys); //rt reg to read from (for syscalls)   
 
@@ -419,7 +420,7 @@ module mips_core(/*AUTOARG*/
 
    //Set wr_data and wr_reg when there is a jump/branch with link
    mux2to1 dataToReg(wr_data, wr_dataMem, pc_WB+4, jLink_en_WB); 
-   mux2to1 #(5)regNumber(wr_reg, wr_regNum, 5'd31, jLink_en_WB);
+   mux2to1 #(5)regNumber(wr_reg, wr_reg_WB, 5'd31, jLink_en_WB);
 
 /*****************************************************************************/
 
@@ -696,7 +697,7 @@ module cntlRegister (
          hi_en <= 1'b0;
          lo_en <= 1'b0;
          memtoreg <= memtoreg_in;
-         pcMuxSel <= pcMuxSel_in;
+         pcMuxSel <= 0;
          alu__sel <= alu__sel_in;
          mem_write_en <= 1'b0;
          load_sel <= load_sel_in;
