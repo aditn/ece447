@@ -697,7 +697,7 @@ module cntlRegister (
          hi_en <= 1'b0;
          lo_en <= 1'b0;
          memtoreg <= memtoreg_in;
-         pcMuxSel <= 0;
+         pcMuxSel <= 2'b0;
          alu__sel <= alu__sel_in;
          mem_write_en <= 1'b0;
          load_sel <= load_sel_in;
