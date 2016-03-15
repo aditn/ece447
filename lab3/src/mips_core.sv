@@ -259,10 +259,9 @@ module mips_core(/*AUTOARG*/
 
    //Decode (ID) stage registers and wirings
    wire IDen; //enable for decode stage
-   wire IDflush;
    wire [31:0] pc_ID;
    register pcID(pc_ID, pc, clk, IDen, rst_b);
-   resetregister irD(inst_ID, inst, clk, IDen, IDflush, rst_b);
+   register irD(inst_ID, inst, clk, IDen, rst_b);
 
    //Execute (EX) stage registers
    wire EXen; //enable for execute stage
@@ -787,15 +786,12 @@ always_comb begin
   if (flush == 1'b1) begin
     $display("flushmod1");
     EXen = 1'b0;
-    //IDen = 1'b0;
-    IDflush = 1'b1;
   end
   else if(flush ==1'b0 && pcMuxSelFinal != 2'b0) begin
     $display("flushmod2");
     CDFlushen = 1'b1;
     EXen = 1'b0;
-    IDflush = 1'b1;
-    CDFlushAmt = 3'd2;
+    CDFlushAmt = 1'd1;
   end
 end
 
