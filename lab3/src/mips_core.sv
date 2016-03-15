@@ -354,19 +354,31 @@ module mips_core(/*AUTOARG*/
                        clk, WBen, rst_b);
 
    //check for RAW hazard and Stall
-   wire stall, CDen;
+   
+   wire stall, CDen, EXenStall;
    wire [2:0] CDAmt;
-   wire pcMuxSelFinalProp;
    stallDetector sD(wr_reg_EX,wr_reg_MEM,wr_reg_WB,rt_regNum,dcd_rs,
                     mem_write_en_EX, mem_write_en_MEM, mem_write_en,
-                    pcMuxSelFinal, pcMuxSelFinalProp,
                     ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, regdst, stall,
                     load_stall_EX,
-                    EXen, IDen, IFen, 
+                    EXenStall, IDen, IFen, 
                     CDen, CDAmt);
    countdownReg cdReg(CDen, clk, rst_b,
                       CDAmt,
                       stall);
+
+   //check for branch -> flush
+   wire flush, CDFlushen, EXenFlush;
+   wire [2:0] CDFlushAmt;
+   flushMod fM(pcMuxSelFinal, flush,
+               EXenFlush, IDen, IDflush, CDFlushen,
+               CDFlushAmt);
+   countdownReg cdFlushReg(CDFlushen, clk, rst_b,
+                           CDFlushAmt,
+                           flush);
+
+   assign EXen = (EXenFlush & EXenStall);
+   //mux2to12bit EXchoose(EXen, EXenStall, EXenFlush, {stall,flush});
 
    //Register file
    regfile_forward RegFile(rs_data, rt_data, dcd_rs, rt_regNum, wr_reg_WB, wr_data, ctrl_we_WB, clk, rst_b, halted);
@@ -406,7 +418,7 @@ module mips_core(/*AUTOARG*/
    concat conc(j_target, pc_EX, dcd_target_EX); //get jump target
    pcSelector choosePcMuxSel(pcMuxSelFinal, pcMuxSel_EX, branchTrue); //chooses PC on whether branch condition is met
 
-   register #(2) pcMuxSelFinal1(pcMuxSelFinalProp, pcMuxSelFinal, clk, 1, rst_b);
+   //register #(2) pcMuxSelFinal1(pcMuxSelFinalProp,pcMuxSelFinal,clk,1,rst_b);
 
    //Set wr_data and wr_reg when there is a jump/branch with link
    mux2to1 dataToReg(wr_data, wr_dataMem, pc_WB+4, jLink_en_WB); 
@@ -452,7 +464,18 @@ module mips_core(/*AUTOARG*/
 
 endmodule // mips_core
 
-
+/*module mux2to12bit(
+  output logic EXen,
+  input logic EXenStall, EXenFlush,
+  input [1:0] chooseVal);
+  always_comb begin
+    EXen = 1'b1;
+    if (chooseVal ==2'b10)
+      EXen = EXenStall;
+    else if (chooseVal == 2'b01)
+      EXen = EXenFlush;
+  end
+endmodule*/
 ////
 //// mips_ALU: Performs all arithmetic and logical operations
 ////
@@ -738,6 +761,46 @@ module forwardData(
 
 endmodule
 
+
+////
+//// flushMod: module for flushing if branch
+////
+//// pcMuxSelFinal (input) - determines if there is a branch
+//// flush (input) - signal that indicates an instruction is currently being stalled
+//// IDen, EXen (output) - register enable bits at the IF, ID, and EX stages
+//// CDFlushen  (output) - enables countdown register
+//// CDAmt (output) - number of clock cycles to stall
+////
+module flushMod(
+  input logic [1:0] pcMuxSelFinal,
+  input logic flush,
+  output logic EXen, IDen, IDflush, CDFlushen,
+  output logic [2:0] CDFlushAmt);
+
+always_comb begin
+
+  EXen = 1'b1;
+  IDen = 1'b1;
+  IDflush = 1'b0;
+  CDFlushAmt = 3'b0;
+  CDFlushen = 1'b0;
+  if (flush == 1'b1) begin
+    $display("flushmod1");
+    EXen = 1'b0;
+    //IDen = 1'b0;
+    IDflush = 1'b1;
+  end
+  else if(flush ==1'b0 && pcMuxSelFinal != 2'b0) begin
+    $display("flushmod2");
+    CDFlushen = 1'b1;
+    EXen = 1'b0;
+    IDflush = 1'b1;
+    CDFlushAmt = 3'd2;
+  end
+end
+
+endmodule
+
 ////
 //// stallDetector: module for enabling stalls if RAW hazard
 ////
@@ -752,10 +815,9 @@ endmodule
 module stallDetector(
   input logic [4:0] wr_reg_EX, wr_reg_MEM, wr_reg_WB, dcd_rt, dcd_rs,
   input logic [3:0] mem_write_en_EX, mem_write_en_MEM, mem_write_en,
-  input logic [1:0] pcMuxSelFinal, pcMuxSelFinalProp,
   input logic ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, regdst, stall,
   input logic load_stall_EX,
-  output logic EXen, IDen, IFen, CDen, IDflush,
+  output logic EXen, IDen, IFen, CDen,
   output logic [2:0] CDAmt);
   
   always_comb begin
@@ -764,7 +826,6 @@ module stallDetector(
     EXen = 1'b1;
     CDen = 1'b0;
     CDAmt = 3'b0;
-    IDflush = 1'b0;
     if (stall == 1'b1) begin
       IFen = 1'b0;
       IDen = 1'b0;
@@ -778,15 +839,6 @@ module stallDetector(
         IDen = 1'b0;
         EXen = 1'b0;
       end 
-    end
-    else if(stall == 1'b0 && pcMuxSelFinal != 2'b0) begin
-      EXen = 1'b0;
-      IDflush = 1'b1;
-      //IDen = 1'b0;
-    end
-    else if(pcMuxSelFinalProp != 2'b0) begin
-      EXen = 1'b0;
-      IDflush = 1'b1;
     end
   end
 
