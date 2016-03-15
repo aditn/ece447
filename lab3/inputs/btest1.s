@@ -4,7 +4,7 @@ main:
         addiu $v0, $zero, 0xa
         addiu $3, $zero, 1
         addiu $4, $zero, -1
-        j l_1
+        jal l_1
 l_0:
         ori $0, $0, 0
         ori $0, $0, 0
@@ -17,7 +17,9 @@ l_0:
         addiu $11, $zero, 0xc
         addiu $12, $zero, 0xd
 
-l_1:	addiu $13, $zero, 0xe
+l_1:    addiu $13, $zero, 0xe
+        #addiu $14, $zero, 0x4
+        syscall
         j l_0
         #should not get here
         addiu $13, $13, 0x1

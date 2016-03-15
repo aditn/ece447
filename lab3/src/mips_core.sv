@@ -147,7 +147,7 @@ module mips_core(/*AUTOARG*/
        //$display ("HI: %x, LO: %x, hi_en_EX: %x, hi_en_WB:%x, lo_en_EX: %x, lo_en_WB: %x", hi_out, lo_out,hi_en_EX,hi_en_WB,lo_en_EX, lo_en_WB);
        //$display ("HIWB: %x, LOWB: %x", HIout_WB, LOout_WB);
        //$display ("F: pc: %x, inst_addr: %x", pc, inst_addr);
-       $display ("D: IDen: %x, wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x", IDen, wr_reg, wr_data, dcd_rs, dcd_rt, imm, mem_en);
+       $display ("D: IDen: %x, wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x", IDen, wr_regNum, wr_data, dcd_rs, dcd_rt, imm, mem_en);
        $display ("jLink_en_WB: %x", jLink_en_WB);
        //$display ("   fwd_rs_en: %x, fwd_rt_en: %x", fwd_rs_sel, fwd_rt_sel);
        $display ("E: EXen, %x, wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", EXen, wr_reg_EX, alu_in1, alu_in2, alu__out, ctrl_we_EX, mem_write_en_EX);
@@ -259,10 +259,9 @@ module mips_core(/*AUTOARG*/
 
    //Decode (ID) stage registers and wirings
    wire IDen; //enable for decode stage
-   wire IDflush;
    wire [31:0] pc_ID;
    register pcID(pc_ID, pc, clk, IDen, rst_b);
-   resetregister irD(inst_ID, inst, clk, IDen, IDflush, rst_b);
+   register irD(inst_ID, inst, clk, IDen, rst_b);
 
    //Execute (EX) stage registers
    wire EXen; //enable for execute stage
@@ -277,7 +276,7 @@ module mips_core(/*AUTOARG*/
    register rsEX(rs_data_EX, rs_data, clk, EXen, rst_b);
    register rtEX(rt_data_EX, rt_data, clk, EXen, rst_b);
    register iEX(imm_EX, imm, clk, EXen, rst_b);
-   register #(5) wrEX(wr_reg_EX, wr_reg, clk, EXen, rst_b);
+   register #(5) wrEX(wr_reg_EX, wr_regNum, clk, EXen, rst_b);
    register #(2) fwdrsEX(fwd_rs_sel_EX, fwd_rs_sel, clk, EXen, rst_b);
    register #(2) fwdrtEX(fwd_rt_sel_EX, fwd_rt_sel, clk, EXen, rst_b);
    register #(26) targetEX(dcd_target_EX, dcd_target, clk, EXen, rst_b);
@@ -774,15 +773,12 @@ always_comb begin
   if (flush == 1'b1) begin
     $display("flushmod1");
     EXen = 1'b0;
-    //IDen = 1'b0;
-    IDflush = 1'b1;
   end
   else if(flush ==1'b0 && pcMuxSelFinal != 2'b0) begin
     $display("flushmod2");
     CDFlushen = 1'b1;
     EXen = 1'b0;
-    IDflush = 1'b1;
-    CDFlushAmt = 3'd1;
+    CDFlushAmt = 1'd1;
   end
 end
 
