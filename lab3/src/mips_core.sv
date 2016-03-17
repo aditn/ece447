@@ -147,10 +147,10 @@ module mips_core(/*AUTOARG*/
        //$display ("HI: %x, LO: %x, hi_en_EX: %x, hi_en_WB:%x, lo_en_EX: %x, lo_en_WB: %x", hi_out, lo_out,hi_en_EX,hi_en_WB,lo_en_EX, lo_en_WB);
        //$display ("HIWB: %x, LOWB: %x", HIout_WB, LOout_WB);
        $display ("F: pc: %x, inst_addr: %x", pc, inst_addr);
-       $display ("D: IDen: %x, wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x", IDen, wr_reg, wr_data, dcd_rs, dcd_rt, imm, mem_en);
+       $display ("D: IDen: %x, wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x, SE = %b", IDen, wr_reg, wr_data, dcd_rs, dcd_rt, imm, mem_en, se);
        //$display ("   fwd_rs_en: %x, fwd_rt_en: %x", fwd_rs_sel, fwd_rt_sel);
-       $display ("E: EXen, %x, wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", EXen, wr_reg_EX, alu_in1, alu_in2, alu__out, ctrl_we_EX, mem_write_en_EX);
-       $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, ctrl_we_MEM, mem_write_en_MEM);
+       $display ("E: EXen, %x, wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, rs_data_EX: %x, ctrl_we_EX: %x, mem_EX: %x", EXen, wr_reg_EX, alu_in1, alu_in2, alu__out, rs_data_EX, ctrl_we_EX, mem_write_en_EX);
+       $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, mem_addr: %x, ctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, mem_addr, ctrl_we_MEM, mem_write_en_MEM);
        //$display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
        $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", wr_reg_WB, alu__out_WB, ctrl_we_WB, mem_write_en_WB);
        //$display ("sys: %x, rt_data: %x", ctrl_Sys, rt_data);
@@ -158,11 +158,9 @@ module mips_core(/*AUTOARG*/
        $display ("stall: %x, CDen: %x", stall, CDen);
        //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
-       $display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", branchTrue, pcMuxSel, pcMuxSelFinal);
+       $display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b, brcond_EX: %b", branchTrue, pcMuxSel, pcMuxSelFinal, brcond_EX);
        $display ("j_target: %x, br_target: %x, pc_EX: %x, imm_EX: %x", j_target, br_target, pc_EX, imm_EX);
        $display ("jLink_en_WB: %x, wr_data: %x, wr_reg: %x", jLink_en_WB, wr_data, wr_reg);
-       $display ("pcMuxSel_EX: %x", pcMuxSel_EX);
-       $display ("brcond_EX: %b", brcond_EX);
        $display ("");
      end
    end
@@ -371,7 +369,7 @@ module mips_core(/*AUTOARG*/
    wire flush, CDFlushen, EXenFlush;
    wire [2:0] CDFlushAmt;
    flushMod fM(pcMuxSelFinal, flush,
-               EXenFlush, IDen, IDflush, CDFlushen,
+               EXenFlush, CDFlushen,
                CDFlushAmt);
    countdownReg cdFlushReg(CDFlushen, clk, rst_b,
                            CDFlushAmt,
@@ -391,7 +389,7 @@ module mips_core(/*AUTOARG*/
    //Determines inputs to ALU
    mux2to1 aluSrc1(alu_in1, rs_fwd, rt_fwd, alusrc1_EX); //ALUSrc1
    mux2to1 aluSrc2(alu_in2, rt_fwd, imm_EX, alusrc2_EX); //ALUSrc2
-   mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se_EX); //Zero extend or sign extend immediate
+   mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se); //Zero extend or sign extend immediate
 
    //rs and rt forwarding
    mux4to1 fwdrs(rs_fwd, rs_data_EX, alu__out_MEM, wr_dataMem, , fwd_rs_sel_EX);
@@ -754,21 +752,19 @@ endmodule
 ////
 //// pcMuxSelFinal (input) - determines if there is a branch
 //// flush (input) - signal that indicates an instruction is currently being stalled
-//// IDen, EXen (output) - register enable bits at the IF, ID, and EX stages
+//// EXen (output) - register enable bits at the EX stage
 //// CDFlushen  (output) - enables countdown register
 //// CDAmt (output) - number of clock cycles to stall
 ////
 module flushMod(
   input logic [1:0] pcMuxSelFinal,
   input logic flush,
-  output logic EXen, IDen, IDflush, CDFlushen,
+  output logic EXen, CDFlushen,
   output logic [2:0] CDFlushAmt);
 
 always_comb begin
 
   EXen = 1'b1;
-  IDen = 1'b1;
-  IDflush = 1'b0;
   CDFlushAmt = 3'b0;
   CDFlushen = 1'b0;
   if (flush == 1'b1) begin
@@ -816,7 +812,8 @@ module stallDetector(
       EXen = 1'b0;
     end
     else if(stall == 1'b0 && load_stall_EX == 1'b1) begin
-      if ((ctrl_we_EX != 0 || mem_write_en_EX != 0) && (((regdst == 1) && (dcd_rt != 0) && (dcd_rt == wr_reg_EX)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_EX)))) begin
+      if ((ctrl_we_EX != 0 || mem_write_en_EX != 0) && (((regdst == 1) && (dcd_rt != 0) && (dcd_rt == wr_reg_EX)) || ((regdst == 0) && (dcd_rs != 0) && (dcd_rs == wr_reg_EX)))) begin
+        $display("we_EX: %x, mem_EX: %x, regdst: %x, dcd_rt: %x, dcd_rs: %x, wr_reg_EX: %x", ctrl_we_EX, mem_write_en_EX, regdst, dcd_rt, dcd_rs, wr_reg_EX);
         CDen = 1'b1;
         CDAmt = 3'd0;
         IFen = 1'b0;
