@@ -174,7 +174,7 @@ module mips_decode(/*AUTOARG*/
            `OP0_MTLO: //write to LO reg
              lo_en = 1'b1;
            `OP0_ADD: 
-             alu__sel = `ALU_ADD;
+               alu__sel = `ALU_ADD;
            `OP0_ADDU:
              alu__sel = `ALU_ADD; //same as add
            `OP0_SUB:

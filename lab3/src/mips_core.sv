@@ -137,7 +137,7 @@ module mips_core(/*AUTOARG*/
 
    // synthesis translate_off
    
-   always @(posedge clk) begin
+   /*always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
        $display ( "=== Simulation Cycle %d ===", $time );
@@ -147,7 +147,7 @@ module mips_core(/*AUTOARG*/
        //$display ("HI: %x, LO: %x, hi_en_EX: %x, hi_en_WB:%x, lo_en_EX: %x, lo_en_WB: %x", hi_out, lo_out,hi_en_EX,hi_en_WB,lo_en_EX, lo_en_WB);
        //$display ("HIWB: %x, LOWB: %x", HIout_WB, LOout_WB);
        $display ("F: pc: %x, inst_addr: %x", pc, inst_addr);
-       $display ("D: IDen: %x, wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x, SE = %b", IDen, wr_reg, wr_data, dcd_rs, dcd_rt, imm, mem_en, se);
+       $display ("D: IDen: %x, wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x, rs_data: %x", IDen, wr_regNum, wr_data, dcd_rs, dcd_rt, imm, mem_en, rs_data);
        //$display ("   fwd_rs_en: %x, fwd_rt_en: %x", fwd_rs_sel, fwd_rt_sel);
        $display ("E: EXen, %x, wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, rs_data_EX: %x, ctrl_we_EX: %x, mem_EX: %x", EXen, wr_reg_EX, alu_in1, alu_in2, alu__out, rs_data_EX, ctrl_we_EX, mem_write_en_EX);
        $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, mem_addr: %x, ctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, mem_addr, ctrl_we_MEM, mem_write_en_MEM);
@@ -410,7 +410,7 @@ module mips_core(/*AUTOARG*/
    storer storer(store_data, mem_write_en, rt_data_MEM, store_sel_MEM, alu__out_MEM, mem_write_en_MEM); //operates on data to write to memory
 
    //Mux for next state PC
-   mux4to1 pcMux(newpc, stallpc, br_target, rs_data_EX, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
+   mux4to1 pcMux(newpc, stallpc, br_target, rs_fwd, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
    adder brtarget(br_target, pc_EX+4, (imm_EX << 2), 1'b0); //get branch target
    concat conc(j_target, pc_EX, dcd_target_EX); //get jump target
    pcSelector choosePcMuxSel(pcMuxSelFinal, pcMuxSel_EX, branchTrue); //chooses PC on whether branch condition is met
