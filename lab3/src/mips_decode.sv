@@ -241,6 +241,7 @@ module mips_decode(/*AUTOARG*/
 
        `OP_JAL:
          begin
+          $display("jump and link");
            ctrl_we = 1'b1; //need to write to $ra
            pcMuxSel = 2'b11;
            jLink_en = 1'b1;

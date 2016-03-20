@@ -763,25 +763,21 @@ module flushMod(
   input logic flush,
   output logic EXen, IDen, IDflush, CDFlushen,
   output logic [2:0] CDFlushAmt);
-
-always_comb begin
-
-  EXen = 1'b1;
-  IDen = 1'b1;
-  IDflush = 1'b0;
-  CDFlushAmt = 3'b0;
-  CDFlushen = 1'b0;
-  if (flush == 1'b1) begin
-    $display("flushmod1");
-    EXen = 1'b0;
+  always_comb begin
+    EXen = 1'b1;
+    IDen = 1'b1;
+    IDflush = 1'b0;
+    CDFlushAmt = 3'b0;
+    CDFlushen = 1'b0;
+    if (flush == 1'b1) begin
+      EXen = 1'b0;
+    end
+    else if(flush ==1'b0 && pcMuxSelFinal != 2'b0) begin
+      CDFlushen = 1'b1;
+      EXen = 1'b0;
+      CDFlushAmt = 1'd1;
+    end
   end
-  else if(flush ==1'b0 && pcMuxSelFinal != 2'b0) begin
-    $display("flushmod2");
-    CDFlushen = 1'b1;
-    EXen = 1'b0;
-    CDFlushAmt = 1'd1;
-  end
-end
 
 endmodule
 
