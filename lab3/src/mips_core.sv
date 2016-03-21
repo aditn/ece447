@@ -105,14 +105,14 @@ module mips_core(/*AUTOARG*/
    wire [31:0] inst_ID; //instruction progagated to decode stage
 
    wire [61:0] btb_rd_data;
-   wire[31:0] tagPC,nextPCGuess,pcPred,pcPredNext;
+   wire[31:0] tagPC,nextPCGuess,pcPred,pcNext;
    wire[1:0] state_new,history;
-   wire btb_wr_we,btbpred;
+   wire btb_wr_we,btbpred,EXen;
    // PC Management
    //register #(32, text_start) PCReg(pc, pcNextFinal, clk, ~internal_halt, rst_b);
    register #(32, text_start) PCReg(pc, pcNext, clk, ~internal_halt, rst_b);
-   mux2to1 predPCnext(pcPredNext, pcPred,newpc, );
-   mux2to1 predPC(pcPred,nextPCGuess,pc+4,btbpred);
+   mux2to1 predPCnext(pcNext, pcPred,newpc,EXen);
+   mux2to1 predPC(pcPred,pc+4,nextPCGuess,btbpred);
    
    /*register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
                                        ~internal_halt, rst_b);*/
@@ -144,7 +144,7 @@ module mips_core(/*AUTOARG*/
 
    // synthesis translate_off
    
-   /*always @(posedge clk) begin
+   always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
        $display ( "=== Simulation Cycle %d ===", $time );
@@ -153,25 +153,26 @@ module mips_core(/*AUTOARG*/
       // $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
        //$display ("HI: %x, LO: %x, hi_en_EX: %x, hi_en_WB:%x, lo_en_EX: %x, lo_en_WB: %x", hi_out, lo_out,hi_en_EX,hi_en_WB,lo_en_EX, lo_en_WB);
        //$display ("HIWB: %x, LOWB: %x", HIout_WB, LOout_WB);
-       $display ("F: pc: %x, inst_addr: %x", pc, inst_addr);
+       $display ("F: pc: %x, inst_addr: %x, newpc: %x, pcNext: %x, btbpred:%x, nextPCGuess:%x", pc, inst_addr, newpc,pcNext,btbpred,nextPCGuess);
        $display ("D: IDen: %x, wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x, rs_data: %x", IDen, wr_regNum, wr_data, dcd_rs, dcd_rt, imm, mem_en, rs_data);
        //$display ("   fwd_rs_en: %x, fwd_rt_en: %x", fwd_rs_sel, fwd_rt_sel);
-       $display ("E: EXen, %x, wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, rs_data_EX: %x, ctrl_we_EX: %x, mem_EX: %x", EXen, wr_reg_EX, alu_in1, alu_in2, alu__out, rs_data_EX, ctrl_we_EX, mem_write_en_EX);
-$display("we_EX: %x, mem_EX: %x, regdst: %x, dcd_rt: %x, dcd_rs: %x, wr_reg_EX: %x", ctrl_we_EX, mem_write_en_EX, regdst, dcd_rt, dcd_rs, wr_reg_EX);
-       $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, mem_addr: %x, ctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, mem_addr, ctrl_we_MEM, mem_write_en_MEM);
-       $display ("   mem_addr: %h, load_data: %x, load_st_EX: %x, mem_data_out: %x, store_data: %h, mem_write_en: %b", mem_addr, load_data, load_stall_EX, mem_data_out, store_data, mem_write_en);
-       $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", wr_reg_WB, alu__out_WB, ctrl_we_WB, mem_write_en_WB);
+      // $display ("E: EXen, %x, wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, rs_data_EX: %x, ctrl_we_EX: %x, mem_EX: %x", EXen, wr_reg_EX, alu_in1, alu_in2, alu__out, rs_data_EX, ctrl_we_EX, mem_write_en_EX);
+      //$display("we_EX: %x, mem_EX: %x, regdst: %x, dcd_rt: %x, dcd_rs: %x, wr_reg_EX: %x", ctrl_we_EX, mem_write_en_EX, regdst, dcd_rt, dcd_rs, wr_reg_EX);
+      // $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, mem_addr: %x, ctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, mem_addr, ctrl_we_MEM, mem_write_en_MEM);
+      // $display ("   mem_addr: %h, load_data: %x, load_st_EX: %x, mem_data_out: %x, store_data: %h, mem_write_en: %b", mem_addr, load_data, load_stall_EX, mem_data_out, store_data, mem_write_en);
+      // $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", wr_reg_WB, alu__out_WB, ctrl_we_WB, mem_write_en_WB);
        //$display ("sys: %x, rt_data: %x", ctrl_Sys, rt_data);
        //$display ("sys_WB: %x, rt_data: %x", ctrl_Sys_WB, rt_data_WB);
-       $display ("stall: %x, CDen: %x", stall, CDen);
+      // $display ("stall: %x, CDen: %x", stall, CDen);
        //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
+       $display ("EXenFlush: %x", EXenFlush);
        $display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b, brcond_EX: %b", branchTrue, pcMuxSel, pcMuxSelFinal, brcond_EX);
        $display ("j_target: %x, br_target: %x, pc_EX: %x, imm_EX: %x", j_target, br_target, pc_EX, imm_EX);
        $display ("jLink_en_WB: %x, wr_data: %x, wr_reg: %x", jLink_en_WB, wr_data, wr_reg);
        $display ("");
      end
-   end*/
+   end
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -271,7 +272,7 @@ $display("we_EX: %x, mem_EX: %x, regdst: %x, dcd_rt: %x, dcd_rs: %x, wr_reg_EX: 
    register irD(inst_ID, inst, clk, IDen, rst_b);
 
    //Execute (EX) stage registers
-   wire EXen; //enable for execute stage
+   //wire EXen; //enable for execute stage
    wire [31:0] pc_EX;
    wire [31:0] rs_data_EX;
    wire [31:0] rt_data_EX;
@@ -374,7 +375,7 @@ $display("we_EX: %x, mem_EX: %x, regdst: %x, dcd_rt: %x, dcd_rs: %x, wr_reg_EX: 
                       stall);
 
    //check for branch -> flush
-   wire flush, CDFlushen, EXenFlush;
+   wire flush, CDFlushen,EXenFlush;
    wire [2:0] CDFlushAmt;
    flushMod fM(pcMuxSelFinal, flush,
                EXenFlush, CDFlushen,
@@ -423,14 +424,19 @@ $display("we_EX: %x, mem_EX: %x, regdst: %x, dcd_rt: %x, dcd_rs: %x, wr_reg_EX: 
    concat conc(j_target, pc_EX, dcd_target_EX); //get jump target
    pcSelector choosePcMuxSel(pcMuxSelFinal, pcMuxSel_EX, branchTrue); //chooses PC on whether branch condition is met
 
+   wire [1:0] history_ID, history_EX;
    //btb for branch prediction
-   btbsram btb(btb_rd_data,pc[8:2], pc_EX[8:2], {pc_EX[31:2],state_new,brtarget[31:2]}, btb_wr_we, clk, rst_b);
-   saturationCounter satCounter(state_new,history,branchTrue,clk, rst_b);
-   assign tagPC = {rd_data[61:32],2'b00};
-   assign history = rd_data[31:30];
-   assign nextPCGuess = {rd_data[29:0],2'b00};
+   btbsram btb(btb_rd_data,pc[8:2], pc_EX[8:2], {pc_EX[31:2],state_new,br_target[31:2]}, btb_wr_we, clk, rst_b);
+   saturationCounter satCounter(state_new,history_EX,pcMuxSel_EX!=2'b00,clk, rst_b);
+   assign tagPC = {btb_rd_data[61:32],2'b00};
+   assign history = btb_rd_data[31:30];
+   assign nextPCGuess = {btb_rd_data[29:0],2'b00};
    assign btbpred = ((tagPC[31:2]==pc[31:2]) && history[1]) ? 1'b1 : 1'b0;
    assign btb_wr_we = (pcMuxSel_EX!=2'b00) ? 1'b1 : 1'b0;
+
+   //registers to propogate the history state value
+   register #(2,0) histID(history_ID, history, clk, IDen, rst_b);
+   register #(2,0) histEX(history_EX, history_ID, clk, EXen, rst_b);
 
 
    //Set wr_data and wr_reg when there is a jump/branch with link
