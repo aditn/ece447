@@ -111,7 +111,7 @@ module mips_core(/*AUTOARG*/
    // PC Management
    //register #(32, text_start) PCReg(pc, pcNextFinal, clk, ~internal_halt, rst_b);
    register #(32, text_start) PCReg(pc, pcNext, clk, ~internal_halt, rst_b);
-   mux2to1 predPCnext(pcNext, pcPred,newpc,EXen);
+   mux2to1 predPCnext(pcNext, newpc, pcPred, EXen);
    mux2to1 predPC(pcPred,pc+4,nextPCGuess,btbpred);
    
    /*register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
@@ -144,7 +144,7 @@ module mips_core(/*AUTOARG*/
 
    // synthesis translate_off
    
-   always @(posedge clk) begin
+   /*always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
        $display ( "=== Simulation Cycle %d ===", $time );
@@ -166,13 +166,13 @@ module mips_core(/*AUTOARG*/
       // $display ("stall: %x, CDen: %x", stall, CDen);
        //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
-       $display ("EXenFlush: %x", EXenFlush);
+       $display ("EXenFlush: %x, EXen:%x, f:%x", EXenFlush,EXen,f);
        $display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b, brcond_EX: %b", branchTrue, pcMuxSel, pcMuxSelFinal, brcond_EX);
        $display ("j_target: %x, br_target: %x, pc_EX: %x, imm_EX: %x", j_target, br_target, pc_EX, imm_EX);
        $display ("jLink_en_WB: %x, wr_data: %x, wr_reg: %x", jLink_en_WB, wr_data, wr_reg);
        $display ("");
      end
-   end
+   end*/
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -272,7 +272,7 @@ module mips_core(/*AUTOARG*/
    register irD(inst_ID, inst, clk, IDen, rst_b);
 
    //Execute (EX) stage registers
-   //wire EXen; //enable for execute stage
+   // wire EXen; //enable for execute stage
    wire [31:0] pc_EX;
    wire [31:0] rs_data_EX;
    wire [31:0] rt_data_EX;
@@ -377,9 +377,13 @@ module mips_core(/*AUTOARG*/
    //check for branch -> flush
    wire flush, CDFlushen,EXenFlush;
    wire [2:0] CDFlushAmt;
+   wire f,g;
    flushMod fM(pcMuxSelFinal, flush,
                EXenFlush, CDFlushen,
                CDFlushAmt);
+   /*flushMod fM(f|g, flush,
+               EXenFlush, CDFlushen,
+               CDFlushAmt);*/
    countdownReg cdFlushReg(CDFlushen, clk, rst_b,
                            CDFlushAmt,
                            flush);
@@ -425,6 +429,8 @@ module mips_core(/*AUTOARG*/
    pcSelector choosePcMuxSel(pcMuxSelFinal, pcMuxSel_EX, branchTrue); //chooses PC on whether branch condition is met
 
    wire [1:0] history_ID, history_EX;
+   //wire[31:0] nextPCGuess_ID, nextPCGuess_EX;
+
    //btb for branch prediction
    btbsram btb(btb_rd_data,pc[8:2], pc_EX[8:2], {pc_EX[31:2],state_new,br_target[31:2]}, btb_wr_we, clk, rst_b);
    saturationCounter satCounter(state_new,history_EX,pcMuxSel_EX!=2'b00,clk, rst_b);
@@ -437,7 +443,10 @@ module mips_core(/*AUTOARG*/
    //registers to propogate the history state value
    register #(2,0) histID(history_ID, history, clk, IDen, rst_b);
    register #(2,0) histEX(history_EX, history_ID, clk, EXen, rst_b);
-
+   //register #(31,0) pcGuessID(nextPCGuess_ID, nextPCGuess, clk, IDen, rst_b);
+   //register #(31,0) pcGuessEX(nextPCGuess_EX, nextPCGuess, clk, EXen, rst_b);
+   assign f = (newpc == pc_EX)&branchTrue;
+   assign g = newpc == pc_EX+4;
 
    //Set wr_data and wr_reg when there is a jump/branch with link
    mux2to1 dataToReg(wr_data, wr_dataMem, pc_WB+4, jLink_en_WB); 
@@ -818,6 +827,7 @@ endmodule
 ////
 module flushMod(
   input logic [1:0] pcMuxSelFinal,
+  //input logic f,
   input logic flush,
   output logic EXen, CDFlushen,
   output logic [2:0] CDFlushAmt);
@@ -830,7 +840,7 @@ module flushMod(
       $display("flushmod1");
       EXen = 1'b0;
     end
-    else if(flush ==1'b0 && pcMuxSelFinal != 2'b0) begin
+    else if(flush ==1'b0 && pcMuxSelFinal != 2'b00) begin
       $display("flushmod2");
       CDFlushen = 1'b1;
       EXen = 1'b0;
