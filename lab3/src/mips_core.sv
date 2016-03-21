@@ -104,11 +104,18 @@ module mips_core(/*AUTOARG*/
    //wire [31:0] pcNextFinal;
    wire [31:0] inst_ID; //instruction progagated to decode stage
 
+   wire [61:0] btb_rd_data;
+   wire[31:0] tagPC,nextPCGuess,pcPred,pcPredNext;
+   wire[1:0] state_new,history;
+   wire btb_wr_we,btbpred;
    // PC Management
    //register #(32, text_start) PCReg(pc, pcNextFinal, clk, ~internal_halt, rst_b);
-   register #(32, text_start) PCReg(pc, newpc, clk, ~internal_halt, rst_b);
-   register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
-                                       ~internal_halt, rst_b);
+   register #(32, text_start) PCReg(pc, pcNext, clk, ~internal_halt, rst_b);
+   mux2to1 predPCnext(pcPredNext, pcPred,newpc, );
+   mux2to1 predPC(pcPred,nextPCGuess,pc+4,btbpred);
+   
+   /*register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
+                                       ~internal_halt, rst_b);*/
    //mux2to1 pickNextPC (pcNextFinal, nextpc, nextnextpc,(pcMuxSel[1]|pcMuxSel[0]));
    add_const #(4) NextPCAdder(nextpc, pc);
    //add_const #(4) NextPCAdder(nextnextpc, nextpc, pcMuxSel);
@@ -137,7 +144,7 @@ module mips_core(/*AUTOARG*/
 
    // synthesis translate_off
    
-   always @(posedge clk) begin
+   /*always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
        $display ( "=== Simulation Cycle %d ===", $time );
@@ -164,7 +171,7 @@ $display("we_EX: %x, mem_EX: %x, regdst: %x, dcd_rt: %x, dcd_rs: %x, wr_reg_EX: 
        $display ("jLink_en_WB: %x, wr_data: %x, wr_reg: %x", jLink_en_WB, wr_data, wr_reg);
        $display ("");
      end
-   end
+   end*/
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -416,6 +423,15 @@ $display("we_EX: %x, mem_EX: %x, regdst: %x, dcd_rt: %x, dcd_rs: %x, wr_reg_EX: 
    concat conc(j_target, pc_EX, dcd_target_EX); //get jump target
    pcSelector choosePcMuxSel(pcMuxSelFinal, pcMuxSel_EX, branchTrue); //chooses PC on whether branch condition is met
 
+   //btb for branch prediction
+   btbsram btb(btb_rd_data,pc[8:2], pc_EX[8:2], {pc_EX[31:2],state_new,brtarget[31:2]}, btb_wr_we, clk, rst_b);
+   saturationCounter satCounter(state_new,history,branchTrue,clk, rst_b);
+   assign tagPC = {rd_data[61:32],2'b00};
+   assign history = rd_data[31:30];
+   assign nextPCGuess = {rd_data[29:0],2'b00};
+   assign btbpred = ((tagPC[31:2]==pc[31:2]) && history[1]) ? 1'b1 : 1'b0;
+   assign btb_wr_we = (pcMuxSel_EX!=2'b00) ? 1'b1 : 1'b0;
+
 
    //Set wr_data and wr_reg when there is a jump/branch with link
    mux2to1 dataToReg(wr_data, wr_dataMem, pc_WB+4, jLink_en_WB); 
@@ -559,6 +575,43 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
    //adder AdderUnit(alu__out, alu__op1, alu__op2, alu__sel[0]);
 
 endmodule
+
+
+module saturationCounter(q,d,isBranch,clk, rst_b);
+  parameter
+            width = 2,
+            reset_value = 2'b11;
+
+  output [(width-1):0] q;
+  reg [(width-1):0]    q;
+  input [(width-1):0]  d;
+  input                clk, isBranch, rst_b;
+
+  always @(posedge clk or negedge rst_b)
+    if (~rst_b)
+      q <= reset_value;
+    else if (isBranch) begin
+     if (d==2'b00)
+       q<=2'b01;
+     else if (d==2'b01)
+       q<=2'b10;
+     else if (d==2'b10)
+       q<=2'b11;
+     else if (d==2'b11)
+       q<=2'b11;
+    end
+    else if (~isBranch) begin
+      if (d==2'b00)
+       q<=2'b00;
+     else if (d==2'b01)
+       q<=2'b00;
+     else if (d==2'b10)
+       q<=2'b01;
+     else if (d==2'b11)
+       q<=2'b10;
+    end
+endmodule
+
 
 //// resetregister: A register which may be reset to an arbirary value and is set to 0 if disabled.
 ////
