@@ -101,20 +101,21 @@ module mips_core(/*AUTOARG*/
    wire[1:0] pcMuxSelFinal;
 
    wire [31:0] newpc; //mux output for next state PC
-   //wire [31:0] pcNextFinal;
+   wire [31:0] stallpc; //either PC or PC+4 depending on stall conditions
    wire [31:0] inst_ID; //instruction progagated to decode stage
 
+   //BTB
    wire [61:0] btb_rd_data;
-   wire[31:0] tagPC,nextPCGuess,pcPred,pcNext;
-   wire[1:0] state_new,history;
-   wire btb_wr_we,btbpred,EXen;
-   wire[31:0] nextPCGuess_ID, nextPCGuess_EX;
+
+   wire[31:0] tagPC, nextPCGuess, pcPred;
+   wire[1:0] state_new, history;
+   wire btb_wr_we, btbHit, mispredict, EXen;
 
    // PC Management
    //register #(32, text_start) PCReg(pc, pcNextFinal, clk, ~internal_halt, rst_b);
-   register #(32, text_start) PCReg(pc, pcNext, clk, ~internal_halt, rst_b);
-   mux2to1 predPCnext(pcNext, newpc, pcPred, EXen);
-   mux2to1 predPC(pcPred,pc+4,nextPCGuess,btbpred);
+   register #(32, text_start) PCReg(pc, pcPred, clk, ~internal_halt, rst_b);
+   //mux2to1 predPCnext(pcNext, newpc, pcPred, EXen);
+   mux4to1 predPC(pcPred, stallpc, nextPCGuess, newpc, newpc, {mispredict, btbHit});
    
    /*register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
                                        ~internal_halt, rst_b);*/
@@ -146,7 +147,7 @@ module mips_core(/*AUTOARG*/
 
    // synthesis translate_off
    
-   always @(posedge clk) begin
+   /*always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
        $display ( "=== Simulation Cycle %d ===", $time );
@@ -155,11 +156,11 @@ module mips_core(/*AUTOARG*/
       // $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
        //$display ("HI: %x, LO: %x, hi_en_EX: %x, hi_en_WB:%x, lo_en_EX: %x, lo_en_WB: %x", hi_out, lo_out,hi_en_EX,hi_en_WB,lo_en_EX, lo_en_WB);
        //$display ("HIWB: %x, LOWB: %x", HIout_WB, LOout_WB);
-       $display ("F: pc: %x, inst_addr: %x, newpc: %x, pcNext: %x, btbpred:%x", pc, inst_addr, newpc,pcNext,btbpred);
-       $display ("tagPC:%x, pcPred:%x, nextPCGuess:%x, pc+4:%x",tagPC,pcPred, nextPCGuess, pc+4);
-       //$display ("D: IDen: %x, wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x, rs_data: %x", IDen, wr_regNum, wr_data, dcd_rs, dcd_rt, imm, mem_en, rs_data);
+
+       $display ("F: pc: %x, inst_addr: %x, newpc: %x, pcPred: %d,  nextPCGuess:%x, btbHit: %b, mispred: %b", pc, inst_addr, newpc, pcPred, nextPCGuess, btbHit, mispredict);
+       $display ("D: IDen: %x, wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x, rs_data: %x", IDen, wr_regNum, wr_data, dcd_rs, dcd_rt, imm, mem_en, rs_data);
        //$display ("   fwd_rs_en: %x, fwd_rt_en: %x", fwd_rs_sel, fwd_rt_sel);
-      // $display ("E: EXen, %x, wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, rs_data_EX: %x, ctrl_we_EX: %x, mem_EX: %x", EXen, wr_reg_EX, alu_in1, alu_in2, alu__out, rs_data_EX, ctrl_we_EX, mem_write_en_EX);
+       $display ("E: EXen, %x, wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, rs_data_EX: %x, ctrl_we_EX: %x, mem_EX: %x", EXen, wr_reg_EX, alu_in1, alu_in2, alu__out, rs_data_EX, ctrl_we_EX, mem_write_en_EX);
       //$display("we_EX: %x, mem_EX: %x, regdst: %x, dcd_rt: %x, dcd_rs: %x, wr_reg_EX: %x", ctrl_we_EX, mem_write_en_EX, regdst, dcd_rt, dcd_rs, wr_reg_EX);
       // $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, mem_addr: %x, ctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, mem_addr, ctrl_we_MEM, mem_write_en_MEM);
       // $display ("   mem_addr: %h, load_data: %x, load_st_EX: %x, mem_data_out: %x, store_data: %h, mem_write_en: %b", mem_addr, load_data, load_stall_EX, mem_data_out, store_data, mem_write_en);
@@ -169,13 +170,13 @@ module mips_core(/*AUTOARG*/
       // $display ("stall: %x, CDen: %x", stall, CDen);
        //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
-       $display ("EXenFlush: %x, EXen:%x, f:%x, btb_wr_we:%x", EXenFlush,EXen,f,btb_wr_we);
-       //$display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b, brcond_EX: %b", branchTrue, pcMuxSel, pcMuxSelFinal, brcond_EX);
-       //$display ("j_target: %x, br_target: %x, pc_EX: %x, imm_EX: %x", j_target, br_target, pc_EX, imm_EX);
-       //$display ("jLink_en_WB: %x, wr_data: %x, wr_reg: %x", jLink_en_WB, wr_data, wr_reg);
+       $display ("EXenFlush: %x, EXen:%x, f:%x", EXenFlush,EXen,f);
+       $display ("branchTrue: %b, pcMuxSel_EX: %b, pcMuxSelFinal: %b, brcond_EX: %b", branchTrue, pcMuxSel_EX, pcMuxSelFinal, brcond_EX);
+       $display ("j_target: %x, br_target: %x, pc_EX: %x, imm_EX: %x", j_target, br_target, pc_EX, imm_EX);
+       $display ("jLink_en_WB: %x, wr_data: %x, wr_reg: %x", jLink_en_WB, wr_data, wr_reg);
        $display ("");
      end
-   end
+   end*/
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -265,7 +266,6 @@ module mips_core(/*AUTOARG*/
 
    //Fetch (IF) stage for pc register
    wire IFen; //enable for IF stage
-   wire [31:0] stallpc; //either PC or PC+4 depending on stall conditions
    mux2to1 stallMux(stallpc, pc, pc+4, IFen);
 
    //Decode (ID) stage registers and wirings
@@ -380,9 +380,10 @@ module mips_core(/*AUTOARG*/
    //check for branch -> flush
    wire flush, CDFlushen,EXenFlush;
    wire [2:0] CDFlushAmt;
-   wire f,g;
-   flushMod fM(pcMuxSelFinal, flush,
-               EXenFlush, CDFlushen,
+   //wire f,g;
+   flushMod fM(pcMuxSelFinal, pcMuxSel_EX, pc_ID, pc_EX, br_target, rs_fwd, j_target,
+               flush,
+               EXenFlush, CDFlushen, mispredict,
                CDFlushAmt);
    /*flushMod fM(f|g, flush,
                EXenFlush, CDFlushen,
@@ -434,21 +435,23 @@ module mips_core(/*AUTOARG*/
    wire [1:0] history_ID, history_EX;
    
    //btb for branch prediction
-   btbsram btb(btb_rd_data,pc[8:2], pc_EX[8:2], {pc[31:2],state_new,pcNext[31:2]}, btb_wr_we, clk, rst_b);
-   saturationCounter satCounter(state_new,history_EX,pcMuxSel_EX!=2'b00,clk, rst_b);
+
+   btbsram btb(btb_rd_data,pc[8:2], pc_EX[8:2], {pc_EX[31:2],state_new,br_target[31:2]}, btb_wr_we, clk, rst_b);
+   saturationCounter satCounter(state_new, history_EX, pcMuxSel_EX!=2'b00, clk, rst_b);
    assign tagPC = {btb_rd_data[61:32],2'b00};
    assign history = btb_rd_data[31:30];
    assign nextPCGuess = {btb_rd_data[29:0],2'b00};
-   assign btbpred = ((tagPC[31:2]==pc_ID[31:2]) && history[1]) ? 1'b1 : 1'b0;
+   //assign btbpred = (tagPC[31:2]==pc_ID[31:2] && history[1]) ? 1'b1 : 1'b0;
    assign btb_wr_we = (pcMuxSel_EX!=2'b00) ? 1'b1 : 1'b0;
+   assign btbHit = (pc[31:2]==tagPC[31:2]) & history[1] ? 1'b1 : 1'b0;
 
    //registers to propogate the history state value
    register #(2,0) histID(history_ID, history, clk, IDen, rst_b);
    register #(2,0) histEX(history_EX, history_ID, clk, EXen, rst_b);
-   register #(32,0) pcGuessID(nextPCGuess_ID, nextPCGuess, clk, IDen, rst_b);
+   //register #(32,0) pcGuessID(nextPCGuess_ID, nextPCGuess, clk, IDen, rst_b);
    //register #(32,0) pcGuessEX(nextPCGuess_EX, nextPCGuess, clk, EXen, rst_b);
-   assign f = (newpc == pc_EX)&branchTrue;
-   assign g = newpc == pc_EX+4;
+   //assign f = (newpc == pc_EX)&branchTrue;
+   //assign g = newpc == pc_EX+4;
 
    //Set wr_data and wr_reg when there is a jump/branch with link
    mux2to1 dataToReg(wr_data, wr_dataMem, pc_WB+4, jLink_en_WB); 
@@ -822,31 +825,35 @@ endmodule
 //// flushMod: module for flushing if branch
 ////
 //// pcMuxSelFinal (input) - determines if there is a branch
+//// br_target (input) - branch target calculated in EX stage
+//// pc_ID (input) - address of instruction in ID stage
 //// flush (input) - signal that indicates an instruction is currently being stalled
 //// EXen (output) - register enable bits at the EX stage
 //// CDFlushen  (output) - enables countdown register
 //// CDAmt (output) - number of clock cycles to stall
 ////
 module flushMod(
-  input logic [1:0] pcMuxSelFinal,
-  //input logic f,
+  input logic [1:0] pcMuxSelFinal, pcMuxSel_EX,
+  input logic [31:0] pc_ID, pc_EX, br_target, rs_fwd, j_target,
   input logic flush,
-  output logic EXen, CDFlushen,
+  output logic EXen, CDFlushen, mispredict,
   output logic [2:0] CDFlushAmt);
-  always_comb begin
 
+  always_comb begin
     EXen = 1'b1;
     CDFlushAmt = 3'b0;
     CDFlushen = 1'b0;
+    mispredict = 1'b0;
     if (flush == 1'b1) begin
-      $display("flushmod1");
+      //$display("flushmod1");
       EXen = 1'b0;
     end
-    else if(flush ==1'b0 && pcMuxSelFinal != 2'b00) begin
-      $display("flushmod2");
+    else if(pcMuxSel_EX!=2'b00 && flush==1'b0 && ((pcMuxSelFinal==2'b00 && pc_ID!=pc_EX+4) || (pcMuxSelFinal==2'b01 && pc_ID!=br_target) || (pcMuxSelFinal==2'b10 && pc_ID!=rs_fwd) || (pcMuxSelFinal==2'b11 && pc_ID!=j_target))) begin
+      //$display("flushmod2");
       CDFlushen = 1'b1;
       EXen = 1'b0;
       CDFlushAmt = 1'd1;
+      mispredict = 1'b1;
     end
   end
 endmodule
@@ -883,7 +890,7 @@ module stallDetector(
     end
     else if(stall == 1'b0 && load_stall_EX == 1'b1) begin
       if ((ctrl_we_EX != 0 || mem_write_en_EX != 0) && (((regdst == 1) && (dcd_rt != 0) && (dcd_rt == wr_reg_EX)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_EX)))) begin
-        $display("we_EX: %x, mem_EX: %x, regdst: %x, dcd_rt: %x, dcd_rs: %x, wr_reg_EX: %x", ctrl_we_EX, mem_write_en_EX, regdst, dcd_rt, dcd_rs, wr_reg_EX);
+        //$display("we_EX: %x, mem_EX: %x, regdst: %x, dcd_rt: %x, dcd_rs: %x, wr_reg_EX: %x", ctrl_we_EX, mem_write_en_EX, regdst, dcd_rt, dcd_rs, wr_reg_EX);
         CDen = 1'b1;
         CDAmt = 3'd0;
         IFen = 1'b0;

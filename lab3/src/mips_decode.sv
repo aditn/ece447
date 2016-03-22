@@ -241,7 +241,7 @@ module mips_decode(/*AUTOARG*/
 
        `OP_JAL:
          begin
-          $display("jump and link");
+          ////$display("jump and link");
            ctrl_we = 1'b1; //need to write to $ra
            pcMuxSel = 2'b11;
            jLink_en = 1'b1;
@@ -318,14 +318,14 @@ module mips_decode(/*AUTOARG*/
          end
        `OP_LUI:
          begin
-           $display("loading");
+           //$display("loading");
            memtoreg = 2'b01;
            load_stall = 1'b1;
            load_sel = `LOAD_LUI;
          end
        `OP_LB:
          begin
-          $display("loading");
+          ////$display("loading");
            load_stall = 1'b1;
            alu__sel = `ALU_ADD;
            se = 1'b1;
@@ -335,7 +335,7 @@ module mips_decode(/*AUTOARG*/
          end
        `OP_LH:
          begin
-          $display("loading");
+          //$display("loading");
            load_stall = 1'b1;
            alu__sel = `ALU_ADD;
            se = 1'b1;
@@ -345,7 +345,7 @@ module mips_decode(/*AUTOARG*/
          end
        `OP_LW:
          begin
-          $display("loading");
+          //$display("loading");
            load_stall = 1'b1;
            alu__sel = `ALU_ADD;
            se = 1'b1;
@@ -355,7 +355,7 @@ module mips_decode(/*AUTOARG*/
          end
        `OP_LBU:
          begin
-          $display("loading");
+          //$display("loading");
            load_stall = 1'b1;
            alu__sel = `ALU_ADD;
            se = 1'b1;
@@ -365,7 +365,7 @@ module mips_decode(/*AUTOARG*/
          end
        `OP_LHU:
          begin
-          $display("loading");
+          //$display("loading");
            load_stall = 1'b1;
            alu__sel = `ALU_ADD;
            se = 1'b1;
@@ -375,7 +375,7 @@ module mips_decode(/*AUTOARG*/
          end
        `OP_SB:
          begin
-          $display("storing");
+          //$display("storing");
            ctrl_we = 1'b0;
            alu__sel = `ALU_ADD;
            alusrc2 = 1'b1;
@@ -386,7 +386,7 @@ module mips_decode(/*AUTOARG*/
          end
        `OP_SH:
          begin
-          $display("storing");
+          //$display("storing");
            ctrl_we = 1'b0;
            alu__sel = `ALU_ADD;
            alusrc2 = 1'b1;
@@ -397,7 +397,7 @@ module mips_decode(/*AUTOARG*/
          end
        `OP_SW:
          begin
-          $display("storing");
+          //$display("storing");
            ctrl_we = 1'b0;
            alu__sel = `ALU_ADD;
            alusrc2 = 1'b1;
