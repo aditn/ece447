@@ -106,6 +106,7 @@ module mips_core(/*AUTOARG*/
 
    //BTB
    wire [61:0] btb_rd_data;
+
    wire[31:0] tagPC, nextPCGuess, pcPred;
    wire[1:0] state_new, history;
    wire btb_wr_we, btbPred, mispredict, EXen;
@@ -147,7 +148,7 @@ module mips_core(/*AUTOARG*/
 
    // synthesis translate_off
    
-   always @(posedge clk) begin
+   /*always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
        //$display ( "=== Simulation Cycle %d ===", $time );
@@ -182,7 +183,7 @@ module mips_core(/*AUTOARG*/
        //$display ("jLink_en_WB: %x, wr_data: %x, wr_reg: %x", jLink_en_WB, wr_data, wr_reg);
        $display ("");
      end
-   end
+   end*/
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -390,7 +391,7 @@ module mips_core(/*AUTOARG*/
    //check for branch -> flush
    wire flush, CDFlushen,EXenFlush;
    wire [2:0] CDFlushAmt;
-   wire f,g;
+   //wire f,g;
    flushMod fM(pcMuxSelFinal, pcMuxSel_EX, pc_ID, pc_EX, br_target, rs_fwd, j_target,
                flush,
                EXenFlush, CDFlushen, mispredict,
@@ -443,8 +444,7 @@ module mips_core(/*AUTOARG*/
    pcSelector choosePcMuxSel(pcMuxSelFinal, pcMuxSel_EX, branchTrue); //chooses PC on whether branch condition is met
 
    wire [1:0] history_ID, history_EX;
-   //wire[31:0] nextPCGuess_ID, nextPCGuess_EX;
-
+   
    //btb for branch prediction
    wire [31:0] pred;
    mux4to1 predMux(pred, 32'b0, br_target, rs_fwd, j_target, pcMuxSel_EX);
@@ -460,10 +460,10 @@ module mips_core(/*AUTOARG*/
    //registers to propogate the history state value
    register #(2,0) histID(history_ID, history, clk, IDen, rst_b);
    register #(2,0) histEX(history_EX, history_ID, clk, EXen, rst_b);
-   //register #(31,0) pcGuessID(nextPCGuess_ID, nextPCGuess, clk, IDen, rst_b);
-   //register #(31,0) pcGuessEX(nextPCGuess_EX, nextPCGuess, clk, EXen, rst_b);
-   assign f = (newpc == pc_EX)&branchTrue;
-   assign g = newpc == pc_EX+4;
+   //register #(32,0) pcGuessID(nextPCGuess_ID, nextPCGuess, clk, IDen, rst_b);
+   //register #(32,0) pcGuessEX(nextPCGuess_EX, nextPCGuess, clk, EXen, rst_b);
+   //assign f = (newpc == pc_EX)&branchTrue;
+   //assign g = newpc == pc_EX+4;
 
    //Set wr_data and wr_reg when there is a jump/branch with link
    mux2to1 dataToReg(wr_data, wr_dataMem, pc_WB+4, jLink_en_WB); 
