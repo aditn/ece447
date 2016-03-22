@@ -41,7 +41,7 @@ set_max_delay 25.0 [all_outputs]
 # =============================== REPORTS ================================
 
 check_design
-compile -area_effort high
+compile -incremental_mapping
 
 report_area > area_mips_core.rpt
 report_timing > timing_mips_core.rpt

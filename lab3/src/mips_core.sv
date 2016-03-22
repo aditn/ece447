@@ -935,6 +935,7 @@ module stallDetector(
     end
     else if(stall == 1'b0 && load_stall_EX == 1'b1) begin
       if ((ctrl_we_EX != 0 || mem_write_en_EX != 0) && (((regdst == 1) && (dcd_rt != 0) && (dcd_rt == wr_reg_EX)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_EX)))) begin
+        //$display("we_EX: %x, mem_EX: %x, regdst: %x, dcd_rt: %x, dcd_rs: %x, wr_reg_EX: %x", ctrl_we_EX, mem_write_en_EX, regdst, dcd_rt, dcd_rs, wr_reg_EX);
         CDen = 1'b1;
         CDAmt = 3'd0;
         IFen = 1'b0;
