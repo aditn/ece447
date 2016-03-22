@@ -28,15 +28,16 @@ calculated by the ALU in the EX stage.
 
 Hazard Distance Analysis:
 LW then any instruction: RAW hazard distance = 1
+An instruction that writes to a register, and then JR reads from the register
+directly after will cause a hazard: RAW hazard distance = 1
 
-The critical path is through 
-The minimum clock cycle is 9.07 ns. The minimum clock cycles is of a similar
+The critical path is through the PC_EX register, actual branch_target_EX
+calculations, the flush module, the muxes that determine the new history
+state to write back to the BTB, and the BTB.
+The minimum clock cycle is 9.70 ns. The minimum clock cycles is of a similar
 time to the previous lab where forwarding was incorporated.
-
-Comparing the clock cycles for stalling (7.79ns) and forwarding (9.07ns),
-forwarding would need to improve our IPC by approximately 16.4% to break
-even.
 
 We spent about 3 hrs on planning the design, 8 hrs capturing the design, 4
 hr for testing the design, 25 hrs for debugging, and 2 hours for analyzing
 performance.
+

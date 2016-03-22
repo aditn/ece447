@@ -109,7 +109,7 @@ module mips_core(/*AUTOARG*/
 
    wire[31:0] tagPC, nextPCGuess, pcCorr, pcPred;
    wire[1:0] state_new, history;
-   wire btb_wr_we, btbPred, mispredict, EXen;
+   wire btb_wr_we, btbPred, mispredict, EXen,IFen;
    wire btbHit;
 
    // PC Management
@@ -117,7 +117,7 @@ module mips_core(/*AUTOARG*/
    register #(32, text_start) PCReg(pc, pcCorr, clk, ~internal_halt, rst_b);
    //mux2to1 predPCnext(pcNext, newpc, pcPred, EXen);
    mux2to1 predPC1(pcCorr, pcPred, newpc, mispredict);
-   mux2to1 predPC2(pcPred, stallpc, nextPCGuess, btbPred);
+   mux2to1 predPC2(pcPred, stallpc, nextPCGuess, btbPred&&IFen);
    //mux4to1 predPC(pcPred, stallpc, nextPCGuess, newpc, newpc, {mispredict, btbPred});
    
    /*register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
@@ -153,7 +153,9 @@ module mips_core(/*AUTOARG*/
    always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
+      //$display("cyclesCount:%d", cyclesCount);
        $display ( "=== Simulation Cycle %d ===", $time );
+
        //$display("cycles: %d, fetch: %d, ex: %d", cyclesCount, instFetchedCount, instExCount);
        //$display("brExfwd: %d, brExbwd: %d, brNPfwd: %d, brNPbwd: %d", brExCount_fwd, brExCount_bwd, brNoPred_fwd, brNoPred_bwd);
        //$display("brTCfwd: %d, brTCbwd: %d, brNTfwd: %d, brNTbwd: %d", brTakenCount_fwd, brTakenCount_bwd, brNotTakenCorrect_fwd, brNotTakenCorrect_bwd);
@@ -161,6 +163,7 @@ module mips_core(/*AUTOARG*/
        //$display("jECfwd: %d, jECbwd: %d", jExCorrect_fwd, jExCorrect_bwd);
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    pc_ID, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
+       $display ("rt_data_MEM:%x", rt_data_MEM);
        //$display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
        //$display ("HI: %x, LO: %x, hi_en_EX: %x, hi_en_WB:%x, lo_en_EX: %x, lo_en_WB: %x", hi_out, lo_out,hi_en_EX,hi_en_WB,lo_en_EX, lo_en_WB);
        //$display ("HIWB: %x, LOWB: %x", HIout_WB, LOout_WB);
@@ -170,14 +173,14 @@ module mips_core(/*AUTOARG*/
        //$display ("E: EXen, %x, wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, rs_data_EX: %x, ctrl_we_EX: %x, mem_EX: %x", EXen, wr_reg_EX, alu_in1, alu_in2, alu__out, rs_data_EX, ctrl_we_EX, mem_write_en_EX);
        //$display("we_EX: %x, mem_EX: %x, regdst: %x, dcd_rt: %x, dcd_rs: %x, wr_reg_EX: %x", ctrl_we_EX, mem_write_en_EX, regdst, dcd_rt, dcd_rs, wr_reg_EX);
        //$display ("M: wr_reg_MEM: %x, alu__outMEM: %x, mem_addr: %x, ctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, mem_addr, ctrl_we_MEM, mem_write_en_MEM);
-       //$display ("   mem_addr: %h, load_data: %x, load_st_EX: %x, mem_data_out: %x, store_data: %h, mem_write_en: %b", mem_addr, load_data, load_stall_EX, mem_data_out, store_data, mem_write_en);
+       $display ("   alu__out_MEM: %h, load_data: %x, load_st_EX: %x, mem_data_out: %x, store_data: %h, mem_write_en: %b", alu__out_MEM, load_data, load_stall_EX, mem_data_out, store_data, mem_write_en);
        //$display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", wr_reg_WB, alu__out_WB, ctrl_we_WB, mem_write_en_WB);
        //$display ("sys: %x, rt_data: %x", ctrl_Sys, rt_data);
        //$display ("sys_WB: %x, rt_data: %x", ctrl_Sys_WB, rt_data_WB);
        //$display ("stall: %x, CDen: %x", stall, CDen);
        //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
-       //$display ("EXenFlush: %x, EXen:%x, f:%x", EXenFlush,EXen,f);
+       $display ("EXenFlush: %x, EXen:%x,", EXenFlush,EXen);
        $display ("btbtag: %x, btbhist: %b, btbaddr: %x", tagPC, history, nextPCGuess);
        $display ("btb_wr_we: %x, state_new: %b, history_EX: %b, btbHit_EX: %b", btb_wr_we, state_new, history_EX, btbHit_EX);
        $display ("branchTrue: %b, pcMuxSel_EX: %b, pcMuxSelFinal: %b, brcond_EX: %b", branchTrue, pcMuxSel_EX, pcMuxSelFinal, brcond_EX);
@@ -276,7 +279,7 @@ module mips_core(/*AUTOARG*/
    wire [1:0] fwd_rs_sel, fwd_rt_sel; //select bits for forwarding rs and rt
 
    //Fetch (IF) stage for pc register
-   wire IFen; //enable for IF stage
+   //wire IFen; //enable for IF stage
    mux2to1 stallMux(stallpc, pc, pc+4, IFen);
 
    //Decode (ID) stage registers and wirings
@@ -439,7 +442,9 @@ module mips_core(/*AUTOARG*/
    storer storer(store_data, mem_write_en, rt_data_MEM, store_sel_MEM, alu__out_MEM, mem_write_en_MEM); //operates on data to write to memory
 
    //Mux for next state PC
-   mux4to1 pcMux(newpc, pc_EX+4, br_target, rs_fwd, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
+   wire [31:0] stallpc_EX;
+   mux2to1 stallpcEX(stallpc_EX, pc_EX, pc_EX+4, IFen);
+   mux4to1 pcMux(newpc, stallpc_EX, br_target, rs_fwd, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
    adder brtarget(br_target, pc_EX+4, (imm_EX << 2), 1'b0); //get branch target
    concat conc(j_target, pc_EX, dcd_target_EX); //get jump target
    pcSelector choosePcMuxSel(pcMuxSelFinal, pcMuxSel_EX, branchTrue); //chooses PC on whether branch condition is met
@@ -452,8 +457,9 @@ module mips_core(/*AUTOARG*/
    mux4to1 predMux(pred, 32'b0, br_target, rs_fwd, j_target, pcMuxSel_EX);
    btbsram btb(btb_rd_data, pc[8:2], pc_EX[8:2], {pc_EX[31:2], state_new, pred[31:2]}, btb_wr_we, clk, rst_b);
 
-   mux2to1 histMux1(state_new, first_state, next_state, btbHit_EX);
-   mux2to1 histMux2(first_state, 2'b01, 2'b10, mispredict);
+
+   mux2to1 #(2)histMux1(state_new, first_state, next_state, btbHit_EX);
+   mux2to1 #(2)histMux2(first_state, 2'b01, 2'b10, mispredict);
    //mux4to1 histMux(state_new, next_state, next_state, 2'b10, 2'b01, {~btbHit_EX, mispredict});
    saturationCounter satCounter(next_state, history_EX, pcMuxSelFinal!=2'b00, clk, rst_b);
 
@@ -512,8 +518,8 @@ module mips_core(/*AUTOARG*/
    register #(32, 0) BadVAddrReg(bad_v_addr, pc, clk, load_bva, rst_b);
 
    /* Counters */
-   /*wire [31:0] cyclesCount, instFetchedCount, instExCount;
-   wire [31:0] brExCount_fwd, brExCount_bwd, brNoPred_fwd, brNoPred_bwd;
+   wire [31:0] cyclesCount, instFetchedCount, instExCount;
+   /*wire [31:0] brExCount_fwd, brExCount_bwd, brNoPred_fwd, brNoPred_bwd;
    wire [31:0] brTakenCount_fwd, brTakenCount_bwd;
    wire [31:0] brTakenCorrect_fwd, brTakenCorrect_bwd;
    wire [31:0] brNotTakenCorrect_fwd, brNotTakenCorrect_bwd;
@@ -521,10 +527,10 @@ module mips_core(/*AUTOARG*/
    wire [31:0] jExCorrect_fwd, jExCorrect_bwd;
    wire forward, back;
    assign forward = (pc_EX < newpc) ? 1'b1 : 1'b0;
-   assign back = (pc_EX > newpc) ? 1'b1 : 1'b0;
+   assign back = (pc_EX > newpc) ? 1'b1 : 1'b0;*/
    
    counter cycles(cyclesCount, 1'b1, clk, rst_b);
-   counter instFetched(instFetchedCount, IFen, clk, rst_b);
+   /*counter instFetched(instFetchedCount, IFen, clk, rst_b);
    counter instEx(instExCount, EXen, clk, rst_b);
    counter brExfwd(brExCount_fwd, pcMuxSel_EX==2'b01 && forward, clk, rst_b);
    counter brExbwd(brExCount_bwd, pcMuxSel_EX==2'b01 && back, clk, rst_b);
