@@ -42,12 +42,16 @@ module regfile_forward (/*AUTOARG*/
 	reg         [31:0] mem[0:31];
 	integer            i;
 
+	//logic cnew;
+	//assign cnew = 1'b0;
+
 	always @(posedge clk or negedge rst_b) begin 
+		$display("r4:%d", mem[5'd4]);
 		if (!rst_b) begin
 			`include "regfile_init.vh"
 		end else if (rd_we && (rd_num != 0)) begin 
 			mem[rd_num] <= rd_data; 
-		end 
+		end
 	end 
 
 	assign rs_data = (rs_num == 0) ? 32'h0 : ((rd_we&&(rd_num==rs_num))?rd_data:mem[rs_num]);
@@ -56,7 +60,7 @@ module regfile_forward (/*AUTOARG*/
 	// synthesis translate_off
 	integer fd;
 	always @(halted) begin
-		if (rst_b && halted) begin
+		if ((rst_b && halted)) begin
 			fd = $fopen("regdump.txt");
 
 			$display("--- 18-447 Register file dump ---");

@@ -8,7 +8,7 @@ loading:		# set first N word of data seg to pattern
 sw    $3, 0($2)	
 addiu $2, $2, 4
 addiu $4, $4, -1
-bne   $4, $0, loading
+bltz   $4, $0, loading
 
 addiu $2, $0, 8#40000	# set r2 to byte count N*4	
 lui   $3, 0x1000	# set r3 to start of data seg (src buf)

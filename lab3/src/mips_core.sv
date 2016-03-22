@@ -148,17 +148,17 @@ module mips_core(/*AUTOARG*/
 
    // synthesis translate_off
    
-   /*always @(posedge clk) begin
+   always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
-       //$display ( "=== Simulation Cycle %d ===", $time );
+       $display ( "=== Simulation Cycle %d ===", $time );
        //$display("cycles: %d, fetch: %d, ex: %d", cyclesCount, instFetchedCount, instExCount);
        //$display("brExfwd: %d, brExbwd: %d, brNPfwd: %d, brNPbwd: %d", brExCount_fwd, brExCount_bwd, brNoPred_fwd, brNoPred_bwd);
        //$display("brTCfwd: %d, brTCbwd: %d, brNTfwd: %d, brNTbwd: %d", brTakenCount_fwd, brTakenCount_bwd, brNotTakenCorrect_fwd, brNotTakenCorrect_bwd);
        //$display("jExfwd: %d, jExbwd: %d, jNPfwd: %d, jNPbwd: %d", jExCount_fwd, jExCount_bwd, jNoPred_fwd, jNoPred_bwd);
        //$display("jECfwd: %d, jECbwd: %d", jExCorrect_fwd, jExCorrect_bwd);
-       //$display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
-       //            pc_ID, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
+       $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
+                   pc_ID, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
        //$display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
        //$display ("HI: %x, LO: %x, hi_en_EX: %x, hi_en_WB:%x, lo_en_EX: %x, lo_en_WB: %x", hi_out, lo_out,hi_en_EX,hi_en_WB,lo_en_EX, lo_en_WB);
        //$display ("HIWB: %x, LOWB: %x", HIout_WB, LOout_WB);
@@ -172,10 +172,10 @@ module mips_core(/*AUTOARG*/
        //$display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", wr_reg_WB, alu__out_WB, ctrl_we_WB, mem_write_en_WB);
        //$display ("sys: %x, rt_data: %x", ctrl_Sys, rt_data);
        //$display ("sys_WB: %x, rt_data: %x", ctrl_Sys_WB, rt_data_WB);
-       $display ("stall: %x, CDen: %x", stall, CDen);
+       //$display ("stall: %x, CDen: %x", stall, CDen);
        //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
-       //$display ("EXenFlush: %x, EXen:%x, f:%x", EXenFlush,EXen,f);
+       $display ("EXenFlush: %x, EXen:%x,", EXenFlush,EXen);
        $display ("btbtag: %x, btbhist: %b, btbaddr: %x, btbwr: %b, state_new: %b", tagPC, history, nextPCGuess, btb_wr_we, state_new);
        $display ("branchTrue: %b, pcMuxSel_EX: %b, pcMuxSelFinal: %b, brcond_EX: %b", branchTrue, pcMuxSel_EX, pcMuxSelFinal, brcond_EX);
        $display ("mispredict: %b", mispredict);
@@ -183,7 +183,7 @@ module mips_core(/*AUTOARG*/
        //$display ("jLink_en_WB: %x, wr_data: %x, wr_reg: %x", jLink_en_WB, wr_data, wr_reg);
        $display ("");
      end
-   end*/
+   end
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -448,7 +448,7 @@ module mips_core(/*AUTOARG*/
    mux4to1 predMux(pred, 32'b0, br_target, rs_fwd, j_target, pcMuxSel_EX);
    btbsram btb(btb_rd_data, pc[8:2], pc_EX[8:2], {pc_EX[31:2], state_new, pred[31:2]}, btb_wr_we, clk, rst_b);
    mux4to1 histMux(state_new, next_state, next_state, 2'b10, 2'b01, {~btbHit_EX, mispredict});
-   saturationCounter satCounter(next_state, history_EX, pcMuxSelFinal!=2'b00, clk, rst_b);
+   saturationCounter satCounter(next_state, history_EX, btb_wr_we, clk, rst_b);
 
    assign tagPC = {btb_rd_data[61:32],2'b00};
    assign history = btb_rd_data[31:30];

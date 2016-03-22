@@ -37,6 +37,6 @@ Comparing the clock cycles for stalling (7.79ns) and forwarding (9.07ns),
 forwarding would need to improve our IPC by approximately 16.4% to break
 even.
 
-We spent about 3 hrs on planning the design, 5 hrs capturing the design, 3
-hr for testing the design, 20 hrs for debugging, and 2 hours for analyzing
+We spent about 3 hrs on planning the design, 8 hrs capturing the design, 4
+hr for testing the design, 25 hrs for debugging, and 2 hours for analyzing
 performance.
