@@ -26,7 +26,7 @@ addiu $2, $0, 10000	# set r2 to word count N
 lui   $3, 0x5040
 ori   $3, $3, 0x3020	# set r3 to special pattern
 lui   $4, 0x1000	# set r4 to dest buf (data seg + N*4)
-ori   $4, $4, 40000 
+ori   $4, $4,40000 
 
 CheckLoop:		# check dest buff
 lw    $5, 0($4)

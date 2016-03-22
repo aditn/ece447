@@ -1,4 +1,4 @@
-   lui $t0, 0x010#0x0010
+   lui $t0, 0x0010
 
    addiu $t1, 2
    addiu $t2, 3
