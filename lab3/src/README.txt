@@ -28,7 +28,7 @@ calculated by the ALU in the EX stage.
 
 Hazard Distance Analysis:
 LW then any instruction: RAW hazard distance = 1
-No other hazards
+
 
 
 The critical path is through the output of the ALU in the MEM stage, then

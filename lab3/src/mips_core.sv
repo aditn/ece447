@@ -148,7 +148,7 @@ module mips_core(/*AUTOARG*/
 
    // synthesis translate_off
    
-   always @(posedge clk) begin
+   /*always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
        //$display ( "=== Simulation Cycle %d ===", $time );
@@ -183,7 +183,7 @@ module mips_core(/*AUTOARG*/
        //$display ("jLink_en_WB: %x, wr_data: %x, wr_reg: %x", jLink_en_WB, wr_data, wr_reg);
        $display ("");
      end
-   end
+   end*/
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -502,18 +502,18 @@ module mips_core(/*AUTOARG*/
    register #(32, 0) BadVAddrReg(bad_v_addr, pc, clk, load_bva, rst_b);
 
    /* Counters */
-   wire [31:0] cyclesCount, instFetchedCount, instExCount;
+   /*wire [31:0] cyclesCount, instFetchedCount, instExCount;
    wire [31:0] brExCount_fwd, brExCount_bwd, brNoPred_fwd, brNoPred_bwd;
    wire [31:0] brTakenCount_fwd, brTakenCount_bwd;
    wire [31:0] brTakenCorrect_fwd, brTakenCorrect_bwd;
-   wire [31:0] brNotTakenCorrect_fwd, brNotTaken_bwd;
+   wire [31:0] brNotTakenCorrect_fwd, brNotTakenCorrect_bwd;
    wire [31:0] jExCount_fwd, jExCount_bwd, jNoPred_fwd, jNoPred_bwd;
    wire [31:0] jExCorrect_fwd, jExCorrect_bwd;
    wire forward, back;
    assign forward = (pc_EX < newpc) ? 1'b1 : 1'b0;
    assign back = (pc_EX > newpc) ? 1'b1 : 1'b0;
    
-   counter cycles(cyclesCount, 1, clk, rst_b);
+   counter cycles(cyclesCount, 1'b1, clk, rst_b);
    counter instFetched(instFetchedCount, IFen, clk, rst_b);
    counter instEx(instExCount, EXen, clk, rst_b);
    counter brExfwd(brExCount_fwd, pcMuxSel_EX==2'b01 && forward, clk, rst_b);
@@ -988,7 +988,7 @@ endmodule
 //// reset (input)  - System reset
 //// count (output) - current count
 ////
-module counter #(parameter reset_value = 0) (
+module counter #(parameter reset_value = 32'd0) (
   output logic [31:0] count,
   input logic en, clk, rst_b);
 
