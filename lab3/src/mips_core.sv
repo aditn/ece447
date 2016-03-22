@@ -380,14 +380,11 @@ module mips_core(/*AUTOARG*/
    //check for branch -> flush
    wire flush, CDFlushen,EXenFlush;
    wire [2:0] CDFlushAmt;
-   //wire f,g;
    flushMod fM(pcMuxSelFinal, pcMuxSel_EX, pc_ID, pc_EX, br_target, rs_fwd, j_target,
                flush,
                EXenFlush, CDFlushen, mispredict,
                CDFlushAmt);
-   /*flushMod fM(f|g, flush,
-               EXenFlush, CDFlushen,
-               CDFlushAmt);*/
+
    countdownReg cdFlushReg(CDFlushen, clk, rst_b,
                            CDFlushAmt,
                            flush);
@@ -435,23 +432,17 @@ module mips_core(/*AUTOARG*/
    wire [1:0] history_ID, history_EX;
    
    //btb for branch prediction
-
    btbsram btb(btb_rd_data,pc[8:2], pc_EX[8:2], {pc_EX[31:2],state_new,br_target[31:2]}, btb_wr_we, clk, rst_b);
    saturationCounter satCounter(state_new, history_EX, pcMuxSel_EX!=2'b00, clk, rst_b);
    assign tagPC = {btb_rd_data[61:32],2'b00};
    assign history = btb_rd_data[31:30];
    assign nextPCGuess = {btb_rd_data[29:0],2'b00};
-   //assign btbpred = (tagPC[31:2]==pc_ID[31:2] && history[1]) ? 1'b1 : 1'b0;
    assign btb_wr_we = (pcMuxSel_EX!=2'b00) ? 1'b1 : 1'b0;
    assign btbHit = (pc[31:2]==tagPC[31:2]) & history[1] ? 1'b1 : 1'b0;
 
    //registers to propogate the history state value
    register #(2,0) histID(history_ID, history, clk, IDen, rst_b);
    register #(2,0) histEX(history_EX, history_ID, clk, EXen, rst_b);
-   //register #(32,0) pcGuessID(nextPCGuess_ID, nextPCGuess, clk, IDen, rst_b);
-   //register #(32,0) pcGuessEX(nextPCGuess_EX, nextPCGuess, clk, EXen, rst_b);
-   //assign f = (newpc == pc_EX)&branchTrue;
-   //assign g = newpc == pc_EX+4;
 
    //Set wr_data and wr_reg when there is a jump/branch with link
    mux2to1 dataToReg(wr_data, wr_dataMem, pc_WB+4, jLink_en_WB); 
@@ -596,7 +587,15 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
 
 endmodule
 
-
+////
+//// saturationCounter: fsm for history bits for btb
+////
+//// q (output) - next history bits for determining branch prediction
+//// d (input)  - previous history bits from btb that were propogated to EX stage
+//// isBranch (input) - next history bits change based on this value
+//// clk (input)- Clock (positive edge-senstive)
+//// rst_b (input) - System reset
+////
 module saturationCounter(q,d,isBranch,clk, rst_b);
   parameter
             width = 2,
