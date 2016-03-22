@@ -8,7 +8,7 @@ loading:		# set first N word of data seg to pattern
 sw    $3, 0($2)	
 addiu $2, $2, 4
 addiu $4, $4, -1
-bltz   $4, $0, loading
+bne   $4, $0, loading
 
 addiu $2, $0, 8#40000	# set r2 to byte count N*4	
 lui   $3, 0x1000	# set r3 to start of data seg (src buf)
@@ -26,7 +26,7 @@ addiu $2, $0, 2#10000	# set r2 to word count N
 lui   $3, 0x5040
 ori   $3, $3, 0x3020	# set r3 to special pattern
 lui   $4, 0x1000	# set r4 to dest buf (data seg + N*4)
-ori   $4, $4,8#40000 
+ori   $4, $4, 8#40000 
 
 CheckLoop:		# check dest buff
 lw    $5, 0($4)

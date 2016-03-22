@@ -107,16 +107,18 @@ module mips_core(/*AUTOARG*/
    //BTB
    wire [61:0] btb_rd_data;
 
-   wire[31:0] tagPC, nextPCGuess, pcPred;
+   wire[31:0] tagPC, nextPCGuess, pcCorr, pcPred;
    wire[1:0] state_new, history;
    wire btb_wr_we, btbPred, mispredict, EXen;
    wire btbHit;
 
    // PC Management
    //register #(32, text_start) PCReg(pc, pcNextFinal, clk, ~internal_halt, rst_b);
-   register #(32, text_start) PCReg(pc, pcPred, clk, ~internal_halt, rst_b);
+   register #(32, text_start) PCReg(pc, pcCorr, clk, ~internal_halt, rst_b);
    //mux2to1 predPCnext(pcNext, newpc, pcPred, EXen);
-   mux4to1 predPC(pcPred, stallpc, nextPCGuess, newpc, newpc, {mispredict, btbPred});
+   mux2to1 predPC1(pcCorr, pcPred, newpc, mispredict);
+   mux2to1 predPC2(pcPred, stallpc, nextPCGuess, btbPred);
+   //mux4to1 predPC(pcPred, stallpc, nextPCGuess, newpc, newpc, {mispredict, btbPred});
    
    /*register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
                                        ~internal_halt, rst_b);*/
@@ -175,12 +177,14 @@ module mips_core(/*AUTOARG*/
        //$display ("stall: %x, CDen: %x", stall, CDen);
        //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
-       $display ("EXenFlush: %x, EXen:%x,", EXenFlush,EXen);
-       $display ("btbtag: %x, btbhist: %b, btbaddr: %x, btbwr: %b, state_new: %b", tagPC, history, nextPCGuess, btb_wr_we, state_new);
+       //$display ("EXenFlush: %x, EXen:%x, f:%x", EXenFlush,EXen,f);
+       $display ("btbtag: %x, btbhist: %b, btbaddr: %x", tagPC, history, nextPCGuess);
+       $display ("btb_wr_we: %x, state_new: %b, history_EX: %b, btbHit_EX: %b", btb_wr_we, state_new, history_EX, btbHit_EX);
        $display ("branchTrue: %b, pcMuxSel_EX: %b, pcMuxSelFinal: %b, brcond_EX: %b", branchTrue, pcMuxSel_EX, pcMuxSelFinal, brcond_EX);
        $display ("mispredict: %b", mispredict);
-       //$display ("j_target: %x, br_target: %x, pc_EX: %x, imm_EX: %x", j_target, br_target, pc_EX, imm_EX);
+       $display ("j_target: %x, br_target: %x, pc_EX: %x, imm_EX: %x", j_target, br_target, pc_EX, imm_EX);
        //$display ("jLink_en_WB: %x, wr_data: %x, wr_reg: %x", jLink_en_WB, wr_data, wr_reg);
+       $display ("pcID: %x, pcEX: %x, flush: %b", pc_ID, pc_EX, flush);
        $display ("");
      end
    end
@@ -435,7 +439,7 @@ module mips_core(/*AUTOARG*/
    storer storer(store_data, mem_write_en, rt_data_MEM, store_sel_MEM, alu__out_MEM, mem_write_en_MEM); //operates on data to write to memory
 
    //Mux for next state PC
-   mux4to1 pcMux(newpc, stallpc, br_target, rs_fwd, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
+   mux4to1 pcMux(newpc, pc_EX+4, br_target, rs_fwd, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
    adder brtarget(br_target, pc_EX+4, (imm_EX << 2), 1'b0); //get branch target
    concat conc(j_target, pc_EX, dcd_target_EX); //get jump target
    pcSelector choosePcMuxSel(pcMuxSelFinal, pcMuxSel_EX, branchTrue); //chooses PC on whether branch condition is met
@@ -444,11 +448,14 @@ module mips_core(/*AUTOARG*/
    
    //btb for branch prediction
    wire [31:0] pred;
-   wire [1:0] next_state;
+   wire [1:0] first_state, next_state;
    mux4to1 predMux(pred, 32'b0, br_target, rs_fwd, j_target, pcMuxSel_EX);
    btbsram btb(btb_rd_data, pc[8:2], pc_EX[8:2], {pc_EX[31:2], state_new, pred[31:2]}, btb_wr_we, clk, rst_b);
-   mux4to1 histMux(state_new, next_state, next_state, 2'b10, 2'b01, {~btbHit_EX, mispredict});
-   saturationCounter satCounter(next_state, history_EX, btb_wr_we, clk, rst_b);
+
+   mux2to1 histMux1(state_new, first_state, next_state, btbHit_EX);
+   mux2to1 histMux2(first_state, 2'b01, 2'b10, mispredict);
+   //mux4to1 histMux(state_new, next_state, next_state, 2'b10, 2'b01, {~btbHit_EX, mispredict});
+   saturationCounter satCounter(next_state, history_EX, pcMuxSelFinal!=2'b00, clk, rst_b);
 
    assign tagPC = {btb_rd_data[61:32],2'b00};
    assign history = btb_rd_data[31:30];
@@ -636,7 +643,14 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
 
 endmodule
 
-
+//// saturationCounter: determines what to update the state of the history in the BTB with
+////
+//// q      (output) - Next state
+//// d      (input)  - Current state
+//// isBranch (input) - Whether the branch/jump was taken or not
+//// clk    (input)  - Clock (positive edge-sensitive)
+//// reset  (input)  - System reset
+////
 module saturationCounter(
   output logic [1:0] q,
   input logic [1:0] d,
@@ -888,7 +902,10 @@ module flushMod(
     if (flush == 1'b1) begin
       EXen = 1'b0;
     end
-    else if(pcMuxSel_EX!=2'b00 && flush==1'b0 && ((pcMuxSelFinal==2'b00 && pc_ID!=pc_EX+4) || (pcMuxSelFinal==2'b01 && pc_ID!=br_target) || (pcMuxSelFinal==2'b10 && pc_ID!=rs_fwd) || (pcMuxSelFinal==2'b11 && pc_ID!=j_target))) begin
+    else if(pcMuxSel_EX!=2'b00 && flush==1'b0 && ((pcMuxSelFinal==2'b00 && pc_ID!=pc_EX+4) || 
+                                                  (pcMuxSelFinal==2'b01 && pc_ID!=br_target) ||
+                                                  (pcMuxSelFinal==2'b10 && pc_ID!=rs_fwd) ||
+                                                  (pcMuxSelFinal==2'b11 && pc_ID!=j_target))) begin
       CDFlushen = 1'b1;
       EXen = 1'b0;
       CDFlushAmt = 1'd1;
