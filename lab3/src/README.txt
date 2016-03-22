@@ -29,16 +29,14 @@ calculated by the ALU in the EX stage.
 Hazard Distance Analysis:
 LW then any instruction: RAW hazard distance = 1
 
-
-
-The critical path is through the output of the ALU in the MEM stage, then
-through the forwarding module, then through the ALU inputs, through the
-ALU and ending at the output of the ALU in the MEM stage again.
-The minimum clock cycle is 9.07 ns.
+The critical path is through 
+The minimum clock cycle is 9.07 ns. The minimum clock cycles is of a similar
+time to the previous lab where forwarding was incorporated.
 
 Comparing the clock cycles for stalling (7.79ns) and forwarding (9.07ns),
 forwarding would need to improve our IPC by approximately 16.4% to break
 even.
 
-We spent about 1 hr on planning the design, 2 hr capturing the design, 1
-hr for testing the design and 1 hr for debugging.
+We spent about 3 hrs on planning the design, 5 hrs capturing the design, 3
+hr for testing the design, 20 hrs for debugging, and 2 hours for analyzing
+performance.

@@ -108,7 +108,7 @@ module btbsram #(parameter WIDTH=62, SIZE_LG2=7) (
 		     mem[i] <= 0;
 		   end
 		end else if (wr_we) begin 
-			mem[wr_idx] <= wr_data; 
+			mem[wr_idx] <= wr_data;
 		end 
 	end 
 
