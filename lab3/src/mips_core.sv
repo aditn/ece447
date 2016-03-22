@@ -108,13 +108,14 @@ module mips_core(/*AUTOARG*/
    wire [61:0] btb_rd_data;
    wire[31:0] tagPC, nextPCGuess, pcPred;
    wire[1:0] state_new, history;
-   wire btb_wr_we, btbHit, mispredict, EXen;
+   wire btb_wr_we, btbPred, mispredict, EXen;
+   wire btbHit;
 
    // PC Management
    //register #(32, text_start) PCReg(pc, pcNextFinal, clk, ~internal_halt, rst_b);
    register #(32, text_start) PCReg(pc, pcPred, clk, ~internal_halt, rst_b);
    //mux2to1 predPCnext(pcNext, newpc, pcPred, EXen);
-   mux4to1 predPC(pcPred, stallpc, nextPCGuess, newpc, newpc, {mispredict, btbHit});
+   mux4to1 predPC(pcPred, stallpc, nextPCGuess, newpc, newpc, {mispredict, btbPred});
    
    /*register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
                                        ~internal_halt, rst_b);*/
@@ -149,13 +150,18 @@ module mips_core(/*AUTOARG*/
    always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
-       $display ( "=== Simulation Cycle %d ===", $time );
+       //$display ( "=== Simulation Cycle %d ===", $time );
+       $display("cycles: %d, fetch: %d, ex: %d", cyclesCount, instFetchedCount, instExCount);
+       $display("brExfwd: %d, brExbwd: %d, brNPfwd: %d, brNPbwd: %d", brExCount_fwd, brExCount_bwd, brNoPred_fwd, brNoPred_bwd);
+       $display("brTCfwd: %d, brTCbwd: %d, brNTfwd: %d, brNTbwd: %d", brTakenCount_fwd, brTakenCount_bwd, brNotTakenCorrect_fwd, brNotTakenCorrect_bwd);
+       $display("jExfwd: %d, jExbwd: %d, jNPfwd: %d, jNPbwd: %d", jExCount_fwd, jExCount_bwd, jNoPred_fwd, jNoPred_bwd);
+       $display("jECfwd: %d, jECbwd: %d", jExCorrect_fwd, jExCorrect_bwd);
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    pc_ID, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
       // $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
        //$display ("HI: %x, LO: %x, hi_en_EX: %x, hi_en_WB:%x, lo_en_EX: %x, lo_en_WB: %x", hi_out, lo_out,hi_en_EX,hi_en_WB,lo_en_EX, lo_en_WB);
        //$display ("HIWB: %x, LOWB: %x", HIout_WB, LOout_WB);
-       $display ("F: pc: %x, inst_addr: %x, newpc: %x, pcPred: %d,  nextPCGuess:%x, btbHit: %b, mispred: %b", pc, inst_addr, newpc, pcPred, nextPCGuess, btbHit, mispredict);
+       $display ("F: pc: %x, inst_addr: %x, newpc: %x, pcPred: %d,  nextPCGuess:%x, btbPred: %b, mispred: %b", pc, inst_addr, newpc, pcPred, nextPCGuess, btbPred, mispredict);
        $display ("D: IDen: %x, wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x, rs_data: %x", IDen, wr_regNum, wr_data, dcd_rs, dcd_rt, imm, mem_en, rs_data);
        //$display ("   fwd_rs_en: %x, fwd_rt_en: %x", fwd_rs_sel, fwd_rt_sel);
        $display ("E: EXen, %x, wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, rs_data_EX: %x, ctrl_we_EX: %x, mem_EX: %x", EXen, wr_reg_EX, alu_in1, alu_in2, alu__out, rs_data_EX, ctrl_we_EX, mem_write_en_EX);
@@ -168,10 +174,12 @@ module mips_core(/*AUTOARG*/
       // $display ("stall: %x, CDen: %x", stall, CDen);
        //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
-       $display ("EXenFlush: %x, EXen:%x, f:%x", EXenFlush,EXen,f);
+       //$display ("EXenFlush: %x, EXen:%x, f:%x", EXenFlush,EXen,f);
+       $display ("btbtag: %x, btbhist: %b, btbaddr: %x, statenew: %b", tagPC, history, nextPCGuess, state_new);
        $display ("branchTrue: %b, pcMuxSel_EX: %b, pcMuxSelFinal: %b, brcond_EX: %b", branchTrue, pcMuxSel_EX, pcMuxSelFinal, brcond_EX);
-       $display ("j_target: %x, br_target: %x, pc_EX: %x, imm_EX: %x", j_target, br_target, pc_EX, imm_EX);
-       $display ("jLink_en_WB: %x, wr_data: %x, wr_reg: %x", jLink_en_WB, wr_data, wr_reg);
+       $display ("mispredict: %b", mispredict);
+       //$display ("j_target: %x, br_target: %x, pc_EX: %x, imm_EX: %x", j_target, br_target, pc_EX, imm_EX);
+       //$display ("jLink_en_WB: %x, wr_data: %x, wr_reg: %x", jLink_en_WB, wr_data, wr_reg);
        $display ("");
      end
    end
@@ -269,8 +277,10 @@ module mips_core(/*AUTOARG*/
    //Decode (ID) stage registers and wirings
    wire IDen; //enable for decode stage
    wire [31:0] pc_ID;
+   wire btbHit_ID;
    register pcID(pc_ID, pc, clk, IDen, rst_b);
-   register irD(inst_ID, inst, clk, IDen, rst_b);
+   register irID(inst_ID, inst, clk, IDen, rst_b);
+   register #(1) bhitID(btbHit_ID, btbHit, clk, IDen, rst_b);
 
    //Execute (EX) stage registers
    // wire EXen; //enable for execute stage
@@ -281,6 +291,7 @@ module mips_core(/*AUTOARG*/
    wire [4:0] wr_reg_EX;
    wire [1:0] fwd_rs_sel_EX, fwd_rt_sel_EX;
    wire [25:0] dcd_target_EX;
+   wire btbHit_EX;
    register pcEX(pc_EX, pc_ID, clk, EXen, rst_b);
    register rsEX(rs_data_EX, rs_data, clk, EXen, rst_b);
    register rtEX(rt_data_EX, rt_data, clk, EXen, rst_b);
@@ -289,6 +300,7 @@ module mips_core(/*AUTOARG*/
    register #(2) fwdrsEX(fwd_rs_sel_EX, fwd_rs_sel, clk, EXen, rst_b);
    register #(2) fwdrtEX(fwd_rt_sel_EX, fwd_rt_sel, clk, EXen, rst_b);
    register #(26) targetEX(dcd_target_EX, dcd_target, clk, EXen, rst_b);
+   register #(1) bhitEX(btbHit_EX, btbHit_ID, clk, EXen, rst_b);
 
    wire ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX;
    wire alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, load_stall_EX; 
@@ -434,14 +446,16 @@ module mips_core(/*AUTOARG*/
    //wire[31:0] nextPCGuess_ID, nextPCGuess_EX;
 
    //btb for branch prediction
-   btbsram btb(btb_rd_data,pc[8:2], pc_EX[8:2], {pc_EX[31:2],state_new,br_target[31:2]}, btb_wr_we, clk, rst_b);
-   saturationCounter satCounter(state_new, history_EX, pcMuxSel_EX!=2'b00, clk, rst_b);
+   wire [31:0] pred;
+   mux4to1 predMux(pred, 32'b0, br_target, rs_fwd, j_target, pcMuxSel_EX);
+   btbsram btb(btb_rd_data,pc[8:2], pc_EX[8:2], {pc_EX[31:2], state_new, pred[31:2]}, btb_wr_we, clk, rst_b);
+   saturationCounter satCounter(state_new, history_EX, pcMuxSelFinal!=2'b00, clk, rst_b);
    assign tagPC = {btb_rd_data[61:32],2'b00};
    assign history = btb_rd_data[31:30];
    assign nextPCGuess = {btb_rd_data[29:0],2'b00};
-   //assign btbpred = (tagPC[31:2]==pc_ID[31:2] && history[1]) ? 1'b1 : 1'b0;
    assign btb_wr_we = (pcMuxSel_EX!=2'b00) ? 1'b1 : 1'b0;
-   assign btbHit = (pc[31:2]==tagPC[31:2]) ? 1'b1 : 1'b0;
+   assign btbPred = (pc[31:2]==tagPC[31:2] && history[1]) ? 1'b1 : 1'b0;
+   assign btbHit = pc[31:2]==tagPC[31:2] ? 1'b1 : 1'b0;
 
    //registers to propogate the history state value
    register #(2,0) histID(history_ID, history, clk, IDen, rst_b);
@@ -491,7 +505,39 @@ module mips_core(/*AUTOARG*/
    register #(32, 0) CauseReg(cause,
                               {25'b0, cause_code, 2'b0}, 
                               clk, load_ex_regs, rst_b);
-   register #(32, 0) BadVAddrReg(bad_v_addr, pc, clk, load_bva, rst_b);   
+   register #(32, 0) BadVAddrReg(bad_v_addr, pc, clk, load_bva, rst_b);
+
+   /* Counters */
+   wire [31:0] cyclesCount, instFetchedCount, instExCount;
+   wire [31:0] brExCount_fwd, brExCount_bwd, brNoPred_fwd, brNoPred_bwd;
+   wire [31:0] brTakenCount_fwd, brTakenCount_bwd;
+   wire [31:0] brTakenCorrect_fwd, brTakenCorrect_bwd;
+   wire [31:0] brNotTakenCorrect_fwd, brNotTaken_bwd;
+   wire [31:0] jExCount_fwd, jExCount_bwd, jNoPred_fwd, jNoPred_bwd;
+   wire [31:0] jExCorrect_fwd, jExCorrect_bwd;
+   wire forward, back;
+   assign forward = (pc_EX < newpc) ? 1'b1 : 1'b0;
+   assign back = (pc_EX > newpc) ? 1'b1 : 1'b0;
+   
+   counter cycles(cyclesCount, 1, clk, rst_b);
+   counter instFetched(instFetchedCount, IFen, clk, rst_b);
+   counter instEx(instExCount, EXen, clk, rst_b);
+   counter brExfwd(brExCount_fwd, pcMuxSel_EX==2'b01 && forward, clk, rst_b);
+   counter brExbwd(brExCount_bwd, pcMuxSel_EX==2'b01 && back, clk, rst_b);
+   counter brNPfwd(brNoPred_fwd, pcMuxSel_EX==2'b01 && !btbHit_EX && forward, clk, rst_b);
+   counter brNPbwd(brNoPred_bwd, pcMuxSel_EX==2'b01 && !btbHit_EX && back, clk, rst_b);
+   counter brTakenfwd(brTakenCount_fwd, pcMuxSelFinal==2'b01 && btbHit_EX && forward, clk, rst_b);
+   counter brTakenbwd(brTakenCount_bwd, pcMuxSelFinal==2'b01 && btbHit_EX && back, clk, rst_b);
+   counter brTCfwd(brTakenCorrect_fwd, pcMuxSelFinal==2'b01 && ~mispredict && btbHit_EX && forward, clk, rst_b);
+   counter brTCbwd(brTakenCorrect_bwd, pcMuxSelFinal==2'b01 && ~mispredict && btbHit_EX && back, clk, rst_b);
+   counter brNTCfwd(brNotTakenCorrect_fwd, pcMuxSel_EX==2'b01 && pcMuxSelFinal==2'b00 && ~mispredict && btbHit_EX && forward, clk, rst_b);
+   counter brNTCbwd(brNotTakenCorrect_bwd, pcMuxSel_EX==2'b01 && pcMuxSelFinal==2'b00 && ~mispredict && btbHit_EX && back, clk, rst_b);
+   counter jExfwd(jExCount_fwd, pcMuxSelFinal[1] && forward, clk, rst_b);
+   counter jExbwd(jExCount_bwd, pcMuxSelFinal[1] && back, clk, rst_b);
+   counter jNPfwd(jNoPred_fwd, pcMuxSelFinal[1] && !btbHit_EX && forward, clk, rst_b);
+   counter jNPbwd(jNoPred_bwd, pcMuxSelFinal[1] && !btbHit_EX && back, clk, rst_b);
+   counter jECfwd(jExCorrect_fwd, pcMuxSelFinal[1] && ~mispredict && btbHit_EX && forward, clk, rst_b);
+   counter jECbwd(jExCorrect_bwd, pcMuxSelFinal[1] && ~mispredict && btbHit_EX && back, clk, rst_b);
 
 endmodule // mips_core
 
@@ -552,7 +598,6 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
               end
             `BR_BGTZ:
               begin
-                //$display("alu__op1: %d, alu__op2:%d", alu__op1, alu__op2);
                 if ($signed(alu__op1)>$signed(0))
                   branchTrue = 1'b1;
               end
@@ -823,11 +868,15 @@ endmodule
 //// flushMod: module for flushing if branch
 ////
 //// pcMuxSelFinal (input) - determines if there is a branch
-//// br_target (input) - branch target calculated in EX stage
 //// pc_ID (input) - address of instruction in ID stage
+//// pc_EX (input) - address of instruction in EX stage
+//// br_target (input) - branch target calculated in EX stage
+//// rs_fwd (input) - JR target
+//// j_target (input) - jump target 
 //// flush (input) - signal that indicates an instruction is currently being stalled
 //// EXen (output) - register enable bits at the EX stage
 //// CDFlushen  (output) - enables countdown register
+//// mispredict (output) - signals when a misprediction is detected
 //// CDAmt (output) - number of clock cycles to stall
 ////
 module flushMod(
@@ -843,11 +892,9 @@ module flushMod(
     CDFlushen = 1'b0;
     mispredict = 1'b0;
     if (flush == 1'b1) begin
-      $display("flushmod1");
       EXen = 1'b0;
     end
     else if(pcMuxSel_EX!=2'b00 && flush==1'b0 && ((pcMuxSelFinal==2'b00 && pc_ID!=pc_EX+4) || (pcMuxSelFinal==2'b01 && pc_ID!=br_target) || (pcMuxSelFinal==2'b10 && pc_ID!=rs_fwd) || (pcMuxSelFinal==2'b11 && pc_ID!=j_target))) begin
-      $display("flushmod2");
       CDFlushen = 1'b1;
       EXen = 1'b0;
       CDFlushAmt = 1'd1;
@@ -888,7 +935,6 @@ module stallDetector(
     end
     else if(stall == 1'b0 && load_stall_EX == 1'b1) begin
       if ((ctrl_we_EX != 0 || mem_write_en_EX != 0) && (((regdst == 1) && (dcd_rt != 0) && (dcd_rt == wr_reg_EX)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_EX)))) begin
-        $display("we_EX: %x, mem_EX: %x, regdst: %x, dcd_rt: %x, dcd_rs: %x, wr_reg_EX: %x", ctrl_we_EX, mem_write_en_EX, regdst, dcd_rt, dcd_rs, wr_reg_EX);
         CDen = 1'b1;
         CDAmt = 3'd0;
         IFen = 1'b0;
@@ -926,6 +972,29 @@ module countdownReg #(parameter reset_value = 0) (
     end
     else if (CDAmtq != 3'd0) begin
       CDAmtq <= CDAmtq-1;
+    end
+  end
+
+endmodule
+
+////
+//// counter: keep track of counts
+////
+//// en (input)     - enable bit for count
+//// clk (input)    - Clock (positive edge-sensitive)
+//// reset (input)  - System reset
+//// count (output) - current count
+////
+module counter #(parameter reset_value = 0) (
+  output logic [31:0] count,
+  input logic en, clk, rst_b);
+
+  always_ff @(posedge clk or negedge rst_b) begin
+    if (~rst_b) begin
+      count <= reset_value;
+    end
+    else if (en) begin
+      count <= count + 1;
     end
   end
 

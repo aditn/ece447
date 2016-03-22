@@ -1,6 +1,5 @@
         la  $sp, stack_start
-	addi $a0, $zero, 0x01a	# n
-	#addi $v0, $zero, 10
+	addi $a0, $zero, 0x001a	# n
 	jal fibr
         addiu $v1, $v0, 0 
 	addiu $v0, $zero, 10
@@ -10,8 +9,6 @@
 fibr:
 	addi $sp, $sp, -12  	# adjust stack for 3 items
 	sw   $ra, 4($sp)      	# save return address
-	#add  $t0, $zero, $ra
-	#beq  $a0, $zero, L2
 	sw   $a0, 0($sp)      	# save argument
 	slti $t0, $a0, 2      	# test for n < 2
 	beq  $t0, $zero, L1
@@ -35,8 +32,6 @@ L1:	addi $a0, $a0, -1     	# arg=n-1
 	lw   $ra, 4($sp)      	# restore return address
 	addi $sp, $sp, 12      	# pop 3 items from stack
 	jr   $ra              	# and return
-
-#L2: syscall
 
 
 	# KLUDGE ALERT
