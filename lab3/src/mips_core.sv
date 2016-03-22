@@ -150,7 +150,7 @@ module mips_core(/*AUTOARG*/
 
    // synthesis translate_off
    
-   always @(posedge clk) begin
+   /*always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
        $display ( "=== Simulation Cycle %d ===", $time );
@@ -158,7 +158,7 @@ module mips_core(/*AUTOARG*/
        $display("brExfwd: %d, brExbwd: %d, brNPfwd: %d, brNPbwd: %d", brExCount_fwd, brExCount_bwd, brNoPred_fwd, brNoPred_bwd);
        $display("brTCfwd: %d, brTCbwd: %d, brNTfwd: %d, brNTbwd: %d", brTakenCount_fwd, brTakenCount_bwd, brNotTakenCorrect_fwd, brNotTakenCorrect_bwd);
        $display("jExfwd: %d, jExbwd: %d, jNPfwd: %d, jNPbwd: %d", jExCount_fwd, jExCount_bwd, jNoPred_fwd, jNoPred_bwd);
-       $display("jECfwd: %d, jECbwd: %d", jExCorrect_fwd, jExCorrect_bwd);*/
+       $display("jECfwd: %d, jECbwd: %d", jExCorrect_fwd, jExCorrect_bwd);
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    pc_ID, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
       // $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
@@ -187,7 +187,7 @@ module mips_core(/*AUTOARG*/
        $display ("pcID: %x, pcEX: %x, flush: %b", pc_ID, pc_EX, flush);
        $display ("");
      end
-   end
+   end*/
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -442,7 +442,9 @@ module mips_core(/*AUTOARG*/
    storer storer(store_data, mem_write_en, rt_data_MEM, store_sel_MEM, alu__out_MEM, mem_write_en_MEM); //operates on data to write to memory
 
    //Mux for next state PC
-   mux4to1 pcMux(newpc, stallpc, br_target, rs_fwd, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
+   wire [31:0] stallpc_EX;
+   mux2to1 stallpcEX(stallpc_EX, pc_EX, pc_EX+4, IFen);
+   mux4to1 pcMux(newpc, stallpc_EX, br_target, rs_fwd, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
    adder brtarget(br_target, pc_EX+4, (imm_EX << 2), 1'b0); //get branch target
    concat conc(j_target, pc_EX, dcd_target_EX); //get jump target
    pcSelector choosePcMuxSel(pcMuxSelFinal, pcMuxSel_EX, branchTrue); //chooses PC on whether branch condition is met
@@ -662,7 +664,7 @@ module saturationCounter(
   input logic isBranch, clk, rst_b);
 
   always_comb begin
-    $display("q: %x, d:%x, isBranch: %b", q, d, isBranch);
+    //$display("q: %x, d:%x, isBranch: %b", q, d, isBranch);
     if (~rst_b)
       q = 2'b11;
     else if (isBranch) begin
