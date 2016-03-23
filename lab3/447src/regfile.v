@@ -77,7 +77,6 @@ module regfile_forward (/*AUTOARG*/
 		end
 	end
 	// synthesis translate_on
-
 endmodule
 
 //
