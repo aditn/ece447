@@ -46,10 +46,6 @@ module regfile_forward (/*AUTOARG*/
 	//assign cnew = 1'b0;
 
 	always @(posedge clk or negedge rst_b) begin 
-		for(i = 0; i < 32; i = i+1) begin
-				$display("R%d\t= 0x%8x\t( %0d )", i, mem[i], mem[i]);
-				$fdisplay(fd, "R%d\t= 0x%8h\t( %0d )", i, mem[i], mem[i]); 
-			end
 		if (!rst_b) begin
 			`include "regfile_init.vh"
 		end else if (rd_we && (rd_num != 0)) begin 
@@ -84,7 +80,6 @@ module regfile_forward (/*AUTOARG*/
 		end
 	end
 	// synthesis translate_on
-
 endmodule
 
 //

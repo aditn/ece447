@@ -1,5 +1,5 @@
         la  $sp, stack_start
-        addi $a0, $zero, 0x001  # n
+        addi $a0, $zero, 0x004  # n
 #add $t9, $sp, $zero
         jal sum
         addiu $v1, $v0, 0 
@@ -11,9 +11,9 @@ sum:
         sw   $ra, 4($sp)        # save return address
         sw   $a0, 0($sp)        # save argument
         slti $t0, $a0, 2        # test for n < 2
-        beq  $t0, $zero, base
+        bne  $t0, $zero, base
         addi $a0, $a0, -1
-        jal  sum
+        jal  sum 
         lw   $a0, 0($sp)
         add  $v0, $v0, $a0
         j    ret

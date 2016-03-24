@@ -109,7 +109,8 @@ module mips_core(/*AUTOARG*/
 
    wire[31:0] tagPC, nextPCGuess, pcCorr, pcPred;
    wire[1:0] state_new, history;
-   wire btb_wr_we, btbPred, mispredict, EXen,IFen;
+
+   wire btb_wr_we, btbPred, mispredict, EXen, IFen;
    wire btbHit;
 
    // PC Management
@@ -117,7 +118,7 @@ module mips_core(/*AUTOARG*/
    register #(32, text_start) PCReg(pc, pcCorr, clk, ~internal_halt, rst_b);
    //mux2to1 predPCnext(pcNext, newpc, pcPred, EXen);
    mux2to1 predPC1(pcCorr, pcPred, newpc, mispredict);
-   mux2to1 predPC2(pcPred, stallpc, nextPCGuess, btbPred&&IFen);
+   mux2to1 predPC2(pcPred, stallpc, nextPCGuess, btbPred && IFen);
    //mux4to1 predPC(pcPred, stallpc, nextPCGuess, newpc, newpc, {mispredict, btbPred});
    
    /*register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
@@ -154,41 +155,41 @@ module mips_core(/*AUTOARG*/
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
       //$display("cyclesCount:%d", cyclesCount);
-       $display ( "=== Simulation Cycle %d ===", $time );
+       //$display ( "=== Simulation Cycle %d ===", $time );
 
-       //$display("cycles: %d, fetch: %d, ex: %d", cyclesCount, instFetchedCount, instExCount);
+       $display("cycles: %d, fetch: %d, ex: %d", cyclesCount, instFetchedCount, instExCount);
        //$display("brExfwd: %d, brExbwd: %d, brNPfwd: %d, brNPbwd: %d", brExCount_fwd, brExCount_bwd, brNoPred_fwd, brNoPred_bwd);
        //$display("brTCfwd: %d, brTCbwd: %d, brNTfwd: %d, brNTbwd: %d", brTakenCount_fwd, brTakenCount_bwd, brNotTakenCorrect_fwd, brNotTakenCorrect_bwd);
        //$display("jExfwd: %d, jExbwd: %d, jNPfwd: %d, jNPbwd: %d", jExCount_fwd, jExCount_bwd, jNoPred_fwd, jNoPred_bwd);
        //$display("jECfwd: %d, jECbwd: %d", jExCorrect_fwd, jExCorrect_bwd);
-       $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
-                   pc_ID, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
-       $display ("rt_data_MEM:%x", rt_data_MEM);
+       //$display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
+       //            pc_ID, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
+       //$display ("rt_data_MEM:%x", rt_data_MEM);
        //$display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
        //$display ("HI: %x, LO: %x, hi_en_EX: %x, hi_en_WB:%x, lo_en_EX: %x, lo_en_WB: %x", hi_out, lo_out,hi_en_EX,hi_en_WB,lo_en_EX, lo_en_WB);
        //$display ("HIWB: %x, LOWB: %x", HIout_WB, LOout_WB);
        //$display ("F: pc: %x, inst_addr: %x, newpc: %x, pcPred: %d,  nextPCGuess:%x, btbPred: %b, mispred: %b", pc, inst_addr, newpc, pcPred, nextPCGuess, btbPred, mispredict);
-       //$display ("D: IDen: %x, wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x, rs_data: %x", IDen, wr_regNum, wr_data, dcd_rs, dcd_rt, imm, mem_en, rs_data);
+       //$display ("D: IDen: %x, wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x, rs_data: %x, rt_data: %x", IDen, wr_regNum, wr_data, dcd_rs, dcd_rt, imm, mem_en, rs_data, rt_data);
        //$display ("   fwd_rs_en: %x, fwd_rt_en: %x", fwd_rs_sel, fwd_rt_sel);
-       //$display ("E: EXen, %x, wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, rs_data_EX: %x, ctrl_we_EX: %x, mem_EX: %x", EXen, wr_reg_EX, alu_in1, alu_in2, alu__out, rs_data_EX, ctrl_we_EX, mem_write_en_EX);
-       //$display("we_EX: %x, mem_EX: %x, regdst: %x, dcd_rt: %x, dcd_rs: %x, wr_reg_EX: %x", ctrl_we_EX, mem_write_en_EX, regdst, dcd_rt, dcd_rs, wr_reg_EX);
-       //$display ("M: wr_reg_MEM: %x, alu__outMEM: %x, mem_addr: %x, ctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, mem_addr, ctrl_we_MEM, mem_write_en_MEM);
-       $display ("   alu__out_MEM: %h, load_data: %x, load_st_EX: %x, mem_data_out: %x, store_data: %h, mem_write_en: %b", alu__out_MEM, load_data, load_stall_EX, mem_data_out, store_data, mem_write_en);
-       //$display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", wr_reg_WB, alu__out_WB, ctrl_we_WB, mem_write_en_WB);
+       //$display ("E: EXen, %x, wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, rs_fwd: %x, rt_fwd: %x, rtfwdsel: %x, ctrl_we_EX: %x, mem_EX: %x", EXen, wr_reg_EX, alu_in1, alu_in2, alu__out, rs_fwd, rt_fwd, fwd_rt_sel_EX, ctrl_we_EX, mem_write_en_EX);
+      //$display("we_EX: %x, mem_EX: %x, regdst: %x, dcd_rt: %x, dcd_rs: %x, wr_reg_EX: %x", ctrl_we_EX, mem_write_en_EX, regdst, dcd_rt, dcd_rs, wr_reg_EX);
+       //$display ("M: wr_reg_MEM: %x, alu__outMEM: %x, mem_addr: %x, mem_data_in: %x, mem_data_out: %x, memctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, {mem_addr, 2'b00}, mem_data_in, mem_data_out, ctrl_we_MEM, mem_write_en_MEM);
+      // $display ("   mem_addr: %h, load_data: %x, load_st_EX: %x, mem_data_out: %x, store_data: %h, mem_write_en: %b", mem_addr, load_data, load_stall_EX, mem_data_out, store_data, mem_write_en);
+       //$display ("W: wr_reg: %x, wr_data: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", wr_reg, wr_data, alu__out_WB, ctrl_we_WB, mem_write_en_WB);
        //$display ("sys: %x, rt_data: %x", ctrl_Sys, rt_data);
        //$display ("sys_WB: %x, rt_data: %x", ctrl_Sys_WB, rt_data_WB);
        //$display ("stall: %x, CDen: %x", stall, CDen);
        //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
-       $display ("EXenFlush: %x, EXen:%x,", EXenFlush,EXen);
-       $display ("btbtag: %x, btbhist: %b, btbaddr: %x", tagPC, history, nextPCGuess);
-       $display ("btb_wr_we: %x, state_new: %b, history_EX: %b, btbHit_EX: %b", btb_wr_we, state_new, history_EX, btbHit_EX);
-       $display ("branchTrue: %b, pcMuxSel_EX: %b, pcMuxSelFinal: %b, brcond_EX: %b", branchTrue, pcMuxSel_EX, pcMuxSelFinal, brcond_EX);
-       $display ("mispredict: %b", mispredict);
-       $display ("j_target: %x, br_target: %x, pc_EX: %x, imm_EX: %x", j_target, br_target, pc_EX, imm_EX);
+       //$display ("EXenFlush: %x, EXen:%x,", EXenFlush,EXen);
+       //$display ("btbtag: %x, btbhist: %b, btbaddr: %x", tagPC, history, nextPCGuess);
+       //$display ("btb_wr_we: %x, state_new: %b, history_EX: %b, btbHit_EX: %b", btb_wr_we, state_new, history_EX, btbHit_EX);
+       //$display ("branchTrue: %b, pcMuxSel_EX: %b, pcMuxSelFinal: %b, brcond_EX: %b", branchTrue, pcMuxSel_EX, pcMuxSelFinal, brcond_EX);
+       //$display ("mispredict: %b", mispredict);
+       //$display ("j_target: %x, br_target: %x, pc_EX: %x, imm_EX: %x", j_target, br_target, pc_EX, imm_EX);
        //$display ("jLink_en_WB: %x, wr_data: %x, wr_reg: %x", jLink_en_WB, wr_data, wr_reg);
-       $display ("pcID: %x, pcEX: %x, flush: %b", pc_ID, pc_EX, flush);
-       $display ("");
+       //$display ("pcID: %x, pcEX: %x, flush: %b", pc_ID, pc_EX, flush);
+       //$display ("");
      end
    end
    // synthesis translate_on
@@ -285,6 +286,7 @@ module mips_core(/*AUTOARG*/
    //Decode (ID) stage registers and wirings
    wire IDen; //enable for decode stage
    wire [31:0] pc_ID;
+   wire pcLinkSel;
    wire btbHit_ID;
    register pcID(pc_ID, pc, clk, IDen, rst_b);
    register irID(inst_ID, inst, clk, IDen, rst_b);
@@ -293,6 +295,7 @@ module mips_core(/*AUTOARG*/
    //Execute (EX) stage registers
    // wire EXen; //enable for execute stage
    wire [31:0] pc_EX;
+   wire pcLinkSel_EX;
    wire [31:0] rs_data_EX;
    wire [31:0] rt_data_EX;
    wire [31:0] imm_EX;
@@ -309,6 +312,7 @@ module mips_core(/*AUTOARG*/
    register #(2) fwdrtEX(fwd_rt_sel_EX, fwd_rt_sel, clk, EXen, rst_b);
    register #(26) targetEX(dcd_target_EX, dcd_target, clk, EXen, rst_b);
    register #(1) bhitEX(btbHit_EX, btbHit_ID, clk, EXen, rst_b);
+   register pcLinkSelEX(pcLinkSel_EX, pcLinkSel, clk, EXen, rst_b);
 
    wire ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX;
    wire alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, load_stall_EX; 
@@ -327,6 +331,7 @@ module mips_core(/*AUTOARG*/
    //Memory (MEM) stage registers
    wire MEMen; //enable for memory stage
    wire [31:0] pc_MEM;
+   wire [31:0] pcLink_MEM;
    wire [31:0] alu__out_MEM;
    wire [31:0] rt_data_MEM;
    wire [31:0] imm_MEM;
@@ -337,6 +342,7 @@ module mips_core(/*AUTOARG*/
    register rtMEM(rt_data_MEM, rt_fwd, clk, MEMen, rst_b);
    register iMEM(imm_MEM, imm_EX, clk, MEMen, rst_b);
    register #(5) wrMEM(wr_reg_MEM, wr_reg_EX, clk, MEMen, rst_b);
+   register pcLinkMEM(pcLink_MEM, pc_EX+4, clk, MEMen, rst_b);
 
    wire ctrl_we_MEM, ctrl_Sys_MEM, ctrl_RI_MEM, regdst_MEM, jLink_en_MEM;
    wire alusrc1_MEM, alusrc2_MEM, se_MEM, hi_en_MEM, lo_en_MEM, load_stall_MEM;
@@ -355,6 +361,7 @@ module mips_core(/*AUTOARG*/
    //Writeback stage registers
    wire WBen; //enable for WB stage
    wire [31:0] pc_WB;
+   wire [31:0] pcLink_WB;
    wire [31:0] HIout_WB, LOout_WB, load_data_WB, alu__out_WB;
    wire [31:0] rt_data_WB;
    wire [4:0] wr_reg_WB;
@@ -366,6 +373,7 @@ module mips_core(/*AUTOARG*/
    register LOwb(LOout_WB, lo_out, clk, WBen, rst_b); //holds LO val in WB register (may need to have its own en)
    register rtWB(rt_data_WB, rt_data_MEM, clk, WBen, rst_b);
    register #(5) wrWB(wr_reg_WB, wr_reg_MEM, clk, WBen, rst_b);
+   register pcLinkWB(pcLink_WB, pcLink_MEM, clk, WBen, rst_b);
 
    wire ctrl_we_WB, ctrl_Sys_WB, ctrl_RI_WB, regdst_WB, jLink_en_WB;
    wire alusrc1_WB, alusrc2_WB, se_WB, hi_en_WB, lo_en_WB, load_stall_WB;
@@ -383,7 +391,8 @@ module mips_core(/*AUTOARG*/
 
    //check for RAW hazard and Stall
    
-   wire stall, CDen, EXenStall;
+   //wire stall, 
+   wire CDen, EXenStall;
    wire [2:0] CDAmt;
    stallDetector sD(wr_reg_EX,wr_reg_MEM,wr_reg_WB,rt_regNum,dcd_rs,
                     mem_write_en_EX, mem_write_en_MEM, mem_write_en,
@@ -424,11 +433,14 @@ module mips_core(/*AUTOARG*/
    mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se); //Zero extend or sign extend immediate
 
    //rs and rt forwarding
-   mux4to1 fwdrs(rs_fwd, rs_data_EX, alu__out_MEM, wr_dataMem, , fwd_rs_sel_EX);
-   mux4to1 fwdrt(rt_fwd, rt_data_EX, alu__out_MEM, wr_dataMem, , fwd_rt_sel_EX);
+   wire [31:0] pcfwd;
+   mux2to1 fwdpc(pcfwd, pcLink_MEM, pcLink_WB, pcLinkSel_EX);
+   mux4to1 fwdrs(rs_fwd, rs_data_EX, alu__out_MEM, wr_dataMem, pcfwd, fwd_rs_sel_EX);
+   mux4to1 fwdrt(rt_fwd, rt_data_EX, alu__out_MEM, wr_dataMem, pcfwd, fwd_rt_sel_EX);
    forwardData fwd(wr_reg_EX, wr_reg_MEM, wr_reg_WB, rt_regNum, dcd_rs,
                    mem_write_en_EX, mem_write_en_MEM, mem_write_en,
-                   ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB,
+                   ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, jLink_en_EX, jLink_en_MEM,
+                   pcLinkSel,
                    fwd_rs_sel, fwd_rt_sel);
 
    //Wirings to memory module
@@ -663,7 +675,6 @@ module saturationCounter(
   input logic isBranch, clk, rst_b);
 
   always_comb begin
-    //$display("q: %x, d:%x, isBranch: %b", q, d, isBranch);
     if (~rst_b)
       q = 2'b11;
     else if (isBranch) begin
@@ -844,32 +855,57 @@ endmodule
 //// dcd_rs, dcd_rt (inputs) - the registers the next instruction is reading
 //// mem_write_en_EX, mem_write_en_MEM, mem_write_en (inputs) - the memory write enable bits at different stages
 //// ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB (inputs) - register write enable bits at different stages
+//// pcLinkSel (output) - selects which stage to forward pcLink from
 //// rsfwd, rtfwd (output) - selects what data to forward to rs and rt data outputs
 ////
 
 module forwardData(
   input logic [4:0] wr_reg_EX, wr_reg_MEM, wr_reg_WB, dcd_rt, dcd_rs,
   input logic [3:0] mem_write_en_EX, mem_write_en_MEM, mem_write_en,
-  input logic ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB,
+  input logic ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, jLink_en_EX, jLink_en_MEM,
+  output logic pcLinkSel,
   output logic [1:0] rsfwd, rtfwd);
 
   always_comb begin
     rsfwd = 2'b0;
     rtfwd = 2'b0;
+    pcLinkSel = 1'b0;
     if (ctrl_we_MEM != 0) begin
-      if ((dcd_rs != 0) && (dcd_rs == wr_reg_MEM)) begin
-        rsfwd = 2'b10;
+      if (dcd_rs != 0) begin
+        if (dcd_rs == wr_reg_MEM) begin
+          rsfwd = 2'b10;
+        end
+        if (jLink_en_MEM && dcd_rs == 5'd31) begin
+          rsfwd = 2'b11;
+          pcLinkSel = 1'b1;
+        end
       end
-      if ((dcd_rt != 0) && (dcd_rt == wr_reg_MEM)) begin
-        rtfwd = 2'b10;
+      if (dcd_rt != 0) begin
+        if (dcd_rt == wr_reg_MEM) begin
+          rtfwd = 2'b10;
+        end
+        if (jLink_en_MEM && dcd_rt == 5'd31) begin
+          rtfwd = 2'b11;
+          pcLinkSel = 1'b1;
+        end
       end
     end
     if (ctrl_we_EX != 0) begin
-      if ((dcd_rs != 0) && (dcd_rs == wr_reg_EX)) begin
-        rsfwd = 2'b01;
+      if (dcd_rs != 0) begin
+        if (dcd_rs == wr_reg_EX) begin
+          rsfwd = 2'b01;
+        end
+        if (jLink_en_EX && dcd_rs == 5'd31) begin
+          rsfwd = 2'b11;
+        end
       end
-      if ((dcd_rt != 0) && (dcd_rt == wr_reg_EX)) begin
-        rtfwd = 2'b01;
+      if (dcd_rt != 0) begin
+        if (dcd_rt == wr_reg_EX) begin
+          rtfwd = 2'b01;
+        end
+        if (jLink_en_EX && dcd_rt == 5'd31) begin
+          rtfwd = 2'b11;
+        end
       end
     end
 
