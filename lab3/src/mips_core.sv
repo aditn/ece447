@@ -151,7 +151,7 @@ module mips_core(/*AUTOARG*/
 
    // synthesis translate_off
    
-   always @(posedge clk) begin
+   /*always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
       //$display("cyclesCount:%d", cyclesCount);
@@ -191,7 +191,7 @@ module mips_core(/*AUTOARG*/
        //$display ("pcID: %x, pcEX: %x, flush: %b", pc_ID, pc_EX, flush);
        //$display ("");
      end
-   end
+   end*/
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -312,7 +312,7 @@ module mips_core(/*AUTOARG*/
    register #(2) fwdrtEX(fwd_rt_sel_EX, fwd_rt_sel, clk, EXen, rst_b);
    register #(26) targetEX(dcd_target_EX, dcd_target, clk, EXen, rst_b);
    register #(1) bhitEX(btbHit_EX, btbHit_ID, clk, EXen, rst_b);
-   register pcLinkSelEX(pcLinkSel_EX, pcLinkSel, clk, EXen, rst_b);
+   register #(1)pcLinkSelEX(pcLinkSel_EX, pcLinkSel, clk, EXen, rst_b);
 
    wire ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX;
    wire alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, load_stall_EX; 

@@ -38,6 +38,6 @@ The minimum clock cycle is 9.70 ns. The minimum clock cycles is of a similar
 time to the previous lab where forwarding was incorporated.
 
 We spent about 3 hrs on planning the design, 8 hrs capturing the design, 4
-hr for testing the design, 25 hrs for debugging, and 2 hours for analyzing
+hr for testing the design, 30 hrs for debugging, and 2 hours for analyzing
 performance.
 
