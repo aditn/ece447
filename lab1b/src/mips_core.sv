@@ -134,10 +134,11 @@ module mips_core(/*AUTOARG*/
    assign        dcd_target = inst[25:0];     // target field
    assign        dcd_code = inst[25:6];       // Breakpoint code
 
-   /*// synthesis translate_off
+   // synthesis translate_off
    always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
+      /*
        $display ( "=== Simulation Cycle %d ===", $time );
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    pc, inst, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
@@ -148,9 +149,10 @@ module mips_core(/*AUTOARG*/
        $display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
        $display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", branchTrue, pcMuxSel, pcMuxSelFinal);
        $display ("br_target: %x", br_target);
-       $display ("");
+       $display ("");*/
+       $display ("cyclesCount:%d", cyclesCount);
      end
-   end*/
+   end
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -303,7 +305,37 @@ module mips_core(/*AUTOARG*/
    mux2to1 dataToReg(wr_data, wr_dataMem, pc+4, jLink_en); 
    mux2to1 #(31)regNumber(wr_reg, wr_regNum, 5'd31, jLink_en);
 
+
+   /*Cycle Counter*/
+   wire [31:0] cyclesCount;
+   counter cycles(cyclesCount, 1'b1, clk, rst_b);
+
 endmodule // mips_core
+
+
+////
+//// counter: keep track of counts
+////
+//// en (input)     - enable bit for count
+//// clk (input)    - Clock (positive edge-sensitive)
+//// reset (input)  - System reset
+//// count (output) - current count
+////
+module counter #(parameter reset_value = 32'd0) (
+  output logic [31:0] count,
+  input logic en, clk, rst_b);
+
+  always_ff @(posedge clk or negedge rst_b) begin
+    if (~rst_b) begin
+      count <= reset_value;
+    end
+    else if (en) begin
+      count <= count + 1;
+    end
+  end
+
+endmodule
+
 
 
 ////

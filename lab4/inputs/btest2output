@@ -1,0 +1,395 @@
+[1;32m18-477 Makefile: [0mCopying Verilog into outputs/0315-140711...
+[1;32m18-477 Makefile: [0mCompiling Verilog...
+cd outputs/0315-140711/sim; ncvlog -SV -linedebug -messages -incdir src src/*.v src/mips_core.sv src/mips_decode.sv
+ncvlog: 08.20-s015: (c) Copyright 1995-2009 Cadence Design Systems, Inc.
+file: src/exception_unit.v
+	module worklib.exception_unit
+		errors: 0, warnings: 0
+file: src/mips_mem.v
+	module worklib.mips_mem
+		errors: 0, warnings: 0
+file: src/regfile.v
+	module worklib.regfile_forward
+		errors: 0, warnings: 0
+	module worklib.btbsram
+		errors: 0, warnings: 0
+file: src/syscall_unit.v
+	module worklib.syscall_unit
+		errors: 0, warnings: 0
+file: src/testbench.v
+	module worklib.testbench
+		errors: 0, warnings: 0
+	module worklib.clock
+		errors: 0, warnings: 0
+file: src/mips_core.sv
+	module worklib.mips_core
+		errors: 0, warnings: 0
+	module worklib.mips_ALU
+		errors: 0, warnings: 0
+	module worklib.resetregister
+		errors: 0, warnings: 0
+	module worklib.register
+		errors: 0, warnings: 0
+	module worklib.cntlRegister
+		errors: 0, warnings: 0
+	module worklib.forwardData
+		errors: 0, warnings: 0
+	module worklib.flushMod
+		errors: 0, warnings: 0
+	module worklib.stallDetector
+		errors: 0, warnings: 0
+	module worklib.countdownReg
+		errors: 0, warnings: 0
+	module worklib.adder
+		errors: 0, warnings: 0
+	module worklib.add_const
+		errors: 0, warnings: 0
+	module worklib.mux2to1
+		errors: 0, warnings: 0
+	module worklib.mux4to1
+		errors: 0, warnings: 0
+	module worklib.pcSelector
+		errors: 0, warnings: 0
+	module worklib.concat
+		errors: 0, warnings: 0
+	module worklib.loader
+		errors: 0, warnings: 0
+	module worklib.storer
+		errors: 0, warnings: 0
+file: src/mips_decode.sv
+	module worklib.mips_decode
+		errors: 0, warnings: 0
+[1;32m18-477 Makefile: [0mElaborating Verilog...
+cd outputs/0315-140711/sim; ncelab +access+rwc -messages worklib.testbench
+ncelab: 08.20-s015: (c) Copyright 1995-2009 Cadence Design Systems, Inc.
+	Elaborating the design hierarchy:
+		Caching library 'worklib' ....... Done
+   loader loader(load_data, imm_MEM, mem_data_out, load_sel_MEM, alu__out_MEM); //operates on data loaded from memory
+                                  |
+ncelab: *W,CUVMPW (./src/mips_core.sv,411|34): port sizes differ in port connection.
+	Building instance overlay tables: .................... Done
+	Generating native compiled code:
+		worklib.add_const:module <0x7bda5177>
+			streams:   1, words:   202
+		worklib.adder:module <0x2eb2b050>
+			streams:   1, words:   366
+		worklib.clock:module <0x6ce21b37>
+			streams:   2, words:   699
+		worklib.cntlRegister:module <0x2d6a6e98>
+			streams:  55, words: 15513
+		worklib.concat:module <0x13586d7f>
+			streams:   1, words:   281
+		worklib.countdownReg:module <0x7c420935>
+			streams:   5, words:  1443
+		worklib.exception_unit:module <0x4ecc7789>
+			streams:   6, words:  5958
+		worklib.flushMod:module <0x49e7cfb8>
+			streams:   1, words:  1582
+		worklib.forwardData:module <0x2254ede8>
+			streams:   1, words:  1437
+		worklib.loader:module <0x194e859b>
+			streams:   2, words:  1892
+		worklib.mips_ALU:module <0x487201d7>
+			streams:   1, words:  5481
+		worklib.mips_core:module <0x255c2edc>
+			streams:  43, words: 16058
+		worklib.mips_decode:module <0x1ede94c0>
+			streams:   1, words: 21210
+		worklib.mips_mem:module <0x4425a300>
+			streams:  92, words: 43999
+		worklib.mux2to1:module <0x0a01c8ea>
+			streams:   1, words:   347
+		worklib.mux2to1:module <0x3c9c6092>
+			streams:   1, words:   362
+		worklib.mux4to1:module <0x0bfe8018>
+			streams:   1, words:   753
+		worklib.pcSelector:module <0x06553e81>
+			streams:   1, words:   630
+		worklib.regfile_forward:module <0x3a0601aa>
+			streams:   6, words:  6873
+		worklib.register:module <0x08c894ef>
+			streams:   3, words:   734
+		worklib.register:module <0x11ad4c35>
+			streams:   3, words:   716
+		worklib.register:module <0x3096bbf2>
+			streams:   3, words:   740
+		worklib.register:module <0x3d43a075>
+			streams:   3, words:   740
+		worklib.register:module <0x3e356bf7>
+			streams:   3, words:   716
+		worklib.register:module <0x3e82b362>
+			streams:   3, words:   714
+		worklib.register:module <0x57dc7c68>
+			streams:   3, words:   756
+		worklib.register:module <0x6fdb1a07>
+			streams:   3, words:   925
+		worklib.stallDetector:module <0x654db65e>
+			streams:   1, words:  2100
+		worklib.storer:module <0x2bf2845d>
+			streams:   1, words:  1804
+		worklib.syscall_unit:module <0x7fd85f55>
+			streams:   2, words:   743
+		worklib.testbench:module <0x14077fa9>
+			streams:   8, words:  1861
+	Loading native compiled code:     .................... Done
+	Building instance specific data structures.
+	Design hierarchy summary:
+		               Instances  Unique
+		Modules:              65      23
+		Resolved nets:         0       1
+		Registers:           159      82
+		Scalar wires:         90       -
+		Expanded wires:       32       1
+		Vectored wires:      137       -
+		Named events:          2       2
+		Always blocks:        56      24
+		Initial blocks:        3       3
+		Cont. assignments:    51      40
+		Pseudo assignments:   23      23
+	Writing initial simulation snapshot: worklib.testbench:module
+[1;32m18-477 Makefile: [0m[1;31mElaborator log has warnings![0m
+[1;32m18-477 Makefile: [0mCopying inputs/btest2.s into outputs/0315-140711...
+[1;32m18-477 Makefile: [0mAssemblying input in outputs/0315-140711...
+spim447 -notrap -vasm inputs/btest2.s outputs/0315-140711/sim/mem;
+SPIM Version 6.2 of January 11, 1999
+Copyright 1990-1998 by James R. Larus (larus@cs.wisc.edu).
+All Rights Reserved.
+See the file README for a full copyright notice.
+[1;32m18-477 Makefile: [0mCopying NCSim configuration into outputs/0315-140711...
+[1;32m18-477 Makefile: [0mSimulating Verilog in outputs/0315-140711...
+cd outputs/0315-140711/sim; ncsim worklib.testbench:module -input 447ncsim.tcl -input ncsim.tcl
+ncsim: 08.20-s015: (c) Copyright 1995-2009 Cadence Design Systems, Inc.
+ncsim> database -open -shm -default waveforms
+Created default SHM database waveforms
+ncsim> probe -shm -create -depth all -all 
+Created probe 1
+ncsim> run 
+=== Simulation Cycle                  150 ===
+[pc=00000000, inst=00000000] [op=00, rs= 0, rt= 0, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+F: pc: 00400000, inst_addr: 00100000
+D: IDen: 1, wr_reg: 00, wr_data: 00000000, reg1: 00, reg2: 00, imm: 00000000, mem_en: 0
+E: EXen, 1, wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+W: wr_reg_WB: 00, alu__out_wb: 00000000, ctrl_we_WB: 0, mem_WB: 0
+stall: 0, CDen: 0
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+j_target: 00000000, br_target: 00000004, pc_EX: 00000000, imm_EX: 00000000
+jLink_en_WB: 0, wr_data: 00000000, wr_reg: 00
+brcond_EX: 000
+
+=== Simulation Cycle                  250 ===
+[pc=00400000, inst=2402000a] [op=09, rs= 0, rt= 2, rd= 0, imm=000a, f2=0a] [reset=0, halted=0]
+F: pc: 00400004, inst_addr: 00100001
+D: IDen: 1, wr_reg: 02, wr_data: 00000000, reg1: 00, reg2: 02, imm: 0000000a, mem_en: 0
+E: EXen, 1, wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+W: wr_reg_WB: 00, alu__out_wb: 00000000, ctrl_we_WB: 0, mem_WB: 0
+stall: 0, CDen: 0
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+j_target: 00000000, br_target: 00000004, pc_EX: 00000000, imm_EX: 00000000
+jLink_en_WB: 0, wr_data: 00000000, wr_reg: 02
+brcond_EX: 111
+
+=== Simulation Cycle                  350 ===
+[pc=00400004, inst=24030001] [op=09, rs= 0, rt= 3, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+F: pc: 00400008, inst_addr: 00100002
+D: IDen: 1, wr_reg: 03, wr_data: 00000000, reg1: 00, reg2: 03, imm: 00000001, mem_en: 0
+E: EXen, 1, wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 0000000a, alu__out: 0000000a ctrl_we_EX: 1, mem_EX: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+W: wr_reg_WB: 00, alu__out_wb: 00000000, ctrl_we_WB: 0, mem_WB: 0
+stall: 0, CDen: 0
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+j_target: 00080028, br_target: 0040002c, pc_EX: 00400000, imm_EX: 0000000a
+jLink_en_WB: 0, wr_data: 00000000, wr_reg: 03
+brcond_EX: 111
+
+=== Simulation Cycle                  450 ===
+[pc=00400008, inst=2404ffff] [op=09, rs= 0, rt= 4, rd=31, imm=ffff, f2=3f] [reset=0, halted=0]
+F: pc: 0040000c, inst_addr: 00100003
+D: IDen: 1, wr_reg: 04, wr_data: 00000000, reg1: 00, reg2: 04, imm: ffffffff, mem_en: 0
+E: EXen, 1, wr_reg_EX: 03, alu_in1: 00000000, alu_in2: 00000001, alu__out: 00000001 ctrl_we_EX: 1, mem_EX: 0
+M: wr_reg_MEM: 02, alu__outMEM: 0000000a, ctrl_we_MEM: 1, mem_MEM: 0
+W: wr_reg_WB: 00, alu__out_wb: 00000000, ctrl_we_WB: 1, mem_WB: 0
+stall: 0, CDen: 0
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+j_target: 000c0004, br_target: 0040000c, pc_EX: 00400004, imm_EX: 00000001
+jLink_en_WB: 0, wr_data: 00000000, wr_reg: 04
+brcond_EX: 111
+
+=== Simulation Cycle                  550 ===
+[pc=0040000c, inst=0c100007] [op=03, rs= 0, rt=16, rd= 0, imm=0007, f2=07] [reset=0, halted=0]
+F: pc: 00400010, inst_addr: 00100004
+D: IDen: 1, wr_reg: 10, wr_data: 0000000a, reg1: 00, reg2: 10, imm: 00000007, mem_en: 0
+E: EXen, 1, wr_reg_EX: 04, alu_in1: 00000000, alu_in2: ffffffff, alu__out: ffffffff ctrl_we_EX: 1, mem_EX: 0
+M: wr_reg_MEM: 03, alu__outMEM: 00000001, ctrl_we_MEM: 1, mem_MEM: 0
+W: wr_reg_WB: 02, alu__out_wb: 0000000a, ctrl_we_WB: 1, mem_WB: 0
+stall: 0, CDen: 0
+branchTrue: 0, pcMuxSel: 11, pcMuxSelFinal: 00
+j_target: 0013fffc, br_target: 00400008, pc_EX: 00400008, imm_EX: ffffffff
+jLink_en_WB: 0, wr_data: 0000000a, wr_reg: 10
+brcond_EX: 111
+
+flushmod2
+=== Simulation Cycle                  650 ===
+[pc=00400010, inst=0000000c] [op=00, rs= 0, rt= 0, rd= 0, imm=000c, f2=0c] [reset=0, halted=0]
+F: pc: 00400014, inst_addr: 00100005
+D: IDen: 1, wr_reg: 00, wr_data: 00000001, reg1: 00, reg2: 00, imm: 0000000c, mem_en: 0
+E: EXen, 0, wr_reg_EX: 10, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0
+M: wr_reg_MEM: 04, alu__outMEM: ffffffff, ctrl_we_MEM: 1, mem_MEM: 0
+W: wr_reg_WB: 03, alu__out_wb: 00000001, ctrl_we_WB: 1, mem_WB: 0
+stall: 0, CDen: 0
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 11
+j_target: 0040001c, br_target: 0040002c, pc_EX: 0040000c, imm_EX: 00000007
+jLink_en_WB: 0, wr_data: 00000001, wr_reg: 00
+brcond_EX: 111
+
+flushmod1
+flushmod1
+=== Simulation Cycle                  750 ===
+[pc=00400014, inst=254a000b] [op=09, rs=10, rt=10, rd= 0, imm=000b, f2=0b] [reset=0, halted=0]
+F: pc: 0040001c, inst_addr: 00100007
+D: IDen: 1, wr_reg: 0a, wr_data: ffffffff, reg1: 0a, reg2: 0a, imm: 0000000b, mem_en: 0
+E: EXen, 0, wr_reg_EX: 10, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0
+M: wr_reg_MEM: 10, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+W: wr_reg_WB: 04, alu__out_wb: ffffffff, ctrl_we_WB: 1, mem_WB: 0
+stall: 0, CDen: 0
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+j_target: 0040001c, br_target: 0040002c, pc_EX: 0040000c, imm_EX: 00000007
+jLink_en_WB: 0, wr_data: ffffffff, wr_reg: 0a
+brcond_EX: 111
+
+=== Simulation Cycle                  850 ===
+[pc=0040001c, inst=240d000e] [op=09, rs= 0, rt=13, rd= 0, imm=000e, f2=0e] [reset=0, halted=0]
+F: pc: 00400020, inst_addr: 00100008
+D: IDen: 1, wr_reg: 1f, wr_data: 00400010, reg1: 00, reg2: 0d, imm: 0000000e, mem_en: 0
+E: EXen, 1, wr_reg_EX: 10, alu_in1: 00000000, alu_in2: 00000007, alu__out: 00000007 ctrl_we_EX: 0, mem_EX: 0
+M: wr_reg_MEM: 10, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+W: wr_reg_WB: 10, alu__out_wb: 00000000, ctrl_we_WB: 1, mem_WB: 0
+stall: 0, CDen: 0
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+j_target: 0040001c, br_target: 0040002c, pc_EX: 0040000c, imm_EX: 00000007
+jLink_en_WB: 1, wr_data: 00400010, wr_reg: 1f
+brcond_EX: 111
+
+=== Simulation Cycle                  950 ===
+[pc=00400020, inst=00000025] [op=00, rs= 0, rt= 0, rd= 0, imm=0025, f2=25] [reset=0, halted=0]
+F: pc: 00400024, inst_addr: 00100009
+D: IDen: 1, wr_reg: 00, wr_data: 00000000, reg1: 00, reg2: 00, imm: 00000025, mem_en: 0
+E: EXen, 1, wr_reg_EX: 0d, alu_in1: 00000000, alu_in2: 0000000e, alu__out: 0000000e ctrl_we_EX: 1, mem_EX: 0
+M: wr_reg_MEM: 10, alu__outMEM: 00000007, ctrl_we_MEM: 0, mem_MEM: 0
+W: wr_reg_WB: 10, alu__out_wb: 00000000, ctrl_we_WB: 0, mem_WB: 0
+stall: 0, CDen: 0
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+j_target: 00340038, br_target: 00400058, pc_EX: 0040001c, imm_EX: 0000000e
+jLink_en_WB: 0, wr_data: 00000000, wr_reg: 00
+brcond_EX: 111
+
+=== Simulation Cycle                 1050 ===
+[pc=00400024, inst=00000025] [op=00, rs= 0, rt= 0, rd= 0, imm=0025, f2=25] [reset=0, halted=0]
+F: pc: 00400028, inst_addr: 0010000a
+D: IDen: 1, wr_reg: 00, wr_data: 00000007, reg1: 00, reg2: 00, imm: 00000025, mem_en: 0
+E: EXen, 1, wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0
+M: wr_reg_MEM: 0d, alu__outMEM: 0000000e, ctrl_we_MEM: 1, mem_MEM: 0
+W: wr_reg_WB: 10, alu__out_wb: 00000007, ctrl_we_WB: 0, mem_WB: 0
+stall: 0, CDen: 0
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+j_target: 00000094, br_target: 004000b8, pc_EX: 00400020, imm_EX: 00000025
+jLink_en_WB: 0, wr_data: 00000007, wr_reg: 00
+brcond_EX: 111
+
+=== Simulation Cycle                 1150 ===
+[pc=00400028, inst=00000025] [op=00, rs= 0, rt= 0, rd= 0, imm=0025, f2=25] [reset=0, halted=0]
+F: pc: 0040002c, inst_addr: 0010000b
+D: IDen: 1, wr_reg: 00, wr_data: 0000000e, reg1: 00, reg2: 00, imm: 00000025, mem_en: 0
+E: EXen, 1, wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+W: wr_reg_WB: 0d, alu__out_wb: 0000000e, ctrl_we_WB: 1, mem_WB: 0
+stall: 0, CDen: 0
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+j_target: 00000094, br_target: 004000bc, pc_EX: 00400024, imm_EX: 00000025
+jLink_en_WB: 0, wr_data: 0000000e, wr_reg: 00
+brcond_EX: 111
+
+=== Simulation Cycle                 1250 ===
+[pc=0040002c, inst=03e00008] [op=00, rs=31, rt= 0, rd= 0, imm=0008, f2=08] [reset=0, halted=0]
+F: pc: 00400030, inst_addr: 0010000c
+D: IDen: 1, wr_reg: 00, wr_data: 00000000, reg1: 1f, reg2: 00, imm: 00000008, mem_en: 0
+E: EXen, 1, wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+W: wr_reg_WB: 00, alu__out_wb: 00000000, ctrl_we_WB: 1, mem_WB: 0
+stall: 0, CDen: 0
+branchTrue: 0, pcMuxSel: 10, pcMuxSelFinal: 00
+j_target: 00000094, br_target: 004000c0, pc_EX: 00400028, imm_EX: 00000025
+jLink_en_WB: 0, wr_data: 00000000, wr_reg: 00
+brcond_EX: 111
+
+flushmod2
+=== Simulation Cycle                 1350 ===
+[pc=00400030, inst=25ad0001] [op=09, rs=13, rt=13, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+F: pc: 00400034, inst_addr: 0010000d
+D: IDen: 1, wr_reg: 0d, wr_data: 00000000, reg1: 0d, reg2: 0d, imm: 00000001, mem_en: 0
+E: EXen, 0, wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+W: wr_reg_WB: 00, alu__out_wb: 00000000, ctrl_we_WB: 1, mem_WB: 0
+stall: 0, CDen: 0
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 10
+j_target: 0f800020, br_target: 00400050, pc_EX: 0040002c, imm_EX: 00000008
+jLink_en_WB: 0, wr_data: 00000000, wr_reg: 0d
+brcond_EX: 111
+
+flushmod1
+flushmod1
+[Instruction bus error exception at 0x00000000]
+=== Simulation Cycle                 1450 ===
+[pc=00400034, inst=0000000c] [op=00, rs= 0, rt= 0, rd= 0, imm=000c, f2=0c] [reset=0, halted=0]
+F: pc: 00000000, inst_addr: 00000000
+D: IDen: 1, wr_reg: 00, wr_data: 00000000, reg1: 00, reg2: 00, imm: 0000000c, mem_en: 0
+E: EXen, 0, wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000008, alu__out: 00000008 ctrl_we_EX: 0, mem_EX: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+W: wr_reg_WB: 00, alu__out_wb: 00000000, ctrl_we_WB: 1, mem_WB: 0
+stall: 0, CDen: 0
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+j_target: 0f800020, br_target: 00400050, pc_EX: 0040002c, imm_EX: 00000008
+jLink_en_WB: 0, wr_data: 00000000, wr_reg: 00
+brcond_EX: 111
+
+--- 18-447 Register file dump ---
+=== Simulation Cycle                 1450 ===
+R          0	= 0x00000000	( 0 )
+R          1	= 0x00000000	( 0 )
+R          2	= 0x0000000a	( 10 )
+R          3	= 0x00000001	( 1 )
+R          4	= 0xffffffff	( 4294967295 )
+R          5	= 0x00000000	( 0 )
+R          6	= 0x00000000	( 0 )
+R          7	= 0x00000000	( 0 )
+R          8	= 0x00000000	( 0 )
+R          9	= 0x00000000	( 0 )
+R         10	= 0x00000000	( 0 )
+R         11	= 0x00000000	( 0 )
+R         12	= 0x00000000	( 0 )
+R         13	= 0x0000000e	( 14 )
+R         14	= 0x00000000	( 0 )
+R         15	= 0x00000000	( 0 )
+R         16	= 0x00400010	( 4194320 )
+R         17	= 0x00000000	( 0 )
+R         18	= 0x00000000	( 0 )
+R         19	= 0x00000000	( 0 )
+R         20	= 0x00000000	( 0 )
+R         21	= 0x00000000	( 0 )
+R         22	= 0x00000000	( 0 )
+R         23	= 0x00000000	( 0 )
+R         24	= 0x00000000	( 0 )
+R         25	= 0x00000000	( 0 )
+R         26	= 0x00000000	( 0 )
+R         27	= 0x00000000	( 0 )
+R         28	= 0x00000000	( 0 )
+R         29	= 0x00000000	( 0 )
+R         30	= 0x00000000	( 0 )
+R         31	= 0x00000000	( 0 )
+--- End register file dump ---
+Simulation complete via $finish(1) at time 1450 NS + 4
+./src/testbench.v:85 	  $finish;
+ncsim> exit 
+[1;32m18-477 Makefile: [0mSimulation of inputs/btest2.s has completed in outputs/0315-140711.
+[1;32m18-477 Makefile: [0mTo view waveforms, execute the following command: [1msimvision outputs/0315-140711/sim/waveforms.shm[0m

@@ -1,0 +1,342 @@
+[1;32m18-477 Makefile: [0mCopying Verilog into outputs/0204-140351...
+[1;32m18-477 Makefile: [0mCompiling Verilog...
+cd outputs/0204-140351/sim; ncvlog -SV -linedebug -messages -incdir src src/*.v src/mips_core.sv src/mips_decode.sv
+ncvlog: 08.20-s015: (c) Copyright 1995-2009 Cadence Design Systems, Inc.
+file: src/exception_unit.v
+	module worklib.exception_unit
+		errors: 0, warnings: 0
+file: src/mips_mem.v
+	module worklib.mips_mem
+		errors: 0, warnings: 0
+file: src/regfile.v
+	module worklib.regfile
+		errors: 0, warnings: 0
+file: src/syscall_unit.v
+	module worklib.syscall_unit
+		errors: 0, warnings: 0
+file: src/testbench.v
+	module worklib.testbench
+		errors: 0, warnings: 0
+	module worklib.clock
+		errors: 0, warnings: 0
+file: src/mips_core.sv
+	module worklib.mips_core
+		errors: 0, warnings: 0
+	module worklib.mips_ALU
+		errors: 0, warnings: 0
+	module worklib.register
+		errors: 0, warnings: 0
+	module worklib.adder
+		errors: 0, warnings: 0
+	module worklib.add_const
+		errors: 0, warnings: 0
+	module worklib.mux2to1
+		errors: 0, warnings: 0
+	module worklib.mux4to1
+		errors: 0, warnings: 0
+	module worklib.muxSpecial
+		errors: 0, warnings: 0
+	module worklib.concat
+		errors: 0, warnings: 0
+	module worklib.loader
+		errors: 0, warnings: 0
+	module worklib.storer
+		errors: 0, warnings: 0
+file: src/mips_decode.sv
+	module worklib.mips_decode
+		errors: 0, warnings: 0
+[1;32m18-477 Makefile: [0mElaborating Verilog...
+cd outputs/0204-140351/sim; ncelab +access+rwc -messages worklib.testbench
+ncelab: 08.20-s015: (c) Copyright 1995-2009 Cadence Design Systems, Inc.
+	Elaborating the design hierarchy:
+		Caching library 'worklib' ....... Done
+                .brcond(brcond));
+                             |
+ncelab: *W,CUVMPW (./src/mips_core.sv,230|29): port sizes differ in port connection.
+   mux2to1 #(5) regDest(wr_regNum, dcd_rt, dcd_rd, regdst); //RegDst
+                                |
+ncelab: *W,CUVMPW (./src/mips_core.sv,287|32): port sizes differ in port connection.
+   mux2to1 #(5)regNumber(wr_reg, wr_regNum, 5'd31, jLink_en); //how to define decimal?
+                                         |
+ncelab: *W,CUVMPW (./src/mips_core.sv,311|41): port sizes differ in port connection.
+	Building instance overlay tables: .................... Done
+	Generating native compiled code:
+		worklib.add_const:module <0x7bda5177>
+			streams:   1, words:   202
+		worklib.adder:module <0x2eb2b050>
+			streams:   1, words:   366
+		worklib.clock:module <0x6ce21b37>
+			streams:   2, words:   699
+		worklib.concat:module <0x13586d7f>
+			streams:   1, words:   281
+		worklib.exception_unit:module <0x4ecc7789>
+			streams:   6, words:  5958
+		worklib.loader:module <0x49beda8e>
+			streams:   1, words:  1536
+		worklib.mips_ALU:module <0x47ba1d4e>
+			streams:   1, words:  5796
+		worklib.mips_core:module <0x1da7f892>
+			streams:  41, words: 13073
+		worklib.mips_decode:module <0x52b713aa>
+			streams:   1, words: 22832
+		worklib.mips_mem:module <0x4425a300>
+			streams:  92, words: 43999
+		worklib.mux2to1:module <0x01bc6b9d>
+			streams:   1, words:   415
+		worklib.mux2to1:module <0x1370b10f>
+			streams:   1, words:   347
+		worklib.mux2to1:module <0x38f96072>
+			streams:   1, words:   519
+		worklib.mux4to1:module <0x3611bea6>
+			streams:   1, words:   753
+		worklib.muxSpecial:module <0x30c83742>
+			streams:   1, words:   630
+		worklib.regfile:module <0x26336377>
+			streams:   6, words:  6354
+		worklib.register:module <0x08c894ef>
+			streams:   3, words:   734
+		worklib.register:module <0x11ad4c35>
+			streams:   3, words:   716
+		worklib.register:module <0x3e356bf7>
+			streams:   3, words:   716
+		worklib.register:module <0x3e82b362>
+			streams:   3, words:   714
+		worklib.storer:module <0x6d0f4c94>
+			streams:   1, words:   850
+		worklib.syscall_unit:module <0x7fd85f55>
+			streams:   2, words:   743
+		worklib.testbench:module <0x14077fa9>
+			streams:   8, words:  1861
+	Loading native compiled code:     .................... Done
+	Building instance specific data structures.
+	Design hierarchy summary:
+		              Instances  Unique
+		Modules:             31      18
+		Registers:           61      48
+		Scalar wires:        70       -
+		Expanded wires:      13       3
+		Vectored wires:      72       -
+		Named events:         2       2
+		Always blocks:       26      19
+		Initial blocks:       3       3
+		Cont. assignments:   44      38
+		Pseudo assignments:  21      21
+	Writing initial simulation snapshot: worklib.testbench:module
+[1;32m18-477 Makefile: [0m[1;31mElaborator log has warnings![0m
+[1;32m18-477 Makefile: [0mCopying 447inputs/brtest0.s into outputs/0204-140351...
+[1;32m18-477 Makefile: [0mAssemblying input in outputs/0204-140351...
+spim447 -notrap -vasm 447inputs/brtest0.s outputs/0204-140351/sim/mem;
+SPIM Version 6.2 of January 11, 1999
+Copyright 1990-1998 by James R. Larus (larus@cs.wisc.edu).
+All Rights Reserved.
+See the file README for a full copyright notice.
+[1;32m18-477 Makefile: [0mCopying NCSim configuration into outputs/0204-140351...
+[1;32m18-477 Makefile: [0mSimulating Verilog in outputs/0204-140351...
+cd outputs/0204-140351/sim; ncsim worklib.testbench:module -input 447ncsim.tcl -input ncsim.tcl
+ncsim: 08.20-s015: (c) Copyright 1995-2009 Cadence Design Systems, Inc.
+ncsim> database -open -shm -default waveforms
+Created default SHM database waveforms
+ncsim> probe -shm -create -depth all -all 
+Created probe 1
+ncsim> run 
+=== Simulation Cycle                  150 ===
+[pc=00400000, inst=2402000a] [op=09, rs= 0, rt= 2, rd= 0, imm=000a, f2=0a] [reset=0, halted=0]
+Store address:          0,          2, Store word:          x, ALUOUT:         10, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 00400004, nextnextpc:00400008
+jLink_en:0, wr_reg:  2, wr_data: 0000000a
+Address: 00000002, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:         10, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+=== Simulation Cycle                  250 ===
+[pc=00400004, inst=24050001] [op=09, rs= 0, rt= 5, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+Store address:          0,          0, Store word:          x, ALUOUT:          1, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 00400008, nextnextpc:0040000c
+jLink_en:0, wr_reg:  5, wr_data: 00000001
+Address: 00000000, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:          1, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+=== Simulation Cycle                  350 ===
+[pc=00400008, inst=08100008] [op=02, rs= 0, rt=16, rd= 0, imm=0008, f2=08] [reset=0, halted=0]
+Store address:          0,          0, Store word:          x, ALUOUT:          0, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 3, nextpc: 0040000c, nextnextpc:00400010
+jLink_en:0, wr_reg: 16, wr_data: 00000000
+Address: 00000000, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:          0, brcond: 111
+branchTrue: 0, pcMuxSel: 11, pcMuxSelFinal: 11
+
+=== Simulation Cycle                  450 ===
+[pc=0040000c, inst=254a0f00] [op=09, rs=10, rt=10, rd= 1, imm=0f00, f2=00] [reset=0, halted=0]
+Store address:          0,        960, Store word:          x, ALUOUT:       3840, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 00400020, nextnextpc:00400024
+jLink_en:0, wr_reg: 10, wr_data: 00000f00
+Address: 000003c0, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:       3840, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+brcond: z011
+brcond: z011
+=== Simulation Cycle                  550 ===
+[pc=00400020, inst=14000008] [op=05, rs= 0, rt= 0, rd= 0, imm=0008, f2=08] [reset=0, halted=0]
+Store address:          0,          0, Store word:          x, ALUOUT:          0, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 1, nextpc: 00400024, nextnextpc:00400028
+jLink_en:0, wr_reg:  0, wr_data: 00000000
+Address: 00000000, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:          0, brcond: 011
+branchTrue: 0, pcMuxSel: 01, pcMuxSelFinal: 00
+
+=== Simulation Cycle                  650 ===
+[pc=00400024, inst=34000000] [op=0d, rs= 0, rt= 0, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+Store address:          0,          0, Store word:          x, ALUOUT:          0, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 00400028, nextnextpc:0040002c
+jLink_en:0, wr_reg:  0, wr_data: 00000000
+Address: 00000000, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:          0, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+=== Simulation Cycle                  750 ===
+[pc=00400028, inst=34000000] [op=0d, rs= 0, rt= 0, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+Store address:          0,          0, Store word:          x, ALUOUT:          0, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 0040002c, nextnextpc:00400030
+jLink_en:0, wr_reg:  0, wr_data: 00000000
+Address: 00000000, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:          0, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+=== Simulation Cycle                  850 ===
+[pc=0040002c, inst=24061337] [op=09, rs= 0, rt= 6, rd= 2, imm=1337, f2=37] [reset=0, halted=0]
+Store address:          0,       1229, Store word:          x, ALUOUT:       4919, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 00400030, nextnextpc:00400034
+jLink_en:0, wr_reg:  6, wr_data: 00001337
+Address: 000004cd, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:       4919, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+brcond: z010
+brcond: z010
+=== Simulation Cycle                  950 ===
+[pc=00400030, inst=10000006] [op=04, rs= 0, rt= 0, rd= 0, imm=0006, f2=06] [reset=0, halted=0]
+Store address:          0,          0, Store word:          x, ALUOUT:          0, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 1, nextpc: 00400034, nextnextpc:00400038
+jLink_en:0, wr_reg:  0, wr_data: 00000000
+Address: 00000000, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:          0, brcond: 010
+branchTrue: 0, pcMuxSel: 01, pcMuxSelFinal: 00
+
+=== Simulation Cycle                 1050 ===
+[pc=00400034, inst=34000000] [op=0d, rs= 0, rt= 0, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+Store address:          0,          0, Store word:          x, ALUOUT:          0, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 00400038, nextnextpc:0040003c
+jLink_en:0, wr_reg:  0, wr_data: 00000000
+Address: 00000000, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:          0, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+=== Simulation Cycle                 1150 ===
+[pc=00400038, inst=34000000] [op=0d, rs= 0, rt= 0, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+Store address:          0,          0, Store word:          x, ALUOUT:          0, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 0040003c, nextnextpc:00400040
+jLink_en:0, wr_reg:  0, wr_data: 00000000
+Address: 00000000, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:          0, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+=== Simulation Cycle                 1250 ===
+[pc=0040003c, inst=24070347] [op=09, rs= 0, rt= 7, rd= 0, imm=0347, f2=07] [reset=0, halted=0]
+Store address:          0,        209, Store word:          x, ALUOUT:        839, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 00400040, nextnextpc:00400044
+jLink_en:0, wr_reg:  7, wr_data: 00000347
+Address: 000000d1, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:        839, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+[End of program at 0x00400040]
+=== Simulation Cycle                 1350 ===
+[pc=00400040, inst=0000000c] [op=00, rs= 0, rt= 0, rd= 0, imm=000c, f2=0c] [reset=0, halted=0]
+Store address:          0,          0, Store word:          x, ALUOUT:          0, en:  0
+HI: 00000000, LO: 00000000, pcMuxSel: 0, nextpc: 00400044, nextnextpc:00400048
+jLink_en:0, wr_reg:  0, wr_data: 00000000
+Address: 00000000, Store: xxxxxxxx, Load:xxxxxxxx, en:0000
+alu_in1:          0, alu_in2:          0, brcond: 111
+branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+
+--- 18-447 Register file dump ---
+=== Simulation Cycle                 1350 ===
+R          0	= 0x00000000	( 0 )
+R          1	= 0x00000000	( 0 )
+R          2	= 0x0000000a	( 10 )
+R          3	= 0x00000000	( 0 )
+R          4	= 0x00000000	( 0 )
+R          5	= 0x00000001	( 1 )
+R          6	= 0x00001337	( 4919 )
+R          7	= 0x00000347	( 839 )
+R          8	= 0x00000000	( 0 )
+R          9	= 0x00000000	( 0 )
+R         10	= 0x00000f00	( 3840 )
+R         11	= 0x00000000	( 0 )
+R         12	= 0x00000000	( 0 )
+R         13	= 0x00000000	( 0 )
+R         14	= 0x00000000	( 0 )
+R         15	= 0x00000000	( 0 )
+R         16	= 0x00000000	( 0 )
+R         17	= 0x00000000	( 0 )
+R         18	= 0x00000000	( 0 )
+R         19	= 0x00000000	( 0 )
+R         20	= 0x00000000	( 0 )
+R         21	= 0x00000000	( 0 )
+R         22	= 0x00000000	( 0 )
+R         23	= 0x00000000	( 0 )
+R         24	= 0x00000000	( 0 )
+R         25	= 0x00000000	( 0 )
+R         26	= 0x00000000	( 0 )
+R         27	= 0x00000000	( 0 )
+R         28	= 0x00000000	( 0 )
+R         29	= 0x00000000	( 0 )
+R         30	= 0x00000000	( 0 )
+R         31	= 0x00000000	( 0 )
+--- End register file dump ---
+Simulation complete via $finish(1) at time 1350 NS + 4
+./src/testbench.v:85 	  $finish;
+ncsim> exit 
+[1;32m18-477 Makefile: [0mSimulation of 447inputs/brtest0.s has completed in outputs/0204-140351.
+[1;32m18-477 Makefile: [0mTo view waveforms, execute the following command: [1msimvision outputs/0204-140351/sim/waveforms.shm[0m
+447util/tester.pl outputs/0204-140351/sim/brtest0.reg outputs/0204-140351/sim/regdump.txt
+Reg	Diff?	Ref		Test
+0		00000000	00000000
+1		00000000	00000000
+2		0000000a	0000000a
+3		00000000	00000000
+4		00000000	00000000
+5		00000001	00000001
+6		00001337	00001337
+7	  *	0000d00d	00000347
+8		00000000	00000000
+9		00000000	00000000
+10	  *	00000000	00000f00
+11		00000000	00000000
+12		00000000	00000000
+13		00000000	00000000
+14		00000000	00000000
+15		00000000	00000000
+16		00000000	00000000
+17		00000000	00000000
+18		00000000	00000000
+19		00000000	00000000
+20		00000000	00000000
+21		00000000	00000000
+22		00000000	00000000
+23		00000000	00000000
+24		00000000	00000000
+25		00000000	00000000
+26		00000000	00000000
+27		00000000	00000000
+28		00000000	00000000
+29		00000000	00000000
+30		00000000	00000000
+31		00000000	00000000
+
+[1;32m18-477 Makefile: [0m[01;31mINCORRECT! The simulation register-dump does NOT match the
+  reference.[0m
+[1;32m18-477 Makefile: [0mVerification of 447inputs/brtest0.s has completed in outputs/0204-140351.
+[1;32m18-477 Makefile: [0mTo view the simulation register-dump, execute the following command: [1mcat outputs/0204-140351/sim/regdump.txt[0m
