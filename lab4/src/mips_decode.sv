@@ -107,7 +107,7 @@ module mips_decode(/*AUTOARG*/
      se = 1'b0; //unsigned
 
      mem_write_en = 4'b0; //no mem write
-     load_sel = 3'bx;
+     load_sel = `NO_LOAD;
      store_sel = 2'bx;
      load_stall = 1'b0; //not currently performing a load instruction
      hi_en = 1'b0; //HI reg not enabled

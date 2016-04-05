@@ -45,6 +45,8 @@
 `include "internal_defines.vh"
 
 typedef struct packed{
+  logic [31:0]   inst;
+  logic [31:0]   pc;
   logic [31:0]   dcd_se_imm, dcd_se_offset, dcd_e_imm, dcd_se_mem_offset;
   logic [5:0]    dcd_op, dcd_funct2;
   logic [4:0]    dcd_rs, dcd_funct1, dcd_rt, dcd_rd, dcd_shamt;
@@ -58,6 +60,8 @@ typedef struct packed{
   logic     ctrl_RI;    // From Decoder of mips_decode.v
   logic     ctrl_Sys;   // From Decoder of mips_decode.v
   logic     ctrl_we;    // From Decoder of mips_decode.v
+
+  logic [31:0]   rt_data, rs_data, rd_data, alu__out;
   // End of automatics
   
   //Added control signals
@@ -155,7 +159,7 @@ module mips_core(/*AUTOARG*/
    // Outputs
    inst_addr, mem_addr, mem_data_in, mem_write_en, halted,
    // Inputs
-   clk, inst_excpt, mem_excpt, inst, inst1, mem_data_out, rst_b
+   clk, inst_excpt, mem_excpt, inst_1, inst_2, mem_data_out, rst_b
    );
    
    parameter text_start  = 32'h00400000; /* Initial value of $pc */
@@ -172,16 +176,19 @@ module mips_core(/*AUTOARG*/
 
 
    // Internal signals
-   wire [31:0]   pc, nextpc, nextnextpc;
+   //wire [31:0]   pc, nextpc, nextnextpc;
    wire          exception_halt, syscall_halt, internal_halt;
    wire          load_epc, load_bva, load_bva_sel;
-   wire [31:0]   rt_data, rs_data, rd_data, alu__out, r_v0;
+   wire [31:0]   r_v0;
    wire [31:0]   epc, cause, bad_v_addr;
    wire [4:0]    cause_code;
 
    // Decode signals
    instruction instruc_1;
    instruction instruc_2;
+   assign instruc_1.inst = inst_1;
+   assign instruc_2.inst = inst_2;
+
    //wire [31:0]   dcd_se_imm, dcd_se_offset, dcd_e_imm, dcd_se_mem_offset;
    //wire [5:0]    dcd_op, dcd_funct2;
    //wire [4:0]    dcd_rs, dcd_funct1, dcd_rt, dcd_rd, dcd_shamt;
@@ -194,21 +201,24 @@ module mips_core(/*AUTOARG*/
    wire[1:0] pcMuxSelFinal;
 
    wire [31:0] newpc; //mux output for next state PC
-   //wire [31:0] pcNextFinal;
+   //wire [31:0] pcNextFinal; 
    //wire [31:0] inst_ID; //instruction progagated to decode stage
 
    // PC Management
    //register #(32, text_start) PCReg(pc, pcNextFinal, clk, ~internal_halt, rst_b);
-   register #(32, text_start) PCReg(pc, newpc, clk, ~internal_halt, rst_b);
-   register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
-                                       ~internal_halt, rst_b);
+   register #(32, text_start) PCReg(instruc_1.pc, newpc, clk, ~internal_halt, rst_b);
+   assign instruc_2.pc = instruc_1.pc + 4;
+   assign inst_addr = instruc_1.pc[31:2];
+   //register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
+   //                                    ~internal_halt, rst_b);
    //mux2to1 pickNextPC (pcNextFinal, nextpc, nextnextpc,(pcMuxSel[1]|pcMuxSel[0]));
-   add_const #(4) NextPCAdder(nextpc, pc);
+   //add_const #(4) NextPCAdder(nextpc, pc);
    //add_const #(4) NextPCAdder(nextnextpc, nextpc, pcMuxSel);
-   assign        inst_addr = pc[31:2];
+   
 
    // Instruction decoding
    /*******Instruction 1*******/
+   
    assign        instruc_1.dcd_op = instruc_1.inst_ID[31:26];    // Opcode
    assign        instruc_1.dcd_rs = instruc_1.inst_ID[25:21];    // rs field
    assign        instruc_1.dcd_rt = instruc_1.inst_ID[20:16];    // rt field
@@ -396,7 +406,7 @@ module mips_core(/*AUTOARG*/
    //Fetch (IF) stage for pc register
    wire IFen; //enable for IF stage
    wire [31:0] stallpc; //either PC or PC+4 depending on stall conditions
-   mux2to1 stallMux(stallpc, pc, pc+4, IFen);
+   mux2to1 stallMux(stallpc, instruc_1.pc, instruc_1.pc+8, IFen);
 
    //Decode (ID) stage registers and wirings
    //wire IDen; //enable for decode stage
@@ -495,7 +505,7 @@ module mips_core(/*AUTOARG*/
                         instruc_1.lo_en_MEM, instruc_1.memtoreg_MEM, instruc_1.pcMuxSel_MEM,
                         instruc_1.alu__sel_MEM, instruc_1.mem_write_en_MEM, instruc_1.load_sel_MEM,
                         instruc_1.brcond_MEM, instruc_1.store_sel_MEM,instruc_1.load_stall_MEM,
-                       //Inputs
+                        //Inputs
                         instruc_1.ctrl_we_EX, instruc_1.ctrl_Sys_EX, instruc_1.ctrl_RI_EX,
                         instruc_1.regdst_EX, instruc_1.jLink_en_EX, instruc_1.alusrc1_EX,
                         instruc_1.alusrc2_EX, instruc_1.se_EX, instruc_1.hi_en_EX,
@@ -631,7 +641,10 @@ module mips_core(/*AUTOARG*/
    //Determines inputs to ALU
    mux2to1 aluSrc1(alu_in1, rs_fwd, rt_fwd, alusrc1_EX); //ALUSrc1
    mux2to1 aluSrc2(alu_in2, rt_fwd, imm_EX, alusrc2_EX); //ALUSrc2
-   mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se_EX); //Zero extend or sign extend immediate
+   mux2to1 signext_1(instruc_1.imm, instruc_1.dcd_e_imm, instruc_1.dcd_se_imm,
+            instruc_1.se_EX); //Zero extend or sign extend immediate
+   mux2to1 signext_2(instruc_2.imm, instruc_2.dcd_e_imm, instruc_2.dcd_se_imm,
+            instruc_2.se_EX); //Zero extend or sign extend immediate
 
    //rs and rt forwarding
    mux4to1 fwdrs(rs_fwd, rs_data_EX, alu__out_MEM, wr_dataMem, , fwd_rs_sel_EX);
@@ -642,14 +655,29 @@ module mips_core(/*AUTOARG*/
                    fwd_rs_sel, fwd_rt_sel);
 
    //Wirings to memory module
-   mux4to1 memToReg(wr_dataMem, alu__out_WB, load_data_WB, HIout_WB, LOout_WB, memtoreg_WB);
-   //assign instr_addr = newpc[31:2]; //address of next instruction
-   assign mem_addr = alu__out_MEM[31:2]; //memory address to read/write
-   assign mem_data_in = store_data; //data to store
+   mux4to1 memToReg_1(instruc_1.wr_dataMem, instruc_1.alu__out_WB, load_data_WB,
+                      instruc_1.HIout_WB, instruc_1.LOout_WB, instruc_1.memtoreg_WB);
+   mux4to1 memToReg_2(instruc_2.wr_dataMem, instruc_2.alu__out_WB, load_data_WB,
+                      instruc_2.HIout_WB, instruc_2.LOout_WB, instruc_2.memtoreg_WB);
+
+   assign instruc_1.mem_addr = instruc_1.alu__out_MEM[31:2]; //memory address to read/write
+   assign instruc_1.mem_data_in = instruc_1.store_data; //data to store
+
+   assign instruc_2.mem_addr = instruc_2.alu__out_MEM[31:2]; //memory address to read/write
+   assign instruc_2.mem_data_in = instruc_2.store_data; //data to store
+
+
 
    //To read from / write to memory
-   loader loader(load_data, imm_MEM, mem_data_out, load_sel_MEM, alu__out_MEM); //operates on data loaded from memory
-   storer storer(store_data, mem_write_en, rt_data_MEM, store_sel_MEM, alu__out_MEM, mem_write_en_MEM); //operates on data to write to memory
+   loader loader(load_data, instruc_1.imm_MEM, instruc_2.imm_MEM, mem_data_out,
+                instruc_1.load_sel_MEM, instruc_2.load_sel_MEM,
+                instruc_1.alu__out_MEM instruc_2.alu__out_MEM); //operates on data loaded from memory
+   
+   storer storer(store_data, instruc_1.mem_write_en, instruc_2.mem_write_en,
+                instruc_1.rt_data_MEM, instruc_2.rt_data_MEM,
+                instruc_1.store_sel_MEM, instruc_2.store_sel_MEM,
+                instruc_1.alu__out_MEM, instruc_2.alu__out_MEM,
+                instruc_1.mem_write_en_MEM, instruc_2.mem_write_en_MEM); //operates on data to write to memory
 
    //Mux for next state PC
    mux4to1 pcMux(newpc, stallpc, br_target, rs_data, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
@@ -950,7 +978,7 @@ module cntlRegister (
          pcMuxSel <= pcMuxSel_in;
          alu__sel <= alu__sel_in;
          mem_write_en <= 1'b0;
-         load_sel <= load_sel_in;
+         load_sel <= `NO_LOAD;
          brcond <= brcond_in;
          store_sel <= store_sel_in;
          load_stall <=load_stall_in;
@@ -1204,13 +1232,30 @@ endmodule
 ////
 module loader (
       output logic [31:0] load_data,
-      input logic [15:0] dcd_imm,
+      input logic [15:0] dcd_imm_1,dcd_imm_2,
       input logic [31:0] mem_data,
-      input logic [2:0] load_sel,
-      input logic [31:0] offset);
+      input logic [2:0] load_sel_1,load_sel_2,
+      input logic [31:0] offset_1,offset_2);
 
     //shift the data by the offset number of bytes
     logic [31:0] data;
+    logic [2:0]  load_sel;
+    logic [31:0] offset;
+    always_comb begin
+      if (load_sel_1 != `NO_LOAD) begin
+        load_sel = load_sel_1;
+        offset = offset_1;
+      end
+      else if (load_sel_2 != `NO_LOAD) begin
+        load_sel = load_sel_2;
+        offset = offset_2;
+      end
+      else begin
+        load_sel = `NO_LOAD;
+        offset = 31'd0;
+      end
+    end
+
     assign data = (mem_data >> ((offset & 32'h3) * 8));
 
     always_comb begin
@@ -1227,7 +1272,7 @@ module loader (
           load_data = {24'b0, data[7:0]};
         `LOAD_LHU:
           load_data = {16'b0, data[15:0]};
-        default:
+        `NO_LOAD:
           load_data = 32'hxxxx;
       endcase
     end
@@ -1245,11 +1290,36 @@ endmodule
 ////
 module storer (
       output logic [31:0] store_data,
-      output logic [3:0] mem_write_en,
-      input logic [31:0] rt_data,
-      input logic [1:0] store_sel,
-      input logic [31:0] offset,
-      input logic [3:0] mem_en);
+      output logic [3:0] mem_write_en_1, mem_write_en_2,
+      input logic [31:0] rt_data_1, rt_data_2,
+      input logic [1:0] store_sel_1, store_sel_1,
+      input logic [31:0] offset_1, offset_2,
+      input logic [3:0] mem_en_1, mem_en_2);
+
+    logic [3:0] mem_en, mem_write_en;
+    logic [31:0] rt_data;
+    logic [1:0] store_sel;
+    logic [31:0] offset;
+    always_comb begin
+      if (mem_write_en_1 != 4'd0) begin
+        mem_en = mem_en_1;
+        rt_data = rt_data_1;
+        store_sel = store_sel_1;
+        offset = offset_1;
+      end
+      else if (mem_write_en_2 != 4'd0) begin
+        mem_en = mem_en_2;
+        rt_data = rt_data_2;
+        store_sel = store_sel_2;
+        offset = offset_2;
+      end
+      else begin
+        mem_en = 3'd0;
+        rt_data = 31'bx;
+        store_sel = 2'bx;
+        offset = 31'bx;
+      end
+    end
 
     always_comb begin
       case(store_sel)
@@ -1274,6 +1344,19 @@ module storer (
             mem_write_en = 4'b0000;
           end
       endcase
+    end
+
+    always_comb begin
+      if (mem_write_en_1 != 4'd0) begin
+        mem_write_en_1 = mem_write_en;
+      end
+      else if (mem_write_en_2 != 4'd0) begin
+        mem_write_en_2 = mem_write_en;
+      end
+      else begin
+        mem_write_en_1 = mem_write_en;
+        mem_write_en_2 = mem_write_en;
+      end
     end
 endmodule
 

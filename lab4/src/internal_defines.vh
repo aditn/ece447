@@ -26,6 +26,7 @@
 `define LOAD_LW      3'b011
 `define LOAD_LBU     3'b100
 `define LOAD_LHU     3'b101
+`define NO_LOAD      3'b110
 
 
 // Store instructions for storer module
