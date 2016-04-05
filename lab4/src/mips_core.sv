@@ -69,7 +69,7 @@ module mips_core(/*AUTOARG*/
    
    parameter text_start  = 32'h00400000; /* Initial value of $pc */
 
-   // Core Interfae
+   // Core Interface
    input         clk, inst_excpt, mem_excpt;
    output [29:0] inst_addr;
    output [29:0] mem_addr;
@@ -101,28 +101,14 @@ module mips_core(/*AUTOARG*/
    wire[1:0] pcMuxSelFinal;
 
    wire [31:0] newpc; //mux output for next state PC
-   wire [31:0] stallpc; //either PC or PC+4 depending on stall conditions
+   //wire [31:0] pcNextFinal;
    wire [31:0] inst_ID; //instruction progagated to decode stage
-
-   //BTB
-   wire [61:0] btb_rd_data;
-
-   wire[31:0] tagPC, nextPCGuess, pcCorr, pcPred;
-   wire[1:0] state_new, history;
-
-   wire btb_wr_we, btbPred, mispredict, EXen, IFen;
-   wire btbHit;
 
    // PC Management
    //register #(32, text_start) PCReg(pc, pcNextFinal, clk, ~internal_halt, rst_b);
-   register #(32, text_start) PCReg(pc, pcCorr, clk, ~internal_halt, rst_b);
-   //mux2to1 predPCnext(pcNext, newpc, pcPred, EXen);
-   mux2to1 predPC1(pcCorr, pcPred, newpc, mispredict);
-   mux2to1 predPC2(pcPred, stallpc, nextPCGuess, btbPred && IFen);
-   //mux4to1 predPC(pcPred, stallpc, nextPCGuess, newpc, newpc, {mispredict, btbPred});
-   
-   /*register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
-                                       ~internal_halt, rst_b);*/
+   register #(32, text_start) PCReg(pc, newpc, clk, ~internal_halt, rst_b);
+   register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
+                                       ~internal_halt, rst_b);
    //mux2to1 pickNextPC (pcNextFinal, nextpc, nextnextpc,(pcMuxSel[1]|pcMuxSel[0]));
    add_const #(4) NextPCAdder(nextpc, pc);
    //add_const #(4) NextPCAdder(nextnextpc, nextpc, pcMuxSel);
@@ -151,47 +137,31 @@ module mips_core(/*AUTOARG*/
 
    // synthesis translate_off
    
-   /*always @(posedge clk) begin
+   always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
-      //$display("cyclesCount:%d", cyclesCount);
-       //$display ( "=== Simulation Cycle %d ===", $time );
-
-       $display("cycles: %d, fetch: %d, ex: %d", cyclesCount, instFetchedCount, instExCount);
-       //$display("brExfwd: %d, brExbwd: %d, brNPfwd: %d, brNPbwd: %d", brExCount_fwd, brExCount_bwd, brNoPred_fwd, brNoPred_bwd);
-       //$display("brTCfwd: %d, brTCbwd: %d, brNTfwd: %d, brNTbwd: %d", brTakenCount_fwd, brTakenCount_bwd, brNotTakenCorrect_fwd, brNotTakenCorrect_bwd);
-       //$display("jExfwd: %d, jExbwd: %d, jNPfwd: %d, jNPbwd: %d", jExCount_fwd, jExCount_bwd, jNoPred_fwd, jNoPred_bwd);
-       //$display("jECfwd: %d, jECbwd: %d", jExCorrect_fwd, jExCorrect_bwd);
-       //$display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
-       //            pc_ID, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
-       //$display ("rt_data_MEM:%x", rt_data_MEM);
-       //$display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
-       //$display ("HI: %x, LO: %x, hi_en_EX: %x, hi_en_WB:%x, lo_en_EX: %x, lo_en_WB: %x", hi_out, lo_out,hi_en_EX,hi_en_WB,lo_en_EX, lo_en_WB);
-       //$display ("HIWB: %x, LOWB: %x", HIout_WB, LOout_WB);
-       //$display ("F: pc: %x, inst_addr: %x, newpc: %x, pcPred: %d,  nextPCGuess:%x, btbPred: %b, mispred: %b", pc, inst_addr, newpc, pcPred, nextPCGuess, btbPred, mispredict);
-       //$display ("D: IDen: %x, wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x, rs_data: %x, rt_data: %x", IDen, wr_regNum, wr_data, dcd_rs, dcd_rt, imm, mem_en, rs_data, rt_data);
+       $display ( "=== Simulation Cycle %d ===", $time );
+       $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
+                   pc, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
+      // $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
+       $display ("HI: %x, LO: %x, hi_en_EX: %x, hi_en_WB:%x, lo_en_EX: %x, lo_en_WB: %x", hi_out, lo_out,hi_en_EX,hi_en_WB,lo_en_EX, lo_en_WB);
+       $display ("HIWB: %x, LOWB: %x", HIout_WB, LOout_WB);
+       //$display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, imm: %x, mem_en: %x", wr_reg, wr_data, dcd_rs, dcd_rt, imm, mem_en);
        //$display ("   fwd_rs_en: %x, fwd_rt_en: %x", fwd_rs_sel, fwd_rt_sel);
-       //$display ("E: EXen, %x, wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, rs_fwd: %x, rt_fwd: %x, rtfwdsel: %x, ctrl_we_EX: %x, mem_EX: %x", EXen, wr_reg_EX, alu_in1, alu_in2, alu__out, rs_fwd, rt_fwd, fwd_rt_sel_EX, ctrl_we_EX, mem_write_en_EX);
-      //$display("we_EX: %x, mem_EX: %x, regdst: %x, dcd_rt: %x, dcd_rs: %x, wr_reg_EX: %x", ctrl_we_EX, mem_write_en_EX, regdst, dcd_rt, dcd_rs, wr_reg_EX);
-       //$display ("M: wr_reg_MEM: %x, alu__outMEM: %x, mem_addr: %x, mem_data_in: %x, mem_data_out: %x, memctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, {mem_addr, 2'b00}, mem_data_in, mem_data_out, ctrl_we_MEM, mem_write_en_MEM);
-      // $display ("   mem_addr: %h, load_data: %x, load_st_EX: %x, mem_data_out: %x, store_data: %h, mem_write_en: %b", mem_addr, load_data, load_stall_EX, mem_data_out, store_data, mem_write_en);
-       //$display ("W: wr_reg: %x, wr_data: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", wr_reg, wr_data, alu__out_WB, ctrl_we_WB, mem_write_en_WB);
+       //$display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", wr_reg_EX, alu_in1, alu_in2, alu__out, ctrl_we_EX, mem_write_en_EX);
+       //$display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", wr_reg_MEM, alu__out_MEM, ctrl_we_MEM, mem_write_en_MEM);
+       //$display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
+       //$display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", wr_reg_WB, alu__out_WB, ctrl_we_WB, mem_write_en_WB);
        //$display ("sys: %x, rt_data: %x", ctrl_Sys, rt_data);
        //$display ("sys_WB: %x, rt_data: %x", ctrl_Sys_WB, rt_data_WB);
        //$display ("stall: %x, CDen: %x", stall, CDen);
        //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
-       //$display ("EXenFlush: %x, EXen:%x,", EXenFlush,EXen);
-       //$display ("btbtag: %x, btbhist: %b, btbaddr: %x", tagPC, history, nextPCGuess);
-       //$display ("btb_wr_we: %x, state_new: %b, history_EX: %b, btbHit_EX: %b", btb_wr_we, state_new, history_EX, btbHit_EX);
-       //$display ("branchTrue: %b, pcMuxSel_EX: %b, pcMuxSelFinal: %b, brcond_EX: %b", branchTrue, pcMuxSel_EX, pcMuxSelFinal, brcond_EX);
-       //$display ("mispredict: %b", mispredict);
-       //$display ("j_target: %x, br_target: %x, pc_EX: %x, imm_EX: %x", j_target, br_target, pc_EX, imm_EX);
-       //$display ("jLink_en_WB: %x, wr_data: %x, wr_reg: %x", jLink_en_WB, wr_data, wr_reg);
-       //$display ("pcID: %x, pcEX: %x, flush: %b", pc_ID, pc_EX, flush);
-       //$display ("");
+       //$display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", branchTrue, pcMuxSel, pcMuxSelFinal);
+       //$display ("br_target: %x", br_target);
+       $display ("");
      end
-   end*/
+   end
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -280,39 +250,30 @@ module mips_core(/*AUTOARG*/
    wire [1:0] fwd_rs_sel, fwd_rt_sel; //select bits for forwarding rs and rt
 
    //Fetch (IF) stage for pc register
-   //wire IFen; //enable for IF stage
+   wire IFen; //enable for IF stage
+   wire [31:0] stallpc; //either PC or PC+4 depending on stall conditions
    mux2to1 stallMux(stallpc, pc, pc+4, IFen);
 
    //Decode (ID) stage registers and wirings
    wire IDen; //enable for decode stage
    wire [31:0] pc_ID;
-   wire pcLinkSel;
-   wire btbHit_ID;
-   register pcID(pc_ID, pc, clk, IDen, rst_b);
-   register irID(inst_ID, inst, clk, IDen, rst_b);
-   register #(1) bhitID(btbHit_ID, btbHit, clk, IDen, rst_b);
+   register irD(inst_ID, inst, clk, IDen, rst_b);
 
    //Execute (EX) stage registers
-   // wire EXen; //enable for execute stage
+   wire EXen; //enable for execute stage
    wire [31:0] pc_EX;
-   wire pcLinkSel_EX;
    wire [31:0] rs_data_EX;
    wire [31:0] rt_data_EX;
    wire [31:0] imm_EX;
    wire [4:0] wr_reg_EX;
    wire [1:0] fwd_rs_sel_EX, fwd_rt_sel_EX;
-   wire [25:0] dcd_target_EX;
-   wire btbHit_EX;
    register pcEX(pc_EX, pc_ID, clk, EXen, rst_b);
    register rsEX(rs_data_EX, rs_data, clk, EXen, rst_b);
    register rtEX(rt_data_EX, rt_data, clk, EXen, rst_b);
    register iEX(imm_EX, imm, clk, EXen, rst_b);
-   register #(5) wrEX(wr_reg_EX, wr_regNum, clk, EXen, rst_b);
+   register #(5) wrEX(wr_reg_EX, wr_reg, clk, EXen, rst_b);
    register #(2) fwdrsEX(fwd_rs_sel_EX, fwd_rs_sel, clk, EXen, rst_b);
    register #(2) fwdrtEX(fwd_rt_sel_EX, fwd_rt_sel, clk, EXen, rst_b);
-   register #(26) targetEX(dcd_target_EX, dcd_target, clk, EXen, rst_b);
-   register #(1) bhitEX(btbHit_EX, btbHit_ID, clk, EXen, rst_b);
-   register #(1)pcLinkSelEX(pcLinkSel_EX, pcLinkSel, clk, EXen, rst_b);
 
    wire ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX;
    wire alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, load_stall_EX; 
@@ -331,7 +292,6 @@ module mips_core(/*AUTOARG*/
    //Memory (MEM) stage registers
    wire MEMen; //enable for memory stage
    wire [31:0] pc_MEM;
-   wire [31:0] pcLink_MEM;
    wire [31:0] alu__out_MEM;
    wire [31:0] rt_data_MEM;
    wire [31:0] imm_MEM;
@@ -342,7 +302,6 @@ module mips_core(/*AUTOARG*/
    register rtMEM(rt_data_MEM, rt_fwd, clk, MEMen, rst_b);
    register iMEM(imm_MEM, imm_EX, clk, MEMen, rst_b);
    register #(5) wrMEM(wr_reg_MEM, wr_reg_EX, clk, MEMen, rst_b);
-   register pcLinkMEM(pcLink_MEM, pc_EX+4, clk, MEMen, rst_b);
 
    wire ctrl_we_MEM, ctrl_Sys_MEM, ctrl_RI_MEM, regdst_MEM, jLink_en_MEM;
    wire alusrc1_MEM, alusrc2_MEM, se_MEM, hi_en_MEM, lo_en_MEM, load_stall_MEM;
@@ -360,20 +319,16 @@ module mips_core(/*AUTOARG*/
 
    //Writeback stage registers
    wire WBen; //enable for WB stage
-   wire [31:0] pc_WB;
-   wire [31:0] pcLink_WB;
    wire [31:0] HIout_WB, LOout_WB, load_data_WB, alu__out_WB;
    wire [31:0] rt_data_WB;
    wire [4:0] wr_reg_WB;
    assign WBen = 1; //WB stage never disabled
-   register pcWB(pc_WB, pc_MEM, clk, WBen, rst_b);
    register MDRw(load_data_WB, load_data, clk, WBen, rst_b);
    register Aoutw(alu__out_WB, alu__out_MEM, clk, WBen, rst_b);
    register HIwb(HIout_WB, hi_out, clk, WBen, rst_b); //holds HI val in WB register (may need to have its own en)
    register LOwb(LOout_WB, lo_out, clk, WBen, rst_b); //holds LO val in WB register (may need to have its own en)
    register rtWB(rt_data_WB, rt_data_MEM, clk, WBen, rst_b);
    register #(5) wrWB(wr_reg_WB, wr_reg_MEM, clk, WBen, rst_b);
-   register pcLinkWB(pcLink_WB, pcLink_MEM, clk, WBen, rst_b);
 
    wire ctrl_we_WB, ctrl_Sys_WB, ctrl_RI_WB, regdst_WB, jLink_en_WB;
    wire alusrc1_WB, alusrc2_WB, se_WB, hi_en_WB, lo_en_WB, load_stall_WB;
@@ -390,36 +345,20 @@ module mips_core(/*AUTOARG*/
                        clk, WBen, rst_b);
 
    //check for RAW hazard and Stall
-   
-   //wire stall, 
-   wire CDen, EXenStall;
+   wire stall, CDen;
    wire [2:0] CDAmt;
    stallDetector sD(wr_reg_EX,wr_reg_MEM,wr_reg_WB,rt_regNum,dcd_rs,
-                    mem_write_en_EX, mem_write_en_MEM, mem_write_en,
+                    mem_write_en_EX, mem_write_en_MEM, mem_write_en, 
                     ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, regdst, stall,
                     load_stall_EX,
-                    EXenStall, IDen, IFen, 
+                    EXen, IDen, IFen, 
                     CDen, CDAmt);
-   countdownReg cdsDReg(CDen, clk, rst_b,
+   countdownReg cdReg(CDen, clk, rst_b,
                       CDAmt,
                       stall);
 
-   //check for branch -> flush
-   wire flush, CDFlushen,EXenFlush;
-   wire [2:0] CDFlushAmt;
-   flushMod fM(pcMuxSelFinal, pcMuxSel_EX, pc_ID, pc_EX, br_target, rs_fwd, j_target,
-               flush,
-               EXenFlush, CDFlushen, mispredict,
-               CDFlushAmt);
-
-   countdownReg cdFlushReg(CDFlushen, clk, rst_b,
-                           CDFlushAmt,
-                           flush);
-
-   assign EXen = (EXenFlush & EXenStall);
-
    //Register file
-   regfile_forward RegFile(rs_data, rt_data, dcd_rs, rt_regNum, wr_reg, wr_data, ctrl_we_WB, clk, rst_b, halted);
+   regfile_forward RegFile(rs_data, rt_data, dcd_rs, rt_regNum, wr_reg_WB, wr_data, ctrl_we_WB, clk, rst_b, halted);
    mux2to1 #(5) regDest(wr_regNum, dcd_rt, dcd_rd, regdst); //register to write to
    mux2to1 #(5) regRt(rt_regNum, dcd_rt, 5'd2, ctrl_Sys); //rt reg to read from (for syscalls)   
 
@@ -430,17 +369,14 @@ module mips_core(/*AUTOARG*/
    //Determines inputs to ALU
    mux2to1 aluSrc1(alu_in1, rs_fwd, rt_fwd, alusrc1_EX); //ALUSrc1
    mux2to1 aluSrc2(alu_in2, rt_fwd, imm_EX, alusrc2_EX); //ALUSrc2
-   mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se); //Zero extend or sign extend immediate
+   mux2to1 signext(imm, dcd_e_imm, dcd_se_imm, se_EX); //Zero extend or sign extend immediate
 
    //rs and rt forwarding
-   wire [31:0] pcfwd;
-   mux2to1 fwdpc(pcfwd, pcLink_MEM, pcLink_WB, pcLinkSel_EX);
-   mux4to1 fwdrs(rs_fwd, rs_data_EX, alu__out_MEM, wr_dataMem, pcfwd, fwd_rs_sel_EX);
-   mux4to1 fwdrt(rt_fwd, rt_data_EX, alu__out_MEM, wr_dataMem, pcfwd, fwd_rt_sel_EX);
+   mux4to1 fwdrs(rs_fwd, rs_data_EX, alu__out_MEM, wr_dataMem, , fwd_rs_sel_EX);
+   mux4to1 fwdrt(rt_fwd, rt_data_EX, alu__out_MEM, wr_dataMem, , fwd_rt_sel_EX);
    forwardData fwd(wr_reg_EX, wr_reg_MEM, wr_reg_WB, rt_regNum, dcd_rs,
                    mem_write_en_EX, mem_write_en_MEM, mem_write_en,
-                   ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, jLink_en_EX, jLink_en_MEM,
-                   pcLinkSel,
+                   ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB,
                    fwd_rs_sel, fwd_rt_sel);
 
    //Wirings to memory module
@@ -454,42 +390,14 @@ module mips_core(/*AUTOARG*/
    storer storer(store_data, mem_write_en, rt_data_MEM, store_sel_MEM, alu__out_MEM, mem_write_en_MEM); //operates on data to write to memory
 
    //Mux for next state PC
-   wire [31:0] stallpc_EX;
-   mux2to1 stallpcEX(stallpc_EX, pc_EX, pc_EX+4, IFen);
-   mux4to1 pcMux(newpc, stallpc_EX, br_target, rs_fwd, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
-   adder brtarget(br_target, pc_EX+4, (imm_EX << 2), 1'b0); //get branch target
-   concat conc(j_target, pc_EX, dcd_target_EX); //get jump target
-   pcSelector choosePcMuxSel(pcMuxSelFinal, pcMuxSel_EX, branchTrue); //chooses PC on whether branch condition is met
-
-   wire [1:0] history_ID, history_EX;
-   
-   //btb for branch prediction
-   wire [31:0] pred;
-   wire [1:0] first_state, next_state;
-   mux4to1 predMux(pred, 32'b0, br_target, rs_fwd, j_target, pcMuxSel_EX);
-   btbsram btb(btb_rd_data, pc[8:2], pc_EX[8:2], {pc_EX[31:2], state_new, pred[31:2]}, btb_wr_we, clk, rst_b);
-
-
-   mux2to1 #(2)histMux1(state_new, first_state, next_state, btbHit_EX);
-   mux2to1 #(2)histMux2(first_state, 2'b01, 2'b10, mispredict);
-   //mux4to1 histMux(state_new, next_state, next_state, 2'b10, 2'b01, {~btbHit_EX, mispredict});
-   saturationCounter satCounter(next_state, history_EX, pcMuxSelFinal!=2'b00, clk, rst_b);
-
-   assign tagPC = {btb_rd_data[61:32],2'b00};
-   assign history = btb_rd_data[31:30];
-   //assign history = 2'b00;
-   assign nextPCGuess = {btb_rd_data[29:0],2'b00};
-   assign btb_wr_we = (pcMuxSelFinal!=2'b00) ? 1'b1 : 1'b0;
-   assign btbPred = (pc[31:2]==tagPC[31:2] && history[1]) ? 1'b1 : 1'b0;
-   assign btbHit = pc[31:2]==tagPC[31:2] ? 1'b1 : 1'b0;
-
-   //registers to propogate the history state value
-   register #(2,0) histID(history_ID, history, clk, IDen, rst_b);
-   register #(2,0) histEX(history_EX, history_ID, clk, EXen, rst_b);
+   mux4to1 pcMux(newpc, stallpc, br_target, rs_data, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
+   adder brtarget(br_target, pc + 4, (imm << 2), 1'b0); //get branch target
+   concat conc(j_target, pc, dcd_target); //get jump target
+   pcSelector choosePcMuxSel(pcMuxSelFinal,pcMuxSel,branchTrue); //chooses PC on whether branch condition is met
 
    //Set wr_data and wr_reg when there is a jump/branch with link
-   mux2to1 dataToReg(wr_data, wr_dataMem, pc_WB+4, jLink_en_WB); 
-   mux2to1 #(5)regNumber(wr_reg, wr_reg_WB, 5'd31, jLink_en_WB);
+   mux2to1 dataToReg(wr_data, wr_dataMem, pc+4, jLink_en_WB); 
+   mux2to1 #(5)regNumber(wr_reg, wr_regNum, 5'd31, jLink_en_WB);
 
 /*****************************************************************************/
 
@@ -500,7 +408,7 @@ module mips_core(/*AUTOARG*/
                 .alu__op1(alu_in1),
                 .alu__op2(alu_in2),
                 .alu__sel(alu__sel_EX),
-                .brcond(brcond_EX));
+                .brcond(brcond));
  
    // Miscellaneous stuff (Exceptions, syscalls, and halt)
    exception_unit EU(.exception_halt(exception_halt), .pc(pc), .rst_b(rst_b),
@@ -527,39 +435,7 @@ module mips_core(/*AUTOARG*/
    register #(32, 0) CauseReg(cause,
                               {25'b0, cause_code, 2'b0}, 
                               clk, load_ex_regs, rst_b);
-   register #(32, 0) BadVAddrReg(bad_v_addr, pc, clk, load_bva, rst_b);
-
-   /* Counters */
-   wire [31:0] cyclesCount, instFetchedCount, instExCount;
-   /*wire [31:0] brExCount_fwd, brExCount_bwd, brNoPred_fwd, brNoPred_bwd;
-   wire [31:0] brTakenCount_fwd, brTakenCount_bwd;
-   wire [31:0] brTakenCorrect_fwd, brTakenCorrect_bwd;
-   wire [31:0] brNotTakenCorrect_fwd, brNotTakenCorrect_bwd;
-   wire [31:0] jExCount_fwd, jExCount_bwd, jNoPred_fwd, jNoPred_bwd;
-   wire [31:0] jExCorrect_fwd, jExCorrect_bwd;
-   wire forward, back;
-   assign forward = (pc_EX < newpc) ? 1'b1 : 1'b0;
-   assign back = (pc_EX > newpc) ? 1'b1 : 1'b0;*/
-   
-   counter cycles(cyclesCount, 1'b1, clk, rst_b);
-   /*counter instFetched(instFetchedCount, IFen, clk, rst_b);
-   counter instEx(instExCount, EXen, clk, rst_b);
-   counter brExfwd(brExCount_fwd, pcMuxSel_EX==2'b01 && forward, clk, rst_b);
-   counter brExbwd(brExCount_bwd, pcMuxSel_EX==2'b01 && back, clk, rst_b);
-   counter brNPfwd(brNoPred_fwd, pcMuxSel_EX==2'b01 && !btbHit_EX && forward, clk, rst_b);
-   counter brNPbwd(brNoPred_bwd, pcMuxSel_EX==2'b01 && !btbHit_EX && back, clk, rst_b);
-   counter brTakenfwd(brTakenCount_fwd, pcMuxSelFinal==2'b01 && btbHit_EX && forward, clk, rst_b);
-   counter brTakenbwd(brTakenCount_bwd, pcMuxSelFinal==2'b01 && btbHit_EX && back, clk, rst_b);
-   counter brTCfwd(brTakenCorrect_fwd, pcMuxSelFinal==2'b01 && ~mispredict && btbHit_EX && forward, clk, rst_b);
-   counter brTCbwd(brTakenCorrect_bwd, pcMuxSelFinal==2'b01 && ~mispredict && btbHit_EX && back, clk, rst_b);
-   counter brNTCfwd(brNotTakenCorrect_fwd, pcMuxSel_EX==2'b01 && pcMuxSelFinal==2'b00 && ~mispredict && btbHit_EX && forward, clk, rst_b);
-   counter brNTCbwd(brNotTakenCorrect_bwd, pcMuxSel_EX==2'b01 && pcMuxSelFinal==2'b00 && ~mispredict && btbHit_EX && back, clk, rst_b);
-   counter jExfwd(jExCount_fwd, pcMuxSelFinal[1] && forward, clk, rst_b);
-   counter jExbwd(jExCount_bwd, pcMuxSelFinal[1] && back, clk, rst_b);
-   counter jNPfwd(jNoPred_fwd, pcMuxSelFinal[1] && !btbHit_EX && forward, clk, rst_b);
-   counter jNPbwd(jNoPred_bwd, pcMuxSelFinal[1] && !btbHit_EX && back, clk, rst_b);
-   counter jECfwd(jExCorrect_fwd, pcMuxSelFinal[1] && ~mispredict && btbHit_EX && forward, clk, rst_b);
-   counter jECbwd(jExCorrect_bwd, pcMuxSelFinal[1] && ~mispredict && btbHit_EX && back, clk, rst_b);*/
+   register #(32, 0) BadVAddrReg(bad_v_addr, pc, clk, load_bva, rst_b);   
 
 endmodule // mips_core
 
@@ -591,8 +467,8 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
       `ALU_SUB:
         begin //check if branch condition is met
 	  alu__out = alu__op1 - alu__op2;
-          //$display("sub");
-          case(brcond)
+
+          /*case(brcond)
             `BR_BLTZ:
               begin
                 if ($signed(alu__op1)<0)
@@ -620,12 +496,13 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
               end
             `BR_BGTZ:
               begin
+                $display("alu__op1: %d, alu__op2:%d", alu__op1, alu__op2);
                 if ($signed(alu__op1)>$signed(0))
                   branchTrue = 1'b1;
               end
             default:
               alu__out = alu__op1-alu__op2;
-          endcase
+          endcase*/
         end
       `ALU_SLL:
         //shift by value in bits [10:6] of immediate
@@ -660,76 +537,6 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
    //adder AdderUnit(alu__out, alu__op1, alu__op2, alu__sel[0]);
 
 endmodule
-
-//// saturationCounter: determines what to update the state of the history in the BTB with
-////
-//// q      (output) - Next state
-//// d      (input)  - Current state
-//// isBranch (input) - Whether the branch/jump was taken or not
-//// clk    (input)  - Clock (positive edge-sensitive)
-//// reset  (input)  - System reset
-////
-module saturationCounter(
-  output logic [1:0] q,
-  input logic [1:0] d,
-  input logic isBranch, clk, rst_b);
-
-  always_comb begin
-    if (~rst_b)
-      q = 2'b11;
-    else if (isBranch) begin
-     if (d==2'b00)
-       q=2'b01;
-     else if (d==2'b01)
-       q=2'b10;
-     else if (d==2'b10)
-       q=2'b11;
-     else if (d==2'b11)
-       q=2'b11;
-    end
-    else if (~isBranch) begin
-      if (d==2'b00)
-       q=2'b00;
-     else if (d==2'b01)
-       q=2'b00;
-     else if (d==2'b10)
-       q=2'b01;
-     else if (d==2'b11)
-       q=2'b10;
-    end
-   end
-endmodule
-
-
-//// resetregister: A register which may be reset to an arbirary value and is set to 0 if disabled.
-////
-//// q      (output) - Current value of register
-//// d      (input)  - Next value of register
-//// clk    (input)  - Clock (positive edge-sensitive)
-//// enable (input)  - Load new value?
-//// reset  (input)  - System reset
-////
-module resetregister(q, d, clk, enable, clear, rst_b);
-
-   parameter
-            width = 32,
-            reset_value = 0;
-
-   output [(width-1):0] q;
-   reg [(width-1):0]    q;
-   input [(width-1):0]  d;
-   input                 clk, enable, clear, rst_b;
-
-   always @(posedge clk or negedge rst_b)
-     if (~rst_b)
-       q <= reset_value;
-     else if (clear)
-       q <= 32'b0;
-     else if (enable)
-       q <= d;
-
-endmodule // register
-
 
 //// register: A register which may be reset to an arbirary value
 ////
@@ -837,7 +644,7 @@ module cntlRegister (
          hi_en <= 1'b0;
          lo_en <= 1'b0;
          memtoreg <= memtoreg_in;
-         pcMuxSel <= 2'b0;
+         pcMuxSel <= pcMuxSel_in;
          alu__sel <= alu__sel_in;
          mem_write_en <= 1'b0;
          load_sel <= load_sel_in;
@@ -855,105 +662,37 @@ endmodule
 //// dcd_rs, dcd_rt (inputs) - the registers the next instruction is reading
 //// mem_write_en_EX, mem_write_en_MEM, mem_write_en (inputs) - the memory write enable bits at different stages
 //// ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB (inputs) - register write enable bits at different stages
-//// pcLinkSel (output) - selects which stage to forward pcLink from
 //// rsfwd, rtfwd (output) - selects what data to forward to rs and rt data outputs
 ////
 
 module forwardData(
   input logic [4:0] wr_reg_EX, wr_reg_MEM, wr_reg_WB, dcd_rt, dcd_rs,
   input logic [3:0] mem_write_en_EX, mem_write_en_MEM, mem_write_en,
-  input logic ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, jLink_en_EX, jLink_en_MEM,
-  output logic pcLinkSel,
+  input logic ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB,
   output logic [1:0] rsfwd, rtfwd);
 
   always_comb begin
     rsfwd = 2'b0;
     rtfwd = 2'b0;
-    pcLinkSel = 1'b0;
     if (ctrl_we_MEM != 0) begin
-      if (dcd_rs != 0) begin
-        if (dcd_rs == wr_reg_MEM) begin
-          rsfwd = 2'b10;
-        end
-        if (jLink_en_MEM && dcd_rs == 5'd31) begin
-          rsfwd = 2'b11;
-          pcLinkSel = 1'b1;
-        end
+      if ((dcd_rs != 0) && (dcd_rs == wr_reg_MEM)) begin
+        rsfwd = 2'b10;
       end
-      if (dcd_rt != 0) begin
-        if (dcd_rt == wr_reg_MEM) begin
-          rtfwd = 2'b10;
-        end
-        if (jLink_en_MEM && dcd_rt == 5'd31) begin
-          rtfwd = 2'b11;
-          pcLinkSel = 1'b1;
-        end
+      if ((dcd_rt != 0) && (dcd_rt == wr_reg_MEM)) begin
+        rtfwd = 2'b10;
       end
     end
     if (ctrl_we_EX != 0) begin
-      if (dcd_rs != 0) begin
-        if (dcd_rs == wr_reg_EX) begin
-          rsfwd = 2'b01;
-        end
-        if (jLink_en_EX && dcd_rs == 5'd31) begin
-          rsfwd = 2'b11;
-        end
+      if ((dcd_rs != 0) && (dcd_rs == wr_reg_EX)) begin
+        rsfwd = 2'b01;
       end
-      if (dcd_rt != 0) begin
-        if (dcd_rt == wr_reg_EX) begin
-          rtfwd = 2'b01;
-        end
-        if (jLink_en_EX && dcd_rt == 5'd31) begin
-          rtfwd = 2'b11;
-        end
+      if ((dcd_rt != 0) && (dcd_rt == wr_reg_EX)) begin
+        rtfwd = 2'b01;
       end
     end
 
   end
 
-endmodule
-
-
-////
-//// flushMod: module for flushing if branch
-////
-//// pcMuxSelFinal (input) - determines if there is a branch
-//// pc_ID (input) - address of instruction in ID stage
-//// pc_EX (input) - address of instruction in EX stage
-//// br_target (input) - branch target calculated in EX stage
-//// rs_fwd (input) - JR target
-//// j_target (input) - jump target 
-//// flush (input) - signal that indicates an instruction is currently being stalled
-//// EXen (output) - register enable bits at the EX stage
-//// CDFlushen  (output) - enables countdown register
-//// mispredict (output) - signals when a misprediction is detected
-//// CDAmt (output) - number of clock cycles to stall
-////
-module flushMod(
-  input logic [1:0] pcMuxSelFinal, pcMuxSel_EX,
-  input logic [31:0] pc_ID, pc_EX, br_target, rs_fwd, j_target,
-  input logic flush,
-  output logic EXen, CDFlushen, mispredict,
-  output logic [2:0] CDFlushAmt);
-
-  always_comb begin
-    EXen = 1'b1;
-    CDFlushAmt = 3'b0;
-    CDFlushen = 1'b0;
-    mispredict = 1'b0;
-    if (flush == 1'b1) begin
-      EXen = 1'b0;
-    end
-    else if(pcMuxSel_EX!=2'b00 && flush==1'b0 && ((pcMuxSelFinal==2'b00 && pc_ID!=pc_EX+4) || 
-                                                  (pcMuxSelFinal==2'b01 && pc_ID!=br_target) ||
-                                                  (pcMuxSelFinal==2'b10 && pc_ID!=rs_fwd) ||
-                                                  (pcMuxSelFinal==2'b11 && pc_ID!=j_target))) begin
-      CDFlushen = 1'b1;
-      EXen = 1'b0;
-      CDFlushAmt = 1'd1;
-      mispredict = 1'b1;
-    end
-  end
 endmodule
 
 ////
@@ -988,7 +727,6 @@ module stallDetector(
     end
     else if(stall == 1'b0 && load_stall_EX == 1'b1) begin
       if ((ctrl_we_EX != 0 || mem_write_en_EX != 0) && (((regdst == 1) && (dcd_rt != 0) && (dcd_rt == wr_reg_EX)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_EX)))) begin
-        //$display("we_EX: %x, mem_EX: %x, regdst: %x, dcd_rt: %x, dcd_rs: %x, wr_reg_EX: %x", ctrl_we_EX, mem_write_en_EX, regdst, dcd_rt, dcd_rs, wr_reg_EX);
         CDen = 1'b1;
         CDAmt = 3'd0;
         IFen = 1'b0;
@@ -1026,29 +764,6 @@ module countdownReg #(parameter reset_value = 0) (
     end
     else if (CDAmtq != 3'd0) begin
       CDAmtq <= CDAmtq-1;
-    end
-  end
-
-endmodule
-
-////
-//// counter: keep track of counts
-////
-//// en (input)     - enable bit for count
-//// clk (input)    - Clock (positive edge-sensitive)
-//// reset (input)  - System reset
-//// count (output) - current count
-////
-module counter #(parameter reset_value = 32'd0) (
-  output logic [31:0] count,
-  input logic en, clk, rst_b);
-
-  always_ff @(posedge clk or negedge rst_b) begin
-    if (~rst_b) begin
-      count <= reset_value;
-    end
-    else if (en) begin
-      count <= count + 1;
     end
   end
 

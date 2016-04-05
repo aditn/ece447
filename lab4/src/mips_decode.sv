@@ -174,7 +174,7 @@ module mips_decode(/*AUTOARG*/
            `OP0_MTLO: //write to LO reg
              lo_en = 1'b1;
            `OP0_ADD: 
-               alu__sel = `ALU_ADD;
+             alu__sel = `ALU_ADD;
            `OP0_ADDU:
              alu__sel = `ALU_ADD; //same as add
            `OP0_SUB:
@@ -372,7 +372,6 @@ module mips_decode(/*AUTOARG*/
            alu__sel = `ALU_ADD;
            alusrc2 = 1'b1;
            se = 1'b1;
-           regdst = 1'b1;
            mem_write_en = 4'b1000;
            store_sel = `ST_SB;
          end
@@ -382,7 +381,6 @@ module mips_decode(/*AUTOARG*/
            alu__sel = `ALU_ADD;
            alusrc2 = 1'b1;
            se = 1'b1;
-           regdst = 1'b1;
            mem_write_en = 4'b1100;
            store_sel = `ST_SH;
          end
@@ -392,7 +390,6 @@ module mips_decode(/*AUTOARG*/
            alu__sel = `ALU_ADD;
            alusrc2 = 1'b1;
            se = 1'b1;
-           regdst = 1'b1;
            mem_write_en = 4'b1111;
            store_sel = `ST_SW;
          end
