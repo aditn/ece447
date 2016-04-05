@@ -665,12 +665,20 @@ module mips_core(/*AUTOARG*/
 
 
    // Execute
-   mips_ALU ALU(.alu__out(alu__out),
-                .branchTrue(branchTrue), 
-                .alu__op1(alu_in1),
-                .alu__op2(alu_in2),
-                .alu__sel(alu__sel_EX),
-                .brcond(brcond));
+   mips_ALU ALU1(.alu__out(instruc_1.alu__out),
+                .branchTrue(instruc_1.branchTrue), 
+                .alu__op1(instruc_1.alu_in1),
+                .alu__op2(instruc_1.alu_in2),
+                .alu__sel(instruc_1.alu__sel_EX),
+                .brcond(instruc_1.brcond_EX));
+
+   mips_ALU ALU2(.alu__out(instruc_2.alu__out_2),
+                .branchTrue(instruc_2.branchTrue), 
+                .alu__op1(instruc_2.alu_in1),
+                .alu__op2(instruc_2.alu_in2),
+                .alu__sel(instruc_2.alu__sel_EX),
+                .brcond(instruc_2.brcond_EX));
+
  
    // Miscellaneous stuff (Exceptions, syscalls, and halt)
    exception_unit EU(.exception_halt(exception_halt), .pc(pc), .rst_b(rst_b),
