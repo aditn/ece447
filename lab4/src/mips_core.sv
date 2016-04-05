@@ -1027,43 +1027,124 @@ module forwardData(
 endmodule
 
 ////
-//// stallDetector: module for enabling stalls if RAW hazard
+//// stallDetector: module for enabling stalls if RAW, WAR, WAW hazard
 ////
-//// wr_reg_EX, wr_reg_MEM, wr_reg_WB (inputs) - are reg numbers at different stages
+//// wr_reg_EX, wr_reg_MEM (inputs) - are reg numbers at different stages
 //// dcd_rs, dcd_rt (inputs) - the registers the next instruction is reading
-//// mem_write_en_EX, mem_write_en_MEM, mem_write_en (inputs) - the memory write enable bits at different stages
-//// ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB (inputs) - register write enable bits at different stages
+//// mem_write_en_EX, mem_write_en_MEM (inputs) - the memory write enable bits at different stages
+//// ctrl_we_EX, ctrl_we_MEM (inputs) - register write enable bits at different stages
 //// stall (input) - signal that indicates an instruction is currently being stalled
 //// IFen, IDen, EXen, (output) - register enable bits at the IF, ID, and EX stages
 //// CDAmt (output) - number of clock cycles to stall
 ////
 module stallDetector(
-  input logic [4:0] wr_reg_EX, wr_reg_MEM, wr_reg_WB, dcd_rt, dcd_rs,
-  input logic [3:0] mem_write_en_EX, mem_write_en_MEM, mem_write_en,
-  input logic ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, regdst, stall,
-  input logic load_stall_EX,
-  output logic EXen, IDen, IFen, CDen,
+  input logic [31:0] pc_ID_1, pc_EX_1,
+  input logic [4:0] wr_reg_1, wr_reg_EX_1, wr_reg_MEM_1, dcd_rt_1, dcd_rs_1,
+  input logic [3:0] mem_en_1,
+  input logic ctrl_we_1, ctrl_we_EX_1, regdst_1,
+  input logic [31:0] pc_ID_2, pc_EX_2, pc_MEM_2,
+  input logic [4:0] wr_reg_2, wr_reg_EX_2, wr_reg_MEM_2, dcd_rt_2, dcd_rs_2,
+  input logic [3:0] mem_en_2,
+  input logic ctrl_we_2, ctrl_we_EX_2, regdst_2, 
+  input logic stall_1, stall_2, load_stall_1, load_stall_EX_1, load_stall_2, load_stall_EX_2,
+  output logic IFen_1, IDen_1, EXen_1, IFen_2, IDen_2, EXen_2, CDen,
   output logic [2:0] CDAmt);
   
   always_comb begin
-    IFen = 1'b1;
-    IDen = 1'b1;
-    EXen = 1'b1;
+    IFen_1 = 1'b1;
+    IDen_1 = 1'b1;
+    EXen_1 = 1'b1;
+    IFen_2 = 1'b1;
+    IDen_2 = 1'b1;
+    IDen_2 = 1'b1;
     CDen = 1'b0;
     CDAmt = 3'b0;
-    if (stall == 1'b1) begin
-      IFen = 1'b0;
-      IDen = 1'b0;
-      EXen = 1'b0;
+    if(stall_1==1'b1) begin
+      IFen_1 = 1'b0;
+      IDen_1 = 1'b0;
+      EXen_1 = 1'b0;
+      IFen_2 = 1'b0;
+      IDen_2 = 1'b0;
+      EXen_2 = 1'b0;
     end
-    else if(stall == 1'b0 && load_stall_EX == 1'b1) begin
-      if ((ctrl_we_EX != 0 || mem_write_en_EX != 0) && (((regdst == 1) && (dcd_rt != 0) && (dcd_rt == wr_reg_EX)) || ((dcd_rs != 0) && (dcd_rs == wr_reg_EX)))) begin
-        CDen = 1'b1;
-        CDAmt = 3'd0;
-        IFen = 1'b0;
-        IDen = 1'b0;
-        EXen = 1'b0;
-      end 
+    else if(stall_1==1'b0) begin 
+      if(load_stall_EX_1==1'b1) begin
+        if((ctrl_we_EX_1!=0) && (((regdst_1==1) && (dcd_rt_1!=0) && (dcd_rt_1==wr_reg_EX_1)) || ((dcd_rs_1!=0) && (dcd_rs_1==wr_reg_EX_1)))) begin
+          IFen_1 = 1'b0;
+          IDen_1 = 1'b0;
+          EXen_1 = 1'b0;
+          IFen_2 = 1'b0;
+          IDen_2 = 1'b0;
+          EXen_2 = 1'b0;
+        end
+      end
+      else if(load_stall_EX_2==1'b1 && (pc_ID_1>pc_EX_2)) begin
+        if((ctrl_we_EX_1!=0) && (((regdst_1==1) && (dcd_rt_1!=0) && (dcd_rt_1==wr_reg_EX_2)) || ((dcd_rs_1!=0) && (dcd_rs_1==wr_reg_EX_2)))) begin
+          IFen_1 = 1'b0;
+          IDen_1 = 1'b0;
+          EXen_1 = 1'b0;
+          IFen_2 = 1'b0;
+          IDen_2 = 1'b0;
+          EXen_2 = 1'b0;
+        end
+      end
+      else if((load_stall_1==1'b1 || mem_en_1==1'b1) && (load_stall_2==1'b1 || mem_en_2==1'b1) && (pc_ID_1>pc_ID_2)) begin
+        IFen_1 = 1'b0;
+        IDen_1 = 1'b0;
+        EXen_1 = 1'b0;
+        IFen_2 = 1'b0;
+        IDen_2 = 1'b0;
+      end
+      /*if(load_stall_2==1'b1 && (pc_ID_1>pc_ID_2)) begin
+        if((ctrl_we!=0) && (((regdst_1==1) && (dcd_rt_1!=0) && (dcd_rt_1==wr_reg_EX_2)) || ((dcd_rs_1!=0) && (dcd_rs_1==wr_reg_EX_2)))) begin
+      end*/
+      
+    end
+    
+    if(stall_2==1'b1) begin
+      IFen_2 = 1'b0;
+      IDen_2 = 1'b0;
+      EXen_2 = 1'b0;
+      IFen_1 = 1'b0;
+      IDen_1 = 1'b0;
+    end
+    else if(stall_2==1'b0) begin
+      if(load_stall_EX_2==1'b1) begin
+        if((ctrl_we_EX_2!=0) && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_EX_2)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_EX_2)))) begin
+          IFen_2 = 1'b0;
+          IDen_2 = 1'b0;
+          EXen_2 = 1'b0;
+          IFen_1 = 1'b0;
+          IDen_1 = 1'b0;
+        end
+      end
+      else if(load_stall_EX_1==1'b1 && (pc_ID_2>pc_EX_1)) begin
+        if((ctrl_we_EX_2!=0) && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_EX_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_EX_1)))) begin
+          IFen_2 = 1'b0;
+          IDen_2 = 1'b0;
+          EXen_2 = 1'b0;
+          IFen_1 = 1'b0;
+          IDen_1 = 1'b0;
+        end
+      end
+      else if((load_stall_1==1'b1 || mem_en_1==1'b1) && (load_stall_2==1'b1 || mem_en_2==1'b1) && (pc_ID_2>pc_ID_1)) begin
+        IFen_1 = 1'b0;
+        IDen_1 = 1'b0;
+        IFen_2 = 1'b0;
+        IDen_2 = 1'b0;
+        EXen_2 = 1'b0;
+      end
+      if(load_stall_1==1'b1 && (pc_ID_2>pc_ID_1)) begin
+        if((ctrl_we_2!=0) && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_EX_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_EX_1)))) begin
+          IFen_2 = 1'b0;
+          IDen_2 = 1'b0;
+          EXen_2 = 1'b0;
+          IFen_1 = 1'b0;
+          IDen_1 = 1'b0;
+          CDen = 1'b1;
+          CDAmt = 3'd2;
+        end
+      end
     end
   end
 
