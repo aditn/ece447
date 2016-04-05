@@ -442,11 +442,11 @@ module mips_core(/*AUTOARG*/
                        instruc_1.store_sel,instruc_1.load_stall, clk, instruc_1.EXen, rst_b);
 
    /**********Instruction 2**********/
-   register pcEX_1(instruc_2.pc_EX, instruc_2.pc_ID, clk, instruc_2.EXen, rst_b);
-   register rsEX_1(instruc_2.rs_data_EX, instruc_2.rs_data, clk, instruc_2.EXen, rst_b);
-   register rtEX_1(instruc_2.rt_data_EX, instruc_2.rt_data, clk, instruc_2.EXen, rst_b);
-   register iEX_1(instruc_2.imm_EX, instruc_2.imm, clk, instruc_2.EXen, rst_b);
-   register #(5) wrEX_1(instruc_2.wr_reg_EX, instruc_2.wr_reg, clk, instruc_2.EXen, rst_b);
+   register pcEX_2(instruc_2.pc_EX, instruc_2.pc_ID, clk, instruc_2.EXen, rst_b);
+   register rsEX_2(instruc_2.rs_data_EX, instruc_2.rs_data, clk, instruc_2.EXen, rst_b);
+   register rtEX_2(instruc_2.rt_data_EX, instruc_2.rt_data, clk, instruc_2.EXen, rst_b);
+   register iEX_2(instruc_2.imm_EX, instruc_2.imm, clk, instruc_2.EXen, rst_b);
+   register #(5) wrEX_2(instruc_2.wr_reg_EX, instruc_2.wr_reg, clk, instruc_2.EXen, rst_b);
    //register #(2) fwdrsEX(fwd_rs_sel_EX, fwd_rs_sel, clk, EXen, rst_b);
    //register #(2) fwdrtEX(fwd_rt_sel_EX, fwd_rt_sel, clk, EXen, rst_b);
 
@@ -656,12 +656,20 @@ module mips_core(/*AUTOARG*/
 
 
    // Execute
-   mips_ALU ALU(.alu__out(alu__out),
-                .branchTrue(branchTrue), 
-                .alu__op1(alu_in1),
-                .alu__op2(alu_in2),
-                .alu__sel(alu__sel_EX),
-                .brcond(brcond));
+   mips_ALU ALU1(.alu__out(instruc_1.alu__out),
+                .branchTrue(instruc_1.branchTrue), 
+                .alu__op1(instruc_1.alu_in1),
+                .alu__op2(instruc_1.alu_in2),
+                .alu__sel(instruc_1.alu__sel_EX),
+                .brcond(instruc_1.brcond_EX));
+
+   mips_ALU ALU2(.alu__out(instruc_2.alu__out_2),
+                .branchTrue(instruc_2.branchTrue), 
+                .alu__op1(instruc_2.alu_in1),
+                .alu__op2(instruc_2.alu_in2),
+                .alu__sel(instruc_2.alu__sel_EX),
+                .brcond(instruc_2.brcond_EX));
+
  
    // Miscellaneous stuff (Exceptions, syscalls, and halt)
    exception_unit EU(.exception_halt(exception_halt), .pc(pc), .rst_b(rst_b),
