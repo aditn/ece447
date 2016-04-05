@@ -610,8 +610,8 @@ module mips_core(/*AUTOARG*/
                       CDAmt,
                       stall);
    */
-
    //Register file
+
    regfile2_forward RegFile(instruc_1.rs_data, instruc_1.rt_data,
                             instruc_2.rs_data, instruc_2.rt_data,
 
