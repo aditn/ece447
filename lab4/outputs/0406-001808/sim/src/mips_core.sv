@@ -45,14 +45,6 @@
 `include "internal_defines.vh"
 
 typedef struct packed{
-   logic exception_halt, syscall_halt, internal_halt;
-   logic load_epc, load_bva, load_bva_sel, load_ex_regs;
-   logic [31:0]   epc, cause, bad_v_addr;
-   logic [4:0]    cause_code;
-
-   logic[1:0] pcMuxSel;
-   logic[1:0] pcMuxSelFinal;
-
   logic [31:0]   inst;
   logic [31:0]   pc;
   logic [31:0]   dcd_se_imm, dcd_se_offset, dcd_e_imm, dcd_se_mem_offset;
@@ -102,7 +94,8 @@ typedef struct packed{
   logic [31:0] lo_out; //LO Register out
   logic [31:0] hi_in; //HI Register in
   logic [31:0] lo_in; //LO Register in
-  
+  logic [31:0] load_data; //loaded data
+  logic [31:0] store_data; //data to store
    
   logic [31:0] alu_in1; //mux output of rs_data and rt_data
   logic [31:0] alu_in2; //mux output of rt_data and signed/unsigned imm to ALU
@@ -137,7 +130,7 @@ typedef struct packed{
   logic [2:0] load_sel_MEM, brcond_MEM;
 
   logic WBen; //enable for WB stage
-  logic [31:0] HIout_WB, LOout_WB, alu__out_WB;
+  logic [31:0] HIout_WB, LOout_WB, load_data_WB, alu__out_WB;
   logic [31:0] rt_data_WB;
   logic [4:0] wr_reg_WB;
   logic ctrl_we_WB, ctrl_Sys_WB, ctrl_RI_WB, regdst_WB, jLink_en_WB;
@@ -145,12 +138,6 @@ typedef struct packed{
   logic [1:0] memtoreg_WB, pcMuxSel_WB, store_sel_WB;
   logic [3:0] alu__sel_WB, mem_write_en_WB;
   logic [2:0] load_sel_WB, brcond_WB;
-
-  logic [31:0] rs_fwd; //forwarded value of rs
-  logic [31:0] rt_fwd; //forwarded value of rt
-  logic [1:0] fwd_rs_sel, fwd_rt_sel; //select bits for forwarding rs and rt
-  logic [1:0] fwd_rs_sel_EX, fwd_rt_sel_EX;
-
 }instruction;
 
 ////
@@ -173,7 +160,7 @@ module mips_core(/*AUTOARG*/
    // Outputs
    inst_addr, mem_addr, mem_data_in, mem_write_en, halted,
    // Inputs
-   clk, inst_excpt, mem_excpt, inst, inst_1, inst_2,inst_3, mem_data_out, rst_b
+   clk, inst_excpt, mem_excpt, inst_1, inst_2, mem_data_out, rst_b
    );
    
    parameter text_start  = 32'h00400000; /* Initial value of $pc */
@@ -182,7 +169,7 @@ module mips_core(/*AUTOARG*/
    input         clk, inst_excpt, mem_excpt;
    output [29:0] inst_addr;
    output [29:0] mem_addr;
-   input  [31:0] inst, inst_1, inst_2, inst_3, mem_data_out;
+   input  [31:0] inst_1, inst_2, mem_data_out;
    output [31:0] mem_data_in;
    output [3:0]  mem_write_en;
    output        halted;
@@ -191,14 +178,17 @@ module mips_core(/*AUTOARG*/
 
    // Internal signals
    //wire [31:0]   pc, nextpc, nextnextpc;
-
+   wire          exception_halt, syscall_halt, internal_halt;
+   wire          load_epc, load_bva, load_bva_sel;
    wire [31:0]   r_v0;
+   wire [31:0]   epc, cause, bad_v_addr;
+   wire [4:0]    cause_code;
 
    // Decode signals
    instruction instruc_1;
    instruction instruc_2;
-   assign instruc_1.inst = inst;
-   assign instruc_2.inst = inst_1;
+   assign instruc_1.inst = inst_1;
+   assign instruc_2.inst = inst_2;
 
    //wire [31:0]   dcd_se_imm, dcd_se_offset, dcd_e_imm, dcd_se_mem_offset;
    //wire [5:0]    dcd_op, dcd_funct2;
@@ -207,9 +197,9 @@ module mips_core(/*AUTOARG*/
    //wire [25:0]   dcd_target;
    //wire [19:0]   dcd_code;
    //wire          dcd_bczft;
-  
-   wire [31:0] load_data,load_data_WB; //loaded data
-   wire [31:0] store_data; //data to store
+   
+   wire[1:0] pcMuxSel;
+   wire[1:0] pcMuxSelFinal;
 
    wire [31:0] newpc; //mux output for next state PC
    //wire [31:0] pcNextFinal; 
@@ -410,7 +400,9 @@ module mips_core(/*AUTOARG*/
    //wire [31:0] alu_in2; //mux output of rt_data and signed/unsigned imm to ALU
 
 
-
+   wire [31:0] rs_fwd; //forwarded value of rs
+   wire [31:0] rt_fwd; //forwarded value of rt
+   wire [1:0] fwd_rs_sel, fwd_rt_sel; //select bits for forwarding rs and rt
 
    //Fetch (IF) stage for pc register
    wire IFen; //enable for IF stage
@@ -431,6 +423,7 @@ module mips_core(/*AUTOARG*/
    //wire [31:0] imm_EX;
    //wire [4:0] wr_reg_EX;
    
+   //wire [1:0] fwd_rs_sel_EX, fwd_rt_sel_EX;
    /**********Instruction 1**********/
    register pcEX_1(instruc_1.pc_EX, instruc_1.pc_ID, clk, instruc_1.EXen, rst_b);
    register rsEX_1(instruc_1.rs_data_EX, instruc_1.rs_data, clk, instruc_1.EXen, rst_b);
@@ -558,7 +551,7 @@ module mips_core(/*AUTOARG*/
    //wire [4:0] wr_reg_WB;
    /**********Instruction 1********/
    assign instruc_1.WBen = 1; //WB stage never disabled
-   //register MDRw_1(instruc_1.load_data_WB, instruc_1.load_data, clk, instruc_1.WBen, rst_b);
+   register MDRw_1(instruc_1.load_data_WB, instruc_1.load_data, clk, instruc_1.WBen, rst_b);
    register Aoutw_1(instruc_1.alu__out_WB, instruc_1.alu__out_MEM, clk, instruc_1.WBen, rst_b);
    register HIwb_1(instruc_1.HIout_WB, instruc_1.hi_out, clk, instruc_1.WBen, rst_b); //holds HI val in WB register (may need to have its own en)
    register LOwb_1(instruc_1.LOout_WB, instruc_1.lo_out, clk, instruc_1.WBen, rst_b); //holds LO val in WB register (may need to have its own en)
@@ -587,7 +580,7 @@ module mips_core(/*AUTOARG*/
 
    /**********Instruction 2**********/
    assign instruc_2.WBen = 1; //WB stage never disabled
-   //register MDRw_2(instruc_2.load_data_WB, instruc_2.load_data, clk, instruc_2.WBen, rst_b);
+   register MDRw_2(instruc_2.load_data_WB, instruc_2.load_data, clk, instruc_2.WBen, rst_b);
    register Aoutw_2(instruc_2.alu__out_WB, instruc_2.alu__out_MEM, clk, instruc_2.WBen, rst_b);
    register HIwb_2(instruc_2.HIout_WB, instruc_2.hi_out, clk, instruc_2.WBen, rst_b); //holds HI val in WB register (may need to have its own en)
    register LOwb_2(instruc_2.LOout_WB, instruc_2.lo_out, clk, instruc_2.WBen, rst_b); //holds LO val in WB register (may need to have its own en)
@@ -644,8 +637,8 @@ module mips_core(/*AUTOARG*/
                             clk, rst_b, halted);
 
    //HI, LO registers
-   register2Input #(32,0) hiReg(hi_out, instruc_1.rs_fwd, instruc_2.rs_fwd, clk, {instruc_1.hi_en_EX, instruc_2.hi_en_EX}, rst_b);
-   register2Input #(32,0) loReg(lo_out, instruc_1.rs_fwd, instruc_2.rs_fwd, clk, {instruc_1.lo_en_EX, instruc_2.lo_en_EX}, rst_b);
+   register2Input #(32,0) hiReg(hi_out, instruct_1.rs_fwd, instruct_2.rs_fwd, clk, {instruct_1.hi_en_EX, instruct_2.hi_en_EX}, rst_b);
+   register2Input #(32,0) loReg(lo_out, instruct_1.rs_fwd, instruct_2.rs_fwd, clk, {instruct_1.lo_en_EX, instruct_2.lo_en_EX}, rst_b);
 
    forwardData fwd(instruc_1.wr_reg_EX, instruc_1.wr_reg_MEM, instruc_1.rt_regNum, instruc_1.dcd_rs,
                    instruc_2.wr_reg_EX, instruc_2.wr_reg_MEM, instruc_2.rt_regNum, instruc_2.dcd_rs,
@@ -657,7 +650,7 @@ module mips_core(/*AUTOARG*/
                 instruc_1.load_sel_MEM, instruc_2.load_sel_MEM,
                 instruc_1.alu__out_MEM, instruc_2.alu__out_MEM); //operates on data loaded from memory
 
-   storer storer(store_data, mem_write_en,
+   storer storer(store_data, instruc_1.mem_write_en, instruc_2.mem_write_en,
                 instruc_1.rt_data_MEM, instruc_2.rt_data_MEM,
                 instruc_1.store_sel_MEM, instruc_2.store_sel_MEM,
                 instruc_1.alu__out_MEM, instruc_2.alu__out_MEM,
@@ -681,11 +674,19 @@ module mips_core(/*AUTOARG*/
    mux4to1 memToReg_1(instruc_1.wr_dataMem, instruc_1.alu__out_WB, load_data_WB,
                       instruc_1.HIout_WB, instruc_1.LOout_WB, instruc_1.memtoreg_WB);
 
+   assign instruc_1.mem_addr = instruc_1.alu__out_MEM[31:2]; //memory address to read/write
 
+   assign instruc_1.mem_data_in = instruc_1.store_data; //data to store 
+
+   //Mux for next state PC
+   mux4to1 pcMux(newpc, stallpc, br_target, rs_data, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
+   adder brtarget(br_target, pc + 4, (imm << 2), 1'b0); //get branch target
+   concat conc(j_target, pc, dcd_target); //get jump target
+   pcSelector choosePcMuxSel(pcMuxSelFinal,pcMuxSel,branchTrue); //chooses PC on whether branch condition is met
 
    //Set wr_data and wr_reg when there is a jump/branch with link
-   mux2to1 dataToReg_1(instruc_1.wr_data, instruc_1.wr_dataMem, instruc_1.pc+4, instruc_1.jLink_en_WB); 
-   mux2to1 #(5)regNumber_1(instruc_1.wr_reg, instruc_1.wr_reg_WB, 5'd31, instruc_1.jLink_en_WB);
+   mux2to1 dataToReg(wr_data, wr_dataMem, pc+4, jLink_en_WB); 
+   mux2to1 #(5)regNumber(wr_reg, wr_reg_WB, 5'd31, jLink_en_WB);
 
 
    /********PIPELINE2 MUXES**********/
@@ -705,26 +706,11 @@ module mips_core(/*AUTOARG*/
    mux4to1 memToReg_2(instruc_2.wr_dataMem, instruc_2.alu__out_WB, load_data_WB,
                       instruc_2.HIout_WB, instruc_2.LOout_WB, instruc_2.memtoreg_WB);
 
-   mux2to1 dataToReg_2(instruc_2.wr_data, instruc_2.wr_dataMem, instruc_2.pc+4, instruc_2.jLink_en_WB); 
-   mux2to1 #(5)regNumber_2(instruc_2.wr_reg, instruc_2.wr_reg_WB, 5'd31, instruc_2.jLink_en_WB);
-
-
+   assign instruc_2.mem_addr = instruc_2.alu__out_MEM[31:2]; //memory address to read/write
+   assign instruc_2.mem_data_in = instruc_2.store_data; //data to store
 
 /*****************************************************************************/
 
-   //Mux for next state PC
-   mux4to1 pcMux(newpc, stallpc, br_target, rs_data, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
-   adder brtarget(br_target, pc + 4, (imm << 2), 1'b0); //get branch target
-   concat conc(j_target, pc, dcd_target); //get jump target
-   pcSelector choosePcMuxSel(pcMuxSelFinal,pcMuxSel,branchTrue); //chooses PC on whether branch condition is met
-
-   //propogate load_data to WB stage
-   register MDRw(load_data_WB, load_data, clk, instruc_2.WBen, rst_b);
-
-   //sets values for mem_addr and mem_data_in if there is a store
-   setMemValues setMemForStore(mem_addr,mem_data_in,
-                    instruc_1.alu__out_MEM,instruc_2.alu__out_MEM_2, store_data,
-                    instruc_1.mem_write_en_MEM_1,instruc_2.mem_write_en_MEM_2);
 
    // Execute
    mips_ALU ALU1(.alu__out(instruc_1.alu__out),
@@ -743,56 +729,31 @@ module mips_core(/*AUTOARG*/
 
  
    // Miscellaneous stuff (Exceptions, syscalls, and halt)
-   exception_unit EU_1(.exception_halt(instruc_1.exception_halt), .pc(instruc_1.pc), .rst_b(rst_b),
-                     .clk(clk), .load_ex_regs(instruc_1.load_ex_regs),
-                     .load_bva(instruc_1.load_bva), .load_bva_sel(instruc_1.load_bva_sel),
-                     .cause(instruc_1.cause_code),
+   exception_unit EU(.exception_halt(exception_halt), .pc(pc), .rst_b(rst_b),
+                     .clk(clk), .load_ex_regs(load_ex_regs),
+                     .load_bva(load_bva), .load_bva_sel(load_bva_sel),
+                     .cause(cause_code),
                      .IBE(inst_excpt),
                      .DBE(1'b0),
                      .RI(ctrl_RI),
                      .Ov(1'b0),
                      .BP(1'b0),
-                     .AdEL_inst(instruc_1.pc[1:0]?1'b1:1'b0),
-                     .AdEL_data(1'b0),
-                     .AdES(1'b0),
-                     .CpU(1'b0));
-
-   exception_unit EU_2(.exception_halt(instruc_2.exception_halt), .pc(instruc_2.pc), .rst_b(rst_b),
-                     .clk(clk), .load_ex_regs(instruc_2.load_ex_regs),
-                     .load_bva(instruc_2.load_bva), .load_bva_sel(instruc_2.load_bva_sel),
-                     .cause(instruc_2.cause_code),
-                     .IBE(inst_excpt),
-                     .DBE(1'b0),
-                     .RI(ctrl_RI),
-                     .Ov(1'b0),
-                     .BP(1'b0),
-                     .AdEL_inst(instruc_2.pc[1:0]?1'b1:1'b0),
+                     .AdEL_inst(pc[1:0]?1'b1:1'b0),
                      .AdEL_data(1'b0),
                      .AdES(1'b0),
                      .CpU(1'b0));
 
    assign r_v0 = (instruc_2.ctrl_Sys_WB) ? instruc_2.rt_data_WB : instruc_1.rt_data_WB; // rt_data for syscall is data from $v0
 
-   syscall_unit SU_1(.syscall_halt(instruc_1.syscall_halt), .pc(instruc_1.pc), .clk(clk), .Sys(instruc_1.ctrl_Sys_WB),
+   syscall_unit SU(.syscall_halt(syscall_halt), .pc(pc), .clk(clk), .Sys(instruc_1.ctrl_Sys_WB | instruc_2.ctrl_Sys_WB),
                    .r_v0(r_v0), .rst_b(rst_b));
-   syscall_unit SU_2(.syscall_halt(instruc_2.syscall_halt), .pc(instruc_2.pc), .clk(clk), .Sys(instruc_2.ctrl_Sys_WB),
-                   .r_v0(r_v0), .rst_b(rst_b));
-
-   assign        internal_halt = instruc_1.exception_halt | instruc_2.exception_halt  | instruc_1.syscall_halt |instruc_2.syscall_halt;
+   assign        internal_halt = exception_halt | syscall_halt;
    register #(1, 0) Halt(halted, internal_halt, clk, 1'b1, rst_b);
-   
-   register #(32, 0) EPCReg_1(instruc_1.epc, instruc_1.pc, clk, instruc_1.load_ex_regs, rst_b);
-   register #(32, 0) EPCReg_2(instruc_2.epc, instruc_2.pc, clk, instruc_2.load_ex_regs, rst_b);
-
-   register #(32, 0) CauseReg_1(instruc_1.cause,
-                              {25'b0, instruc_1.cause_code, 2'b0}, 
-                              clk, instruc_1.load_ex_regs, rst_b);
-   register #(32, 0) CauseReg_2(instruc_2.cause,
-                              {25'b0, instruc_2.cause_code, 2'b0}, 
-                              clk, instruc_2.load_ex_regs, rst_b);
-
-   register #(32, 0) BadVAddrReg_1(instruc_1.bad_v_addr, instruc_1.pc, clk, instruc_1.load_bva, rst_b);
-   register #(32, 0) BadVAddrReg_2(instruc_2.bad_v_addr, instruc_2.pc, clk, instruc_2.load_bva, rst_b);
+   register #(32, 0) EPCReg(epc, pc, clk, load_ex_regs, rst_b);
+   register #(32, 0) CauseReg(cause,
+                              {25'b0, cause_code, 2'b0}, 
+                              clk, load_ex_regs, rst_b);
+   register #(32, 0) BadVAddrReg(bad_v_addr, pc, clk, load_bva, rst_b);   
 
 endmodule // mips_core
 
@@ -894,30 +855,6 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
    //adder AdderUnit(alu__out, alu__op1, alu__op2, alu__sel[0]);
 
 endmodule
-
-
-module setMemValues(mem_addr,mem_data_in,
-                    alu__out_MEM_1,alu__out_MEM_2,
-                    store_data,
-                    mem_write_en_MEM_1,mem_write_en_MEM_2);
-   
-   output [29:0] mem_addr;
-   output [31:0] mem_data_in;
-   input  [31:0] alu__out_MEM_1,alu__out_MEM_2, store_data;
-   input  [3:0]  mem_write_en_MEM_1, mem_write_en_MEM_2;
-
-   always_comb begin
-     mem_addr = 30'bx;
-     mem_data_in = store_data;
-     if (mem_write_en_MEM_1 != 4'd0) begin
-       mem_addr = alu__out_MEM_1[31:2];
-     end
-     else if (mem_write_en_MEM_2 != 4'd0) begin
-       mem_addr = alu__out_MEM_2[31:2];
-     end
-   end
-endmodule
-
 
 //// register: A register which may be reset to an arbirary value
 ////
@@ -1503,7 +1440,7 @@ module storer (
       output logic [31:0] store_data,
       output logic [3:0] mem_write_en,
       input logic [31:0] rt_data_1, rt_data_2,
-      input logic [1:0] store_sel_1, store_sel_2,
+      input logic [1:0] store_sel_1, store_sel_1,
       input logic [31:0] offset_1, offset_2,
       input logic [3:0] mem_en_1, mem_en_2);
 
@@ -1512,13 +1449,13 @@ module storer (
     logic [1:0] store_sel;
     logic [31:0] offset;
     always_comb begin
-      if (mem_en_1 != 4'd0) begin
+      if (mem_write_en_1 != 4'd0) begin
         mem_en = mem_en_1;
         rt_data = rt_data_1;
         store_sel = store_sel_1;
         offset = offset_1;
       end
-      else if (mem_en_2 != 4'd0) begin
+      else if (mem_write_en_2 != 4'd0) begin
         mem_en = mem_en_2;
         rt_data = rt_data_2;
         store_sel = store_sel_2;

@@ -45,7 +45,7 @@ module testbench;
 
    wire       clk, inst_excpt, mem_excpt, halted;
    wire [29:0] pc, mem_addr;
-   wire [31:0] inst, inst_1, inst_2, inst_3, mem_data_in, mem_data_out;
+   wire [31:0] inst,inst1,inst2,inst3, mem_data_in, mem_data_out;
    wire [3:0]  mem_write_en;
    reg 	       rst_b;
 
@@ -53,8 +53,7 @@ module testbench;
    clock CLK(clk);
 
    // The MIPS core
-   mips_core core(.clk(clk), .inst_addr(pc), .inst(inst), .inst_1(inst_1),
-		  .inst_2(inst_2), .inst_3(inst_3), 
+   mips_core core(.clk(clk), .inst_addr(pc), .inst(inst),.inst1(inst1),
 		  .inst_excpt(inst_excpt), .mem_addr(mem_addr),
 		  .mem_data_in(mem_data_in), .mem_data_out(mem_data_out),
 		  .mem_write_en(mem_write_en), .mem_excpt(mem_excpt),
@@ -62,8 +61,8 @@ module testbench;
 
    // Memory
    mips_mem Memory(// Port 1 (instructions)
-		   .addr1(pc), .data_in1(), .data_out1(inst), .data_out1_1(inst_1),
-		   .data_out1_2(inst_2), .data_out1_3(inst_3), .we1(4'b0),
+		   .addr1(pc), .data_in1(), .data_out1(inst),.data_out1_1(inst1),.data_out1_2(inst2),.data_out1_3(inst3),
+       .we1(4'b0),
 		   .excpt1(inst_excpt), .allow_kernel1(1'b1), .kernel1(),
 
 		   // Port 2 (data)

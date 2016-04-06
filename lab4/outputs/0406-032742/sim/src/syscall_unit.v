@@ -35,73 +35,27 @@
  *
  */
 
+`include "mips_defines.vh"
 
-// Top module for the MIPS processor core
-// NOT synthesizable Verilog!
-module testbench;
+module syscall_unit(/*AUTOARG*/
+   // Outputs
+   syscall_halt,
+   // Inputs
+   pc, r_v0, Sys, rst_b, clk
+   );
+	output wire        syscall_halt;
+	input       [31:0] pc, r_v0;
+	input 	           Sys, rst_b, clk;
+	
+	assign 	syscall_halt = rst_b && Sys && (r_v0 == `SYS_EXIT);
 
-   reg [31:0] i;
-   reg [29:0] addr;
-
-   wire       clk, inst_excpt, mem_excpt, halted;
-   wire [29:0] pc, mem_addr;
-   wire [31:0] inst, inst_1, inst_2, inst_3, mem_data_in, mem_data_out;
-   wire [3:0]  mem_write_en;
-   reg 	       rst_b;
-
-   // The clock
-   clock CLK(clk);
-
-   // The MIPS core
-   mips_core core(.clk(clk), .inst_addr(pc), .inst(inst), .inst_1(inst_1),
-		  .inst_2(inst_2), .inst_3(inst_3), 
-		  .inst_excpt(inst_excpt), .mem_addr(mem_addr),
-		  .mem_data_in(mem_data_in), .mem_data_out(mem_data_out),
-		  .mem_write_en(mem_write_en), .mem_excpt(mem_excpt),
-		  .halted(halted), .rst_b(rst_b));
-
-   // Memory
-   mips_mem Memory(// Port 1 (instructions)
-		   .addr1(pc), .data_in1(), .data_out1(inst), .data_out1_1(inst_1),
-		   .data_out1_2(inst_2), .data_out1_3(inst_3), .we1(4'b0),
-		   .excpt1(inst_excpt), .allow_kernel1(1'b1), .kernel1(),
-
-		   // Port 2 (data)
-		   .addr2(mem_addr), .data_in2(mem_data_in),
-		   .data_out2(mem_data_out), .we2(mem_write_en),
-		   .excpt2(mem_excpt), .allow_kernel2(1'b1), .kernel2(),
-		   .rst_b(rst_b), .clk(clk));
-
-
-   initial
-     begin
-	rst_b = 0;
-	#75;
-	rst_b <= 1;
-     end
-
-   always @(halted)
-     begin
-	#0;
-	if(halted === 1'b1)
-	  $finish;
-     end
-   
-
-endmodule
-
-
-// Clock module for the MIPS core.  You may increase the clock period
-// if your design requires it.
-module clock(clockSignal);
-   parameter start = 0, halfPeriod = 50;
-   output    clockSignal;
-   reg 	     clockSignal;
-   
-   initial
-     clockSignal = start;
-   
-   always
-     #halfPeriod clockSignal = ~clockSignal;
-   
+	// synthesis translate_off
+	always @(posedge clk)
+		if (rst_b && Sys)
+			case(r_v0)
+			`SYS_EXIT: begin
+				$display(`MSG_EOP_S, pc);
+			end
+			endcase
+	// synthesis translate_on
 endmodule

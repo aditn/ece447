@@ -102,7 +102,8 @@ typedef struct packed{
   logic [31:0] lo_out; //LO Register out
   logic [31:0] hi_in; //HI Register in
   logic [31:0] lo_in; //LO Register in
-  
+  logic [31:0] load_data; //loaded data
+  logic [31:0] store_data; //data to store
    
   logic [31:0] alu_in1; //mux output of rs_data and rt_data
   logic [31:0] alu_in2; //mux output of rt_data and signed/unsigned imm to ALU
@@ -137,7 +138,7 @@ typedef struct packed{
   logic [2:0] load_sel_MEM, brcond_MEM;
 
   logic WBen; //enable for WB stage
-  logic [31:0] HIout_WB, LOout_WB, alu__out_WB;
+  logic [31:0] HIout_WB, LOout_WB, load_data_WB, alu__out_WB;
   logic [31:0] rt_data_WB;
   logic [4:0] wr_reg_WB;
   logic ctrl_we_WB, ctrl_Sys_WB, ctrl_RI_WB, regdst_WB, jLink_en_WB;
@@ -207,9 +208,8 @@ module mips_core(/*AUTOARG*/
    //wire [25:0]   dcd_target;
    //wire [19:0]   dcd_code;
    //wire          dcd_bczft;
-  
-   wire [31:0] load_data,load_data_WB; //loaded data
-   wire [31:0] store_data; //data to store
+   
+
 
    wire [31:0] newpc; //mux output for next state PC
    //wire [31:0] pcNextFinal; 
@@ -558,7 +558,7 @@ module mips_core(/*AUTOARG*/
    //wire [4:0] wr_reg_WB;
    /**********Instruction 1********/
    assign instruc_1.WBen = 1; //WB stage never disabled
-   //register MDRw_1(instruc_1.load_data_WB, instruc_1.load_data, clk, instruc_1.WBen, rst_b);
+   register MDRw_1(instruc_1.load_data_WB, instruc_1.load_data, clk, instruc_1.WBen, rst_b);
    register Aoutw_1(instruc_1.alu__out_WB, instruc_1.alu__out_MEM, clk, instruc_1.WBen, rst_b);
    register HIwb_1(instruc_1.HIout_WB, instruc_1.hi_out, clk, instruc_1.WBen, rst_b); //holds HI val in WB register (may need to have its own en)
    register LOwb_1(instruc_1.LOout_WB, instruc_1.lo_out, clk, instruc_1.WBen, rst_b); //holds LO val in WB register (may need to have its own en)
@@ -587,7 +587,7 @@ module mips_core(/*AUTOARG*/
 
    /**********Instruction 2**********/
    assign instruc_2.WBen = 1; //WB stage never disabled
-   //register MDRw_2(instruc_2.load_data_WB, instruc_2.load_data, clk, instruc_2.WBen, rst_b);
+   register MDRw_2(instruc_2.load_data_WB, instruc_2.load_data, clk, instruc_2.WBen, rst_b);
    register Aoutw_2(instruc_2.alu__out_WB, instruc_2.alu__out_MEM, clk, instruc_2.WBen, rst_b);
    register HIwb_2(instruc_2.HIout_WB, instruc_2.hi_out, clk, instruc_2.WBen, rst_b); //holds HI val in WB register (may need to have its own en)
    register LOwb_2(instruc_2.LOout_WB, instruc_2.lo_out, clk, instruc_2.WBen, rst_b); //holds LO val in WB register (may need to have its own en)
@@ -718,13 +718,22 @@ module mips_core(/*AUTOARG*/
    concat conc(j_target, pc, dcd_target); //get jump target
    pcSelector choosePcMuxSel(pcMuxSelFinal,pcMuxSel,branchTrue); //chooses PC on whether branch condition is met
 
-   //propogate load_data to WB stage
-   register MDRw(load_data_WB, load_data, clk, instruc_2.WBen, rst_b);
-
    //sets values for mem_addr and mem_data_in if there is a store
-   setMemValues setMemForStore(mem_addr,mem_data_in,
-                    instruc_1.alu__out_MEM,instruc_2.alu__out_MEM_2, store_data,
-                    instruc_1.mem_write_en_MEM_1,instruc_2.mem_write_en_MEM_2);
+   mux2to1
+
+   always_comb begin
+     mem_addr <= 29'bx;
+     mem_data_in <=31'bx; 
+     if (instruc_1.mem_write_en_MEM != 4'd0) begin
+       mem_addr <= instruc_1.alu__out_MEM[31:2];
+       mem_data_in <= instruc_1.store_data;
+     end
+     else if (instruc_2.mem_write_en_MEM != 4'd0) begin
+       mem_addr <= instruc_2.alu__out_MEM[31:2];
+       mem_data_in <= instruc_2.store_data;
+     end
+   end
+
 
    // Execute
    mips_ALU ALU1(.alu__out(instruc_1.alu__out),
@@ -894,30 +903,6 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
    //adder AdderUnit(alu__out, alu__op1, alu__op2, alu__sel[0]);
 
 endmodule
-
-
-module setMemValues(mem_addr,mem_data_in,
-                    alu__out_MEM_1,alu__out_MEM_2,
-                    store_data,
-                    mem_write_en_MEM_1,mem_write_en_MEM_2);
-   
-   output [29:0] mem_addr;
-   output [31:0] mem_data_in;
-   input  [31:0] alu__out_MEM_1,alu__out_MEM_2, store_data;
-   input  [3:0]  mem_write_en_MEM_1, mem_write_en_MEM_2;
-
-   always_comb begin
-     mem_addr = 30'bx;
-     mem_data_in = store_data;
-     if (mem_write_en_MEM_1 != 4'd0) begin
-       mem_addr = alu__out_MEM_1[31:2];
-     end
-     else if (mem_write_en_MEM_2 != 4'd0) begin
-       mem_addr = alu__out_MEM_2[31:2];
-     end
-   end
-endmodule
-
 
 //// register: A register which may be reset to an arbirary value
 ////
