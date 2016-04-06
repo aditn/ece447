@@ -719,7 +719,7 @@ module mips_core(/*AUTOARG*/
    pcSelector choosePcMuxSel(pcMuxSelFinal,pcMuxSel,branchTrue); //chooses PC on whether branch condition is met
 
    //propogate load_data to WB stage
-   register MDRw(load_data_WB, load_data, clk, instruc_2.WBen, rst_b);
+   register MDRw(load_data_WB, load_data, clk, instruc_2.WBen | instruc_1.WBen, rst_b);
 
    //sets values for mem_addr and mem_data_in if there is a store
    setMemValues setMemForStore(mem_addr,mem_data_in,
