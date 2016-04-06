@@ -306,6 +306,16 @@ module mips_core(/*AUTOARG*/
        //$display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
        $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_1.wr_reg_WB, instruc_1.alu__out_WB, instruc_1.ctrl_we_WB, instruc_1.mem_write_en_WB);
        $display ("");
+       $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
+                   instruc_2.pc, instruc_2.inst_ID, instruc_2.dcd_op, instruc_2.dcd_rs, instruc_2.dcd_rt, instruc_2.dcd_rd, instruc_2.dcd_imm, instruc_2.dcd_funct2, ~rst_b, halted);
+       $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, mem_en: %x", instruc_2.wr_regNum, instruc_2.wr_data, instruc_2.dcd_rs, instruc_2.dcd_rt, instruc_2.rs_data, instruc_2.rt_data, instruc_2.imm, instruc_2.mem_en);
+       $display ("   rsfwd: %x, rtfwd: %x, fwd_rs_en: %x, fwd_rt_en: %x", instruc_2.rs_fwd, instruc_2.rt_fwd, instruc_2.fwd_rs_sel_EX, instruc_2.fwd_rt_sel_EX);
+       $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, ctrl_we_EX: %x, mem_EX: %x, EXen: %x", instruc_2.wr_reg_EX, instruc_2.alu_in1, instruc_2.alu_in2, instruc_2.alu__out, instruc_2.ctrl_we_EX, instruc_2.mem_write_en_EX, instruc_2.EXen);
+       $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_2.wr_reg_MEM, instruc_2.alu__out_MEM, instruc_2.ctrl_we_MEM, instruc_2.mem_write_en_MEM);
+       //$display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
+       $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_2.wr_reg_WB, instruc_2.alu__out_WB, instruc_2.ctrl_we_WB, instruc_2.mem_write_en_WB);
+       $display ("");
+       $display ("");
      end
    end
    // synthesis translate_on
@@ -429,7 +439,9 @@ module mips_core(/*AUTOARG*/
    //Decode (ID) stage registers and wirings
    //wire IDen; //enable for decode stage
    //wire [31:0] pc_ID;
-   register irD_1(instruc_1.inst_ID, instruc_1.inst, clk, instruc_1.IDen, rst_b);
+   register pcID_1(instruc_1.pc_ID, instruc_1.pc, clk, instruc_1.IDen, rst_b);
+   register pcID_2(instruc_2.pc_ID, instruc_2.pc, clk, instruc_2.IDen, rst_b);
+   clearRegister irD_1(instruc_1.inst_ID, instruc_1.inst, clk, instruc_1.IDen, rst_b);
    register irD_2(instruc_2.inst_ID, instruc_2.inst, clk, instruc_2.IDen, rst_b);
 
    //Execute (EX) stage registers
@@ -628,19 +640,19 @@ module mips_core(/*AUTOARG*/
    wire CDen;
    wire [2:0] CDAmt;
    stallDetector sD(instruc_1.pc_ID, instruc_1.pc_EX,
-                    instruc_1.wr_reg_EX, instruc_1.wr_reg_MEM, instruc_1.wr_reg_WB, instruc_1.rt_regNum, instruc_1.dcd_rs,
+                    instruc_1.wr_regNum, instruc_1.wr_reg_EX, instruc_1.wr_reg_MEM, instruc_1.rt_regNum, instruc_1.dcd_rs,
                     instruc_1.mem_en,
-                    instruc_1.ctrl_we_EX, instruc_1.ctrl_we_MEM, instruc_1.regdst,
+                    instruc_1.ctrl_we, instruc_1.ctrl_we_EX, instruc_1.regdst,
                     instruc_2.pc_ID, instruc_2.pc_EX,
-                    instruc_2.wr_reg_EX, instruc_2.wr_reg_MEM, instruc_2.wr_reg_WB, instruc_2.rt_regNum, instruc_2.dcd_rs,
+                    instruc_2.wr_regNum, instruc_2.wr_reg_EX, instruc_2.wr_reg_MEM, instruc_2.rt_regNum, instruc_2.dcd_rs,
                     instruc_2.mem_en,
-                    instruc_2.ctrl_we_EX, instruc_2.ctrl_we_MEM, instruc_2.regdst,
+                    instruc_2.ctrl_we, instruc_2.ctrl_we_EX, instruc_2.regdst,
                     instruc_1.stall, instruc_2.stall, instruc_1.load_stall, instruc_1.load_stall_EX, instruc_2.load_stall, instruc_2.load_stall_EX,
                     IFen, instruc_1.IDen, instruc_1.EXen, , instruc_2.IDen, instruc_2.EXen,
                     CDen, CDAmt);
    countdownReg cdReg(CDen, clk, rst_b,
                       CDAmt,
-                      stall);
+                      instruc_2.stall);
 
    //Register file
    regfile2_forward RegFile(instruc_1.rs_data, instruc_1.rt_data,
@@ -698,7 +710,7 @@ module mips_core(/*AUTOARG*/
 
 
    /********PIPELINE2 MUXES**********/
-   mux2to1 #(5) regDest_2(instruc_2.wr_regNum, instruc_2.dcd_rt, instruc_2.dcd_rd, instruc_1.regdst); //register to write to
+   mux2to1 #(5) regDest_2(instruc_2.wr_regNum, instruc_2.dcd_rt, instruc_2.dcd_rd, instruc_2.regdst); //register to write to
    mux2to1 #(5) regRt_2(instruc_2.rt_regNum, instruc_2.dcd_rt, 5'd2, instruc_2.ctrl_Sys); //rt reg to read from (for syscalls)   
 
    //Determines inputs to ALU
@@ -956,6 +968,35 @@ module register(q, d, clk, enable, rst_b);
 
 endmodule // register
 
+//// clearRegister: A register which is cleared when not enabled
+////
+//// q      (output) - Current value of register
+//// d      (input)  - Next value of register
+//// clk    (input)  - Clock (positive edge-sensitive)
+//// enable (input)  - Load new value?
+//// reset  (input)  - System reset
+////
+module clearRegister(q, d, clk, enable, rst_b);
+
+   parameter
+            width = 32,
+            reset_value = 0;
+
+   output [(width-1):0] q;
+   reg [(width-1):0]    q;
+   input [(width-1):0]  d;
+   input                 clk, enable, rst_b;
+
+   always @(posedge clk or negedge rst_b)
+     if (~rst_b)
+       q <= reset_value;
+     else if (enable)
+       q <= d;
+     else if (~enable)
+       q <= 32'b0;
+
+endmodule // register
+
 
 //// register2Input: A register which may be reset to one of two arbitrary values
 ////
@@ -1193,7 +1234,7 @@ module stallDetector(
     EXen_1 = 1'b1;
     IFen_2 = 1'b1;
     IDen_2 = 1'b1;
-    IDen_2 = 1'b1;
+    EXen_2 = 1'b1;
     CDen = 1'b0;
     CDAmt = 3'b0;
     if(stall_1==1'b1) begin
@@ -1237,7 +1278,8 @@ module stallDetector(
       end*/
       
     end
-    
+   $display ("we_1: %x, we_2: %x, dcd_rt_2: %x, dcd_rs_2: %x, wr_reg_1: %x", ctrl_we_1, ctrl_we_2, dcd_rt_2, dcd_rs_2, wr_reg_1);
+   $display ("pc_ID_2: %x, pc_ID_1: %x, regdst_2: %x", pc_ID_2, pc_ID_1, regdst_2);
     if(stall_2==1'b1) begin
       IFen_2 = 1'b0;
       IDen_2 = 1'b0;
@@ -1246,7 +1288,14 @@ module stallDetector(
       IDen_1 = 1'b0;
     end
     else if(stall_2==1'b0) begin
-      if(load_stall_EX_2==1'b1) begin
+      if(ctrl_we_1!=0 && ctrl_we_2!=0 && pc_ID_2>pc_ID_1 && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_1)))) begin
+        IFen_2 = 1'b0;
+        IDen_2 = 1'b0;
+        EXen_2 = 1'b0;
+        IFen_1 = 1'b0;
+        IDen_1 = 1'b0;
+      end
+      else if(load_stall_EX_2==1'b1) begin
         if((ctrl_we_EX_2!=0) && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_EX_2)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_EX_2)))) begin
           IFen_2 = 1'b0;
           IDen_2 = 1'b0;
@@ -1256,7 +1305,7 @@ module stallDetector(
         end
       end
       else if(load_stall_EX_1==1'b1 && (pc_ID_2>pc_EX_1)) begin
-        if((ctrl_we_EX_2!=0) && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_EX_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_EX_1)))) begin
+        if((ctrl_we_EX_1!=0) && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_EX_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_EX_1)))) begin
           IFen_2 = 1'b0;
           IDen_2 = 1'b0;
           EXen_2 = 1'b0;
