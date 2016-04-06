@@ -79,6 +79,7 @@ typedef struct packed{
   logic lo_en;
   logic [1:0] store_sel; //selects the type of store for the storer to perform
   logic load_stall; //check if instruction is a load or MF to signal a stall
+  logic stall;
 
   logic [4:0] wr_reg; //input to write register
   logic [31:0] imm; //signed or unsigned immediate
@@ -428,7 +429,7 @@ module mips_core(/*AUTOARG*/
    register rsEX_1(instruc_1.rs_data_EX, instruc_1.rs_data, clk, instruc_1.EXen, rst_b);
    register rtEX_1(instruc_1.rt_data_EX, instruc_1.rt_data, clk, instruc_1.EXen, rst_b);
    register iEX_1(instruc_1.imm_EX, instruc_1.imm, clk, instruc_1.EXen, rst_b);
-   register #(5) wrEX_1(instruc_1.wr_reg_EX, instruc_1.wr_reg, clk, instruc_1.EXen, rst_b);
+   register #(5) wrEX_1(instruc_1.wr_reg_EX, instruc_1.wr_regNum, clk, instruc_1.EXen, rst_b);
    //register #(2) fwdrsEX(fwd_rs_sel_EX, fwd_rs_sel, clk, EXen, rst_b);
    //register #(2) fwdrtEX(fwd_rt_sel_EX, fwd_rt_sel, clk, EXen, rst_b);
 
@@ -456,7 +457,7 @@ module mips_core(/*AUTOARG*/
    register rsEX_2(instruc_2.rs_data_EX, instruc_2.rs_data, clk, instruc_2.EXen, rst_b);
    register rtEX_2(instruc_2.rt_data_EX, instruc_2.rt_data, clk, instruc_2.EXen, rst_b);
    register iEX_2(instruc_2.imm_EX, instruc_2.imm, clk, instruc_2.EXen, rst_b);
-   register #(5) wrEX_2(instruc_2.wr_reg_EX, instruc_2.wr_reg, clk, instruc_2.EXen, rst_b);
+   register #(5) wrEX_2(instruc_2.wr_reg_EX, instruc_2.wr_regNum, clk, instruc_2.EXen, rst_b);
    //register #(2) fwdrsEX(fwd_rs_sel_EX, fwd_rs_sel, clk, EXen, rst_b);
    //register #(2) fwdrtEX(fwd_rt_sel_EX, fwd_rt_sel, clk, EXen, rst_b);
 
@@ -608,18 +609,22 @@ module mips_core(/*AUTOARG*/
     /*******************************/
 
    //check for RAW hazard and Stall
-   /*wire stall, CDen;
+   wire CDen;
    wire [2:0] CDAmt;
-   stallDetector sD(wr_reg_EX,wr_reg_MEM,wr_reg_WB,rt_regNum,dcd_rs,
-                    mem_write_en_EX, mem_write_en_MEM, mem_write_en, 
-                    ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB, regdst, stall,
-                    load_stall_EX,
-                    EXen, IDen, IFen, 
+   stallDetector sD(instruc_1.pc_ID, instruc_1.pc_EX,
+                    instruc_1.wr_reg_EX, instruc_1.wr_reg_MEM, instruc_1.wr_reg_WB, instruc_1.rt_regNum, instruc_1.dcd_rs,
+                    instruc_1.mem_en,
+                    instruc_1.ctrl_we_EX, instruc_1.ctrl_we_MEM, instruc_1.regdst,
+                    instruc_2.pc_ID, instruc_2.pc_EX,
+                    instruc_2.wr_reg_EX, instruc_2.wr_reg_MEM, instruc_2.wr_reg_WB, instruc_2.rt_regNum, instruc_2.dcd_rs,
+                    instruc_2.mem_en,
+                    instruc_2.ctrl_we_EX, instruc_2.ctrl_we_MEM, instruc_2.regdst,
+                    instruc_1.stall, instruc_2.stall, instruc_1.load_stall, instruc_1.load_stall_EX, instruc_2.load_stall, instruc_2.load_stall_EX,
+                    IFen, instruc_1.IDen, instruc_1.EXen, , instruc_2.IDen, instruc_2.EXen,
                     CDen, CDAmt);
    countdownReg cdReg(CDen, clk, rst_b,
                       CDAmt,
                       stall);
-   */
 
    //Register file
    regfile2_forward RegFile(instruc_1.rs_data, instruc_1.rt_data,
@@ -631,53 +636,47 @@ module mips_core(/*AUTOARG*/
                             instruc_2.wr_reg_WB, instruc_2.wr_data, instruc_2.ctrl_we_WB,
                             clk, rst_b, halted);
 
-   mux2to1 #(5) regDest(wr_regNum, dcd_rt, dcd_rd, regdst); //register to write to
-   mux2to1 #(5) regRt(rt_regNum, dcd_rt, 5'd2, ctrl_Sys); //rt reg to read from (for syscalls)   
-
    //HI, LO registers
    register2Input #(32,0) hiReg(hi_out, instruct_1.rs_fwd, instruct_2.rs_fwd, clk, {instruct_1.hi_en_EX, instruct_2.hi_en_EX}, rst_b);
    register2Input #(32,0) loReg(lo_out, instruct_1.rs_fwd, instruct_2.rs_fwd, clk, {instruct_1.lo_en_EX, instruct_2.lo_en_EX}, rst_b);
 
-   //Determines inputs to ALU
-   mux2to1 aluSrc1(alu_in1, rs_fwd, rt_fwd, alusrc1_EX); //ALUSrc1
-   mux2to1 aluSrc2(alu_in2, rt_fwd, imm_EX, alusrc2_EX); //ALUSrc2
-   mux2to1 signext_1(instruc_1.imm, instruc_1.dcd_e_imm, instruc_1.dcd_se_imm,
-            instruc_1.se_EX); //Zero extend or sign extend immediate
-   mux2to1 signext_2(instruc_2.imm, instruc_2.dcd_e_imm, instruc_2.dcd_se_imm,
-            instruc_2.se_EX); //Zero extend or sign extend immediate
-
-   //rs and rt forwarding
-   mux4to1 fwdrs(rs_fwd, rs_data_EX, alu__out_MEM, wr_dataMem, , fwd_rs_sel_EX);
-   mux4to1 fwdrt(rt_fwd, rt_data_EX, alu__out_MEM, wr_dataMem, , fwd_rt_sel_EX);
-   forwardData fwd(wr_reg_EX, wr_reg_MEM, wr_reg_WB, rt_regNum, dcd_rs,
-                   mem_write_en_EX, mem_write_en_MEM, mem_write_en,
-                   ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB,
-                   fwd_rs_sel, fwd_rt_sel);
-
-   //Wirings to memory module
-   mux4to1 memToReg_1(instruc_1.wr_dataMem, instruc_1.alu__out_WB, load_data_WB,
-                      instruc_1.HIout_WB, instruc_1.LOout_WB, instruc_1.memtoreg_WB);
-   mux4to1 memToReg_2(instruc_2.wr_dataMem, instruc_2.alu__out_WB, load_data_WB,
-                      instruc_2.HIout_WB, instruc_2.LOout_WB, instruc_2.memtoreg_WB);
-
-   assign instruc_1.mem_addr = instruc_1.alu__out_MEM[31:2]; //memory address to read/write
-   assign instruc_1.mem_data_in = instruc_1.store_data; //data to store
-
-   assign instruc_2.mem_addr = instruc_2.alu__out_MEM[31:2]; //memory address to read/write
-   assign instruc_2.mem_data_in = instruc_2.store_data; //data to store
-
-
+   forwardData fwd(instruc_1.wr_reg_EX, instruc_1.wr_reg_MEM, instruc_1.rt_regNum, instruc_1.dcd_rs,
+                   instruc_2.wr_reg_EX, instruc_2.wr_reg_MEM, instruc_2.rt_regNum, instruc_2.dcd_rs,
+                   instruc_1.ctrl_we_EX, instruc_1.ctrl_we_MEM, instruc_2.ctrl_we_EX, instruc_2.ctrl_we_EX,
+                   instruc_1.fwd_rs_sel, instruc_1.fwd_rt_sel, instruc_2.fwd_rs_sel, instruc_2.fwd_rt_sel);
 
    //To read from / write to memory
    loader loader(load_data, instruc_1.imm_MEM, instruc_2.imm_MEM, mem_data_out,
                 instruc_1.load_sel_MEM, instruc_2.load_sel_MEM,
-                instruc_1.alu__out_MEM instruc_2.alu__out_MEM); //operates on data loaded from memory
-   
-   storer storer(store_data, mem_write_en,
+                instruc_1.alu__out_MEM, instruc_2.alu__out_MEM); //operates on data loaded from memory
+
+   storer storer(store_data, instruc_1.mem_write_en, instruc_2.mem_write_en,
                 instruc_1.rt_data_MEM, instruc_2.rt_data_MEM,
                 instruc_1.store_sel_MEM, instruc_2.store_sel_MEM,
                 instruc_1.alu__out_MEM, instruc_2.alu__out_MEM,
                 instruc_1.mem_write_en_MEM, instruc_2.mem_write_en_MEM); //operates on data to write to memory
+
+   /********PIPELINE1 MUXES**********/
+   mux2to1 #(5) regDest(instruc_1.wr_regNum, instruc_1.dcd_rt, instruc_1.dcd_rd, instruc_1.regdst); //register to write to
+   mux2to1 #(5) regRt(instruc_1.rt_regNum, instruc_1.dcd_rt, 5'd2, instruc_1.ctrl_Sys); //rt reg to read from (for syscalls)   
+
+   //Determines inputs to ALU
+   mux2to1 aluSrc1(instruc_1.alu_in1, instruc_1.rs_fwd, instruc_1.rt_fwd, instruc_1.alusrc1_EX); //ALUSrc1
+   mux2to1 aluSrc2(instruc_1.alu_in2, instruc_1.rt_fwd, instruc_1.imm_EX, instruc_1.alusrc2_EX); //ALUSrc2
+   mux2to1 signext_1(instruc_1.imm, instruc_1.dcd_e_imm, instruc_1.dcd_se_imm,
+            instruc_1.se_EX); //Zero extend or sign extend immediate
+
+   //rs and rt forwarding
+   mux4to1 fwdrs(instruc_1.rs_fwd, instruc_1.rs_data_EX, instruc_1.alu__out_MEM, instruc_1.wr_dataMem, , instruc_1.fwd_rs_sel_EX);
+   mux4to1 fwdrt(instruc_1.rt_fwd, instruc_1.rt_data_EX, instruc_1.alu__out_MEM, instruc_1.wr_dataMem, , instruc_1.fwd_rt_sel_EX);
+   
+   //Wirings to memory module
+   mux4to1 memToReg_1(instruc_1.wr_dataMem, instruc_1.alu__out_WB, load_data_WB,
+                      instruc_1.HIout_WB, instruc_1.LOout_WB, instruc_1.memtoreg_WB);
+
+   assign instruc_1.mem_addr = instruc_1.alu__out_MEM[31:2]; //memory address to read/write
+
+   assign instruc_1.mem_data_in = instruc_1.store_data; //data to store 
 
    //Mux for next state PC
    mux4to1 pcMux(newpc, stallpc, br_target, rs_data, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
@@ -687,7 +686,28 @@ module mips_core(/*AUTOARG*/
 
    //Set wr_data and wr_reg when there is a jump/branch with link
    mux2to1 dataToReg(wr_data, wr_dataMem, pc+4, jLink_en_WB); 
-   mux2to1 #(5)regNumber(wr_reg, wr_regNum, 5'd31, jLink_en_WB);
+   mux2to1 #(5)regNumber(wr_reg, wr_reg_WB, 5'd31, jLink_en_WB);
+
+
+   /********PIPELINE2 MUXES**********/
+   mux2to1 #(5) regDest_2(instruc_2.wr_regNum, instruc_2.dcd_rt, instruc_2.dcd_rd, instruc_1.regdst); //register to write to
+   mux2to1 #(5) regRt_2(instruc_2.rt_regNum, instruc_2.dcd_rt, 5'd2, instruc_2.ctrl_Sys); //rt reg to read from (for syscalls)   
+
+   //Determines inputs to ALU
+   mux2to1 aluSrc1_2(instruc_2.alu_in1, instruc_2.rs_fwd, instruc_2.rt_fwd, instruc_2.alusrc1_EX); //ALUSrc1
+   mux2to1 aluSrc2_2(instruc_2.alu_in2, instruc_2.rt_fwd, instruc_2.imm_EX, instruc_2.alusrc2_EX); //ALUSrc2
+   mux2to1 signext_2(instruc_2.imm, instruc_2.dcd_e_imm, instruc_2.dcd_se_imm,
+                     instruc_2.se_EX); //Zero extend or sign extend immediate
+
+   //rs and rt forwarding
+   mux4to1 fwdrs_2(instruc_2.rs_fwd, instruc_2.rs_data_EX, instruc_2.alu__out_MEM, instruc_2.wr_dataMem, , instruc_2.fwd_rs_sel_EX);
+   mux4to1 fwdrt_2(instruc_2.rt_fwd, instruc_2.rt_data_EX, instruc_2.alu__out_MEM, instruc_2.wr_dataMem, , instruc_2.fwd_rt_sel_EX);
+
+   mux4to1 memToReg_2(instruc_2.wr_dataMem, instruc_2.alu__out_WB, load_data_WB,
+                      instruc_2.HIout_WB, instruc_2.LOout_WB, instruc_2.memtoreg_WB);
+
+   assign instruc_2.mem_addr = instruc_2.alu__out_MEM[31:2]; //memory address to read/write
+   assign instruc_2.mem_data_in = instruc_2.store_data; //data to store
 
 /*****************************************************************************/
 
@@ -723,9 +743,9 @@ module mips_core(/*AUTOARG*/
                      .AdES(1'b0),
                      .CpU(1'b0));
 
-   assign r_v0 = rt_data_WB; // rt_data for syscall is data from $v0
+   assign r_v0 = (instruc_2.ctrl_Sys_WB) ? instruc_2.rt_data_WB : instruc_1.rt_data_WB; // rt_data for syscall is data from $v0
 
-   syscall_unit SU(.syscall_halt(syscall_halt), .pc(pc), .clk(clk), .Sys(ctrl_Sys_WB),
+   syscall_unit SU(.syscall_halt(syscall_halt), .pc(pc), .clk(clk), .Sys(instruc_1.ctrl_Sys_WB | instruc_2.ctrl_Sys_WB),
                    .r_v0(r_v0), .rst_b(rst_b));
    assign        internal_halt = exception_halt | syscall_halt;
    register #(1, 0) Halt(halted, internal_halt, clk, 1'b1, rst_b);
@@ -989,39 +1009,80 @@ endmodule
 ////
 //// forwardData: module for forwarding data to prevent RAW hazards
 ////
-//// wr_reg_EX, wr_reg_MEM, wr_reg_WB (inputs) - are reg numbers at different stages
+//// wr_reg_EX, wr_reg_MEM (inputs) - are reg numbers at different stages
 //// dcd_rs, dcd_rt (inputs) - the registers the next instruction is reading
-//// mem_write_en_EX, mem_write_en_MEM, mem_write_en (inputs) - the memory write enable bits at different stages
-//// ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB (inputs) - register write enable bits at different stages
+//// ctrl_we_EX, ctrl_we_MEM (inputs) - register write enable bits at different stages
 //// rsfwd, rtfwd (output) - selects what data to forward to rs and rt data outputs
 ////
 
 module forwardData(
-  input logic [4:0] wr_reg_EX, wr_reg_MEM, wr_reg_WB, dcd_rt, dcd_rs,
-  input logic [3:0] mem_write_en_EX, mem_write_en_MEM, mem_write_en,
-  input logic ctrl_we_EX, ctrl_we_MEM, ctrl_we_WB,
-  output logic [1:0] rsfwd, rtfwd);
+  //input logic [31:0] pc_ID_1, pc_EX_1, pc_MEM_1, pc_ID_2, pc_EX_2, pc_MEM_2,
+  input logic [4:0] wr_reg_EX_1, wr_reg_MEM_1, dcd_rt_1, dcd_rs_1,
+  input logic [4:0] wr_reg_EX_2, wr_reg_MEM_2, dcd_rt_2, dcd_rs_2,
+  input logic ctrl_we_EX_1, ctrl_we_MEM_1, ctrl_we_EX_2, ctrl_we_MEM_2,
+  output logic [1:0] rsfwd_1, rtfwd_1, rsfwd_2, rtfwd_2);
 
   always_comb begin
-    rsfwd = 2'b0;
-    rtfwd = 2'b0;
-    if (ctrl_we_MEM != 0) begin
-      if ((dcd_rs != 0) && (dcd_rs == wr_reg_MEM)) begin
-        rsfwd = 2'b10;
+    rsfwd_1 = 2'b0;
+    rtfwd_1 = 2'b0;
+    rsfwd_2 = 2'b0;
+    rtfwd_2 = 2'b0;
+    if (ctrl_we_MEM_1 != 0) begin
+      if ((dcd_rs_1 != 0) && (dcd_rs_1 == wr_reg_MEM_1)) begin
+        rsfwd_1 = 2'b11;
       end
-      if ((dcd_rt != 0) && (dcd_rt == wr_reg_MEM)) begin
-        rtfwd = 2'b10;
+      if ((dcd_rt_1 != 0) && (dcd_rt_1 == wr_reg_MEM_1)) begin
+        rtfwd_1 = 2'b11;
+      end
+      if ((dcd_rs_2 != 0) && (dcd_rs_2 == wr_reg_MEM_1)) begin
+        rsfwd_2 = 2'b11;
+      end
+      if ((dcd_rs_2 != 0) && (dcd_rt_2 == wr_reg_MEM_1)) begin
+        rtfwd_2 = 2'b11;
       end
     end
-    if (ctrl_we_EX != 0) begin
-      if ((dcd_rs != 0) && (dcd_rs == wr_reg_EX)) begin
-        rsfwd = 2'b01;
+    if (ctrl_we_MEM_2 != 0) begin
+      if ((dcd_rs_1 != 0) && (dcd_rs_1 == wr_reg_MEM_2)) begin
+        rsfwd_1 = 2'b10;
       end
-      if ((dcd_rt != 0) && (dcd_rt == wr_reg_EX)) begin
-        rtfwd = 2'b01;
+      if ((dcd_rt_1 != 0) && (dcd_rt_1 == wr_reg_MEM_2)) begin
+        rtfwd_1 = 2'b10;
+      end
+      if ((dcd_rs_2 != 0) && (dcd_rs_2 == wr_reg_MEM_2)) begin
+        rsfwd_2 = 2'b10;
+      end
+      if ((dcd_rs_2 != 0) && (dcd_rt_2 == wr_reg_MEM_2)) begin
+        rtfwd_2 = 2'b10;
       end
     end
-
+    if (ctrl_we_EX_1 != 0) begin
+      if ((dcd_rs_1 != 0) && (dcd_rs_1 == wr_reg_EX_1)) begin
+        rsfwd_1 = 2'b01;
+      end
+      if ((dcd_rt_1 != 0) && (dcd_rt_1 == wr_reg_EX_1)) begin
+        rtfwd_1 = 2'b01;
+      end
+      if ((dcd_rs_2 != 0) && (dcd_rs_2 == wr_reg_EX_1)) begin
+        rsfwd_2 = 2'b01;
+      end
+      if ((dcd_rs_2 != 0) && (dcd_rt_2 == wr_reg_EX_1)) begin
+        rtfwd_2 = 2'b01;
+      end
+    end
+    if (ctrl_we_EX_2 != 0) begin
+      if ((dcd_rs_1 != 0) && (dcd_rs_1 == wr_reg_EX_2)) begin
+        rsfwd_1 = 2'b01;
+      end
+      if ((dcd_rt_1 != 0) && (dcd_rt_1 == wr_reg_EX_2)) begin
+        rtfwd_1 = 2'b01;
+      end
+      if ((dcd_rs_2 != 0) && (dcd_rs_2 == wr_reg_EX_2)) begin
+        rsfwd_2 = 2'b01;
+      end
+      if ((dcd_rs_2 != 0) && (dcd_rt_2 == wr_reg_EX_2)) begin
+        rtfwd_2 = 2'b01;
+      end
+    end
   end
 
 endmodule
@@ -1029,12 +1090,15 @@ endmodule
 ////
 //// stallDetector: module for enabling stalls if RAW, WAR, WAW hazard
 ////
+//// pc_ID, pc_EX (inputs) - pc values at different stages
 //// wr_reg_EX, wr_reg_MEM (inputs) - are reg numbers at different stages
 //// dcd_rs, dcd_rt (inputs) - the registers the next instruction is reading
-//// mem_write_en_EX, mem_write_en_MEM (inputs) - the memory write enable bits at different stages
-//// ctrl_we_EX, ctrl_we_MEM (inputs) - register write enable bits at different stages
+//// regdst (input) - destination register
+//// mem_en (input) - the memory write enable bits at ID stage
+//// ctrl_we, ctrl_we_EX (inputs) - register write enable bits at different stages
 //// stall (input) - signal that indicates an instruction is currently being stalled
-//// IFen, IDen, EXen, (output) - register enable bits at the IF, ID, and EX stages
+//// IFen, IDen, EXen (outputs) - register enable bits at the IF, ID, and EX stages
+//// CDen (output) - enable bit for countdown register
 //// CDAmt (output) - number of clock cycles to stall
 ////
 module stallDetector(
@@ -1042,7 +1106,7 @@ module stallDetector(
   input logic [4:0] wr_reg_1, wr_reg_EX_1, wr_reg_MEM_1, dcd_rt_1, dcd_rs_1,
   input logic [3:0] mem_en_1,
   input logic ctrl_we_1, ctrl_we_EX_1, regdst_1,
-  input logic [31:0] pc_ID_2, pc_EX_2, pc_MEM_2,
+  input logic [31:0] pc_ID_2, pc_EX_2,
   input logic [4:0] wr_reg_2, wr_reg_EX_2, wr_reg_MEM_2, dcd_rt_2, dcd_rs_2,
   input logic [3:0] mem_en_2,
   input logic ctrl_we_2, ctrl_we_EX_2, regdst_2, 
