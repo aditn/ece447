@@ -399,8 +399,8 @@ module mips_core(/*AUTOARG*/
 
    //wire [31:0] br_target; //branch target
    //wire [31:0] j_target; //unconditional jump target
-   //wire [31:0] hi_out; //HI Register out
-   //wire [31:0] lo_out; //LO Register out
+   wire [31:0] hi_out; //HI Register out
+   wire [31:0] lo_out; //LO Register out
    //wire [31:0] hi_in; //HI Register in
    //wire [31:0] lo_in; //LO Register in
    //wire [31:0] load_data; //loaded data
@@ -653,7 +653,7 @@ module mips_core(/*AUTOARG*/
                    instruc_1.fwd_rs_sel, instruc_1.fwd_rt_sel, instruc_2.fwd_rs_sel, instruc_2.fwd_rt_sel);
 
    //To read from / write to memory
-   loader loader(load_data, instruc_1.imm_MEM, instruc_2.imm_MEM, mem_data_out,
+   loader loader(load_data, instruc_1.imm_MEM[15:0], instruc_2.imm_MEM[15:0], mem_data_out,
                 instruc_1.load_sel_MEM, instruc_2.load_sel_MEM,
                 instruc_1.alu__out_MEM, instruc_2.alu__out_MEM); //operates on data loaded from memory
 
@@ -723,8 +723,8 @@ module mips_core(/*AUTOARG*/
 
    //sets values for mem_addr and mem_data_in if there is a store
    setMemValues setMemForStore(mem_addr,mem_data_in,
-                    instruc_1.alu__out_MEM,instruc_2.alu__out_MEM_2, store_data,
-                    instruc_1.mem_write_en_MEM_1,instruc_2.mem_write_en_MEM_2);
+                    instruc_1.alu__out_MEM, instruc_2.alu__out_MEM, store_data,
+                    instruc_1.mem_write_en_MEM, instruc_2.mem_write_en_MEM);
 
    // Execute
    mips_ALU ALU1(.alu__out(instruc_1.alu__out),
@@ -734,7 +734,7 @@ module mips_core(/*AUTOARG*/
                 .alu__sel(instruc_1.alu__sel_EX),
                 .brcond(instruc_1.brcond_EX));
 
-   mips_ALU ALU2(.alu__out(instruc_2.alu__out_2),
+   mips_ALU ALU2(.alu__out(instruc_2.alu__out),
                 .branchTrue(instruc_2.branchTrue), 
                 .alu__op1(instruc_2.alu_in1),
                 .alu__op2(instruc_2.alu_in2),
@@ -896,15 +896,16 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
 endmodule
 
 
-module setMemValues(mem_addr,mem_data_in,
-                    alu__out_MEM_1,alu__out_MEM_2,
-                    store_data,
-                    mem_write_en_MEM_1,mem_write_en_MEM_2);
+module setMemValues(
+   output logic [29:0] mem_addr,
+   output logic [31:0] mem_data_in,
+   input logic [31:0] alu__out_MEM_1, alu__out_MEM_2, store_data,
+   input logic [3:0] mem_write_en_MEM_1,mem_write_en_MEM_2);
    
-   output [29:0] mem_addr;
+   /*output [29:0] mem_addr;
    output [31:0] mem_data_in;
    input  [31:0] alu__out_MEM_1,alu__out_MEM_2, store_data;
-   input  [3:0]  mem_write_en_MEM_1, mem_write_en_MEM_2;
+   input  [3:0]  mem_write_en_MEM_1, mem_write_en_MEM_2;*/
 
    always_comb begin
      mem_addr = 30'bx;
