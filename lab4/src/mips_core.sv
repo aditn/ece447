@@ -148,8 +148,8 @@ typedef struct packed{
 
   logic [31:0] rs_fwd; //forwarded value of rs
   logic [31:0] rt_fwd; //forwarded value of rt
-  logic [1:0] fwd_rs_sel, fwd_rt_sel; //select bits for forwarding rs and rt
-  logic [1:0] fwd_rs_sel_EX, fwd_rt_sel_EX;
+  logic [2:0] fwd_rs_sel, fwd_rt_sel; //select bits for forwarding rs and rt
+  logic [2:0] fwd_rs_sel_EX, fwd_rt_sel_EX;
 
 }instruction;
 
@@ -306,6 +306,7 @@ module mips_core(/*AUTOARG*/
        //$display ("   rsfwd: %x, rtfwd: %x, fwd_rs_en: %x, fwd_rt_en: %x", instruc_1.rs_fwd, instruc_1.rt_fwd, instruc_1.fwd_rs_sel_EX, instruc_1.fwd_rt_sel_EX);
        //$display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", instruc_1.wr_reg_EX, instruc_1.alu_in1, instruc_1.alu_in2, instruc_1.alu__out, instruc_1.ctrl_we_EX, instruc_1.mem_write_en_EX);
        //$display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_1.wr_reg_MEM, instruc_1.alu__out_MEM, instruc_1.ctrl_we_MEM, instruc_1.mem_write_en_MEM);
+
        //$display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
        //$display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_1.wr_reg_WB, instruc_1.alu__out_WB, instruc_1.ctrl_we_WB, instruc_1.mem_write_en_WB);
        //$display ("");
@@ -315,6 +316,7 @@ module mips_core(/*AUTOARG*/
        //$display ("   rsfwd: %x, rtfwd: %x, fwd_rs_en: %x, fwd_rt_en: %x", instruc_2.rs_fwd, instruc_2.rt_fwd, instruc_2.fwd_rs_sel_EX, instruc_2.fwd_rt_sel_EX);
        //$display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, ctrl_we_EX: %x, mem_EX: %x, EXen: %x", instruc_2.wr_reg_EX, instruc_2.alu_in1, instruc_2.alu_in2, instruc_2.alu__out, instruc_2.ctrl_we_EX, instruc_2.mem_write_en_EX, instruc_2.EXen);
        //$display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_2.wr_reg_MEM, instruc_2.alu__out_MEM, instruc_2.ctrl_we_MEM, instruc_2.mem_write_en_MEM);
+
        //$display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
        //$display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_2.wr_reg_WB, instruc_2.alu__out_WB, instruc_2.ctrl_we_WB, instruc_2.mem_write_en_WB);
 
@@ -464,8 +466,8 @@ module mips_core(/*AUTOARG*/
    register rtEX_1(instruc_1.rt_data_EX, instruc_1.rt_data, clk, instruc_1.EXen, rst_b);
    register iEX_1(instruc_1.imm_EX, instruc_1.imm, clk, instruc_1.EXen, rst_b);
    register #(5) wrEX_1(instruc_1.wr_reg_EX, instruc_1.wr_regNum, clk, instruc_1.EXen, rst_b);
-   register #(2) fwdrsEX_1(instruc_1.fwd_rs_sel_EX, instruc_1.fwd_rs_sel, clk, instruc_1.EXen, rst_b);
-   register #(2) fwdrtEX_1(instruc_1.fwd_rt_sel_EX, instruc_1.fwd_rt_sel, clk, instruc_1.EXen, rst_b);
+   register #(3) fwdrsEX_1(instruc_1.fwd_rs_sel_EX, instruc_1.fwd_rs_sel, clk, instruc_1.EXen, rst_b);
+   register #(3) fwdrtEX_1(instruc_1.fwd_rt_sel_EX, instruc_1.fwd_rt_sel, clk, instruc_1.EXen, rst_b);
 
    //wire ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX;
    //wire alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, load_stall_EX; 
@@ -492,8 +494,8 @@ module mips_core(/*AUTOARG*/
    register rtEX_2(instruc_2.rt_data_EX, instruc_2.rt_data, clk, instruc_2.EXen, rst_b);
    register iEX_2(instruc_2.imm_EX, instruc_2.imm, clk, instruc_2.EXen, rst_b);
    register #(5) wrEX_2(instruc_2.wr_reg_EX, instruc_2.wr_regNum, clk, instruc_2.EXen, rst_b);
-   register #(2) fwdrsEX_2(instruc_2.fwd_rs_sel_EX, instruc_2.fwd_rs_sel, clk, instruc_2.EXen, rst_b);
-   register #(2) fwdrtEX_2(instruc_2.fwd_rt_sel_EX, instruc_2.fwd_rt_sel, clk, instruc_2.EXen, rst_b);
+   register #(3) fwdrsEX_2(instruc_2.fwd_rs_sel_EX, instruc_2.fwd_rs_sel, clk, instruc_2.EXen, rst_b);
+   register #(3) fwdrtEX_2(instruc_2.fwd_rt_sel_EX, instruc_2.fwd_rt_sel, clk, instruc_2.EXen, rst_b);
 
    //wire ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX;
    //wire alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, load_stall_EX; 
@@ -750,6 +752,7 @@ module mips_core(/*AUTOARG*/
 
    //sets values for mem_addr and mem_data_in if there is a store
    setMemValues setMemForStore(mem_addr,mem_data_in,
+                    instruc_1.load_sel_MEM, instruc_2.load_sel_MEM,
                     instruc_1.alu__out_MEM, instruc_2.alu__out_MEM, store_data,
                     instruc_1.mem_write_en_MEM, instruc_2.mem_write_en_MEM);
 
@@ -926,6 +929,7 @@ endmodule
 module setMemValues(
    output logic [29:0] mem_addr,
    output logic [31:0] mem_data_in,
+   input logic [2:0] load_sel_MEM_1, load_sel_MEM_2,
    input logic [31:0] alu__out_MEM_1, alu__out_MEM_2, store_data,
    input logic [3:0] mem_write_en_MEM_1,mem_write_en_MEM_2);
    
@@ -937,12 +941,12 @@ module setMemValues(
    always_comb begin
      mem_addr = 30'bx;
      mem_data_in = store_data;
-     if (mem_write_en_MEM_1 != 4'd0) begin
-       $display("mem_write_en_MEM_1 != 0");
+     if ((mem_write_en_MEM_1 != 4'd0) | (load_sel_MEM_1 != `NO_LOAD)) begin
+       //$display("mem_write_en_MEM_1 != 0");
        mem_addr = alu__out_MEM_1[31:2];
      end
-     else if (mem_write_en_MEM_2 != 4'd0) begin
-      $display("mem_write_en_MEM_2 != 0");
+     else if ((mem_write_en_MEM_2 != 4'd0) | (load_sel_MEM_2 != `NO_LOAD)) begin
+      //$display("mem_write_en_MEM_2 != 0");
        mem_addr = alu__out_MEM_2[31:2];
      end
    end
@@ -1154,6 +1158,7 @@ module forwardData(
         rsfwd_1 = 3'b100;
       end
       if ((dcd_rt_1 != 0) && (dcd_rt_1 == wr_reg_MEM_1)) begin
+        //$display("here");
         rtfwd_1 = 3'b100;
       end
       if ((dcd_rs_2 != 0) && (dcd_rs_2 == wr_reg_MEM_1)) begin
@@ -1205,6 +1210,7 @@ module forwardData(
         rtfwd_2 = 3'b001;
       end
     end
+    //$display("we_MEM: %b, dcd_rs_1: %x, dcd_rt_1: %x, wr_reg_MEM_1: %x, rtfwd_1: %b", ctrl_we_MEM_1, dcd_rs_1, dcd_rt_1, wr_reg_MEM_1, rtfwd_1);
   end
 
 endmodule
