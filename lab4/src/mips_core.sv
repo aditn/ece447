@@ -314,6 +314,8 @@ module mips_core(/*AUTOARG*/
        $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_2.wr_reg_MEM, instruc_2.alu__out_MEM, instruc_2.ctrl_we_MEM, instruc_2.mem_write_en_MEM);
        //$display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
        $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_2.wr_reg_WB, instruc_2.alu__out_WB, instruc_2.ctrl_we_WB, instruc_2.mem_write_en_WB);
+       $display ("instruc_1.syscall_halt, %x instruc_2.syscall_halt: %x, instruc_1.ctrl_Sys_WB:%x,instruc_2.ctrl_Sys_WB:%x",instruc_1.syscall_halt,instruc_2.syscall_halt, instruc_1.ctrl_Sys_WB,instruc_2.ctrl_Sys_WB);
+       $display ("instruc_1.rt_data_WB:%x, instruc_2.rt_data_WB:%x",instruc_1.rt_data_WB,instruc_2.rt_data_WB);
        $display ("");
        $display ("");
      end
@@ -799,7 +801,7 @@ module mips_core(/*AUTOARG*/
    syscall_unit SU_2(.syscall_halt(instruc_2.syscall_halt), .pc(instruc_2.pc), .clk(clk), .Sys(instruc_2.ctrl_Sys_WB),
                    .r_v0(r_v0), .rst_b(rst_b));
 
-   assign        internal_halt = instruc_1.exception_halt | instruc_2.exception_halt  | instruc_1.syscall_halt |instruc_2.syscall_halt;
+   assign        internal_halt = instruc_1.exception_halt | instruc_2.exception_halt | instruc_1.syscall_halt |instruc_2.syscall_halt;
    register #(1, 0) Halt(halted, internal_halt, clk, 1'b1, rst_b);
    
    register #(32, 0) EPCReg_1(instruc_1.epc, instruc_1.pc, clk, instruc_1.load_ex_regs, rst_b);
