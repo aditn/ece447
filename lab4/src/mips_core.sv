@@ -673,7 +673,7 @@ module mips_core(/*AUTOARG*/
                 instruc_1.load_sel_MEM, instruc_2.load_sel_MEM,
                 instruc_1.alu__out_MEM instruc_2.alu__out_MEM); //operates on data loaded from memory
    
-   storer storer(store_data, instruc_1.mem_write_en, instruc_2.mem_write_en,
+   storer storer(store_data, mem_write_en,
                 instruc_1.rt_data_MEM, instruc_2.rt_data_MEM,
                 instruc_1.store_sel_MEM, instruc_2.store_sel_MEM,
                 instruc_1.alu__out_MEM, instruc_2.alu__out_MEM,
@@ -1371,13 +1371,13 @@ endmodule
 ////
 module storer (
       output logic [31:0] store_data,
-      output logic [3:0] mem_write_en_1, mem_write_en_2,
+      output logic [3:0] mem_write_en,
       input logic [31:0] rt_data_1, rt_data_2,
       input logic [1:0] store_sel_1, store_sel_1,
       input logic [31:0] offset_1, offset_2,
       input logic [3:0] mem_en_1, mem_en_2);
 
-    logic [3:0] mem_en, mem_write_en;
+    logic [3:0] mem_en;
     logic [31:0] rt_data;
     logic [1:0] store_sel;
     logic [31:0] offset;
@@ -1427,18 +1427,6 @@ module storer (
       endcase
     end
 
-    always_comb begin
-      if (mem_write_en_1 != 4'd0) begin
-        mem_write_en_1 = mem_write_en;
-      end
-      else if (mem_write_en_2 != 4'd0) begin
-        mem_write_en_2 = mem_write_en;
-      end
-      else begin
-        mem_write_en_1 = mem_write_en;
-        mem_write_en_2 = mem_write_en;
-      end
-    end
 endmodule
 
 
