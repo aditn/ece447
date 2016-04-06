@@ -212,12 +212,13 @@ module mips_core(/*AUTOARG*/
    wire [31:0] store_data; //data to store
 
    wire [31:0] newpc; //mux output for next state PC
+   wire [31:0] stallpc;
    //wire [31:0] pcNextFinal; 
    //wire [31:0] inst_ID; //instruction progagated to decode stage
 
    // PC Management
    //register #(32, text_start) PCReg(pc, pcNextFinal, clk, ~internal_halt, rst_b);
-   register #(32, text_start) PCReg(instruc_1.pc, newpc, clk, ~internal_halt, rst_b);
+   register #(32, text_start) PCReg(instruc_1.pc, stallpc, clk, ~internal_halt, rst_b);
    assign instruc_2.pc = instruc_1.pc + 4;
    assign inst_addr = instruc_1.pc[31:2];
    //register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
@@ -273,12 +274,12 @@ module mips_core(/*AUTOARG*/
    /****************************/
 
    // synthesis translate_off
-   /*
+   
    always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
        $display ( "=== Simulation Cycle %d ===", $time );
-       $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
+       /*$display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    pc, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
       // $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
        $display ("HI: %x, LO: %x, hi_en_EX: %x, hi_en_WB:%x, lo_en_EX: %x, lo_en_WB: %x", hi_out, lo_out,hi_en_EX,hi_en_WB,lo_en_EX, lo_en_WB);
@@ -295,10 +296,28 @@ module mips_core(/*AUTOARG*/
        //$display ("Address: %h, Store: %h, Load:%h, en:%b", mem_addr, mem_data_in, mem_data_out, mem_write_en);
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
        //$display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", branchTrue, pcMuxSel, pcMuxSelFinal);
-       //$display ("br_target: %x", br_target);
+       //$display ("br_target: %x", br_target);*/
+       $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
+                   instruc_1.pc, instruc_1.inst_ID, instruc_1.dcd_op, instruc_1.dcd_rs, instruc_1.dcd_rt, instruc_1.dcd_rd, instruc_1.dcd_imm, instruc_1.dcd_funct2, ~rst_b, halted);
+       $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, mem_en: %x", instruc_1.wr_regNum, instruc_1.wr_data, instruc_1.dcd_rs, instruc_1.dcd_rt, instruc_1.rs_data, instruc_1.rt_data, instruc_1.imm, instruc_1.mem_en);
+       $display ("   rsfwd: %x, rtfwd: %x, fwd_rs_en: %x, fwd_rt_en: %x", instruc_1.rs_fwd, instruc_1.rt_fwd, instruc_1.fwd_rs_sel_EX, instruc_1.fwd_rt_sel_EX);
+       $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", instruc_1.wr_reg_EX, instruc_1.alu_in1, instruc_1.alu_in2, instruc_1.alu__out, instruc_1.ctrl_we_EX, instruc_1.mem_write_en_EX);
+       $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_1.wr_reg_MEM, instruc_1.alu__out_MEM, instruc_1.ctrl_we_MEM, instruc_1.mem_write_en_MEM);
+       //$display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
+       $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_1.wr_reg_WB, instruc_1.alu__out_WB, instruc_1.ctrl_we_WB, instruc_1.mem_write_en_WB);
+       $display ("");
+       $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
+                   instruc_2.pc, instruc_2.inst_ID, instruc_2.dcd_op, instruc_2.dcd_rs, instruc_2.dcd_rt, instruc_2.dcd_rd, instruc_2.dcd_imm, instruc_2.dcd_funct2, ~rst_b, halted);
+       $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, mem_en: %x", instruc_2.wr_regNum, instruc_2.wr_data, instruc_2.dcd_rs, instruc_2.dcd_rt, instruc_2.rs_data, instruc_2.rt_data, instruc_2.imm, instruc_2.mem_en);
+       $display ("   rsfwd: %x, rtfwd: %x, fwd_rs_en: %x, fwd_rt_en: %x", instruc_2.rs_fwd, instruc_2.rt_fwd, instruc_2.fwd_rs_sel_EX, instruc_2.fwd_rt_sel_EX);
+       $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, ctrl_we_EX: %x, mem_EX: %x, EXen: %x", instruc_2.wr_reg_EX, instruc_2.alu_in1, instruc_2.alu_in2, instruc_2.alu__out, instruc_2.ctrl_we_EX, instruc_2.mem_write_en_EX, instruc_2.EXen);
+       $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_2.wr_reg_MEM, instruc_2.alu__out_MEM, instruc_2.ctrl_we_MEM, instruc_2.mem_write_en_MEM);
+       //$display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
+       $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_2.wr_reg_WB, instruc_2.alu__out_WB, instruc_2.ctrl_we_WB, instruc_2.mem_write_en_WB);
+       $display ("");
        $display ("");
      end
-   end*/
+   end
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -414,13 +433,15 @@ module mips_core(/*AUTOARG*/
 
    //Fetch (IF) stage for pc register
    wire IFen; //enable for IF stage
-   wire [31:0] stallpc; //either PC or PC+4 depending on stall conditions
+   //wire [31:0] stallpc; //either PC or PC+4 depending on stall conditions
    mux2to1 stallMux(stallpc, instruc_1.pc, instruc_1.pc+8, IFen);
 
    //Decode (ID) stage registers and wirings
    //wire IDen; //enable for decode stage
    //wire [31:0] pc_ID;
-   register irD_1(instruc_1.inst_ID, instruc_1.inst, clk, instruc_1.IDen, rst_b);
+   register pcID_1(instruc_1.pc_ID, instruc_1.pc, clk, instruc_1.IDen, rst_b);
+   register pcID_2(instruc_2.pc_ID, instruc_2.pc, clk, instruc_2.IDen, rst_b);
+   clearRegister irD_1(instruc_1.inst_ID, instruc_1.inst, clk, instruc_1.IDen, rst_b);
    register irD_2(instruc_2.inst_ID, instruc_2.inst, clk, instruc_2.IDen, rst_b);
 
    //Execute (EX) stage registers
@@ -437,8 +458,8 @@ module mips_core(/*AUTOARG*/
    register rtEX_1(instruc_1.rt_data_EX, instruc_1.rt_data, clk, instruc_1.EXen, rst_b);
    register iEX_1(instruc_1.imm_EX, instruc_1.imm, clk, instruc_1.EXen, rst_b);
    register #(5) wrEX_1(instruc_1.wr_reg_EX, instruc_1.wr_regNum, clk, instruc_1.EXen, rst_b);
-   //register #(2) fwdrsEX(fwd_rs_sel_EX, fwd_rs_sel, clk, EXen, rst_b);
-   //register #(2) fwdrtEX(fwd_rt_sel_EX, fwd_rt_sel, clk, EXen, rst_b);
+   register #(2) fwdrsEX_1(instruc_1.fwd_rs_sel_EX, instruc_1.fwd_rs_sel, clk, instruc_1.EXen, rst_b);
+   register #(2) fwdrtEX_1(instruc_1.fwd_rt_sel_EX, instruc_1.fwd_rt_sel, clk, instruc_1.EXen, rst_b);
 
    //wire ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX;
    //wire alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, load_stall_EX; 
@@ -465,8 +486,8 @@ module mips_core(/*AUTOARG*/
    register rtEX_2(instruc_2.rt_data_EX, instruc_2.rt_data, clk, instruc_2.EXen, rst_b);
    register iEX_2(instruc_2.imm_EX, instruc_2.imm, clk, instruc_2.EXen, rst_b);
    register #(5) wrEX_2(instruc_2.wr_reg_EX, instruc_2.wr_regNum, clk, instruc_2.EXen, rst_b);
-   //register #(2) fwdrsEX(fwd_rs_sel_EX, fwd_rs_sel, clk, EXen, rst_b);
-   //register #(2) fwdrtEX(fwd_rt_sel_EX, fwd_rt_sel, clk, EXen, rst_b);
+   register #(2) fwdrsEX_2(instruc_2.fwd_rs_sel_EX, instruc_2.fwd_rs_sel, clk, instruc_2.EXen, rst_b);
+   register #(2) fwdrtEX_2(instruc_2.fwd_rt_sel_EX, instruc_2.fwd_rt_sel, clk, instruc_2.EXen, rst_b);
 
    //wire ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX;
    //wire alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, load_stall_EX; 
@@ -619,28 +640,28 @@ module mips_core(/*AUTOARG*/
    wire CDen;
    wire [2:0] CDAmt;
    stallDetector sD(instruc_1.pc_ID, instruc_1.pc_EX,
-                    instruc_1.wr_reg_EX, instruc_1.wr_reg_MEM, instruc_1.wr_reg_WB, instruc_1.rt_regNum, instruc_1.dcd_rs,
+                    instruc_1.wr_regNum, instruc_1.wr_reg_EX, instruc_1.wr_reg_MEM, instruc_1.rt_regNum, instruc_1.dcd_rs,
                     instruc_1.mem_en,
-                    instruc_1.ctrl_we_EX, instruc_1.ctrl_we_MEM, instruc_1.regdst,
+                    instruc_1.ctrl_we, instruc_1.ctrl_we_EX, instruc_1.regdst,
                     instruc_2.pc_ID, instruc_2.pc_EX,
-                    instruc_2.wr_reg_EX, instruc_2.wr_reg_MEM, instruc_2.wr_reg_WB, instruc_2.rt_regNum, instruc_2.dcd_rs,
+                    instruc_2.wr_regNum, instruc_2.wr_reg_EX, instruc_2.wr_reg_MEM, instruc_2.rt_regNum, instruc_2.dcd_rs,
                     instruc_2.mem_en,
-                    instruc_2.ctrl_we_EX, instruc_2.ctrl_we_MEM, instruc_2.regdst,
+                    instruc_2.ctrl_we, instruc_2.ctrl_we_EX, instruc_2.regdst,
                     instruc_1.stall, instruc_2.stall, instruc_1.load_stall, instruc_1.load_stall_EX, instruc_2.load_stall, instruc_2.load_stall_EX,
                     IFen, instruc_1.IDen, instruc_1.EXen, , instruc_2.IDen, instruc_2.EXen,
                     CDen, CDAmt);
    countdownReg cdReg(CDen, clk, rst_b,
                       CDAmt,
-                      stall);
+                      instruc_2.stall);
 
    //Register file
    regfile2_forward RegFile(instruc_1.rs_data, instruc_1.rt_data,
                             instruc_2.rs_data, instruc_2.rt_data,
 
                             instruc_1.dcd_rs, instruc_1.rt_regNum,
-                            instruc_1.wr_reg_WB,instruc_1.wr_data, instruc_1.ctrl_we_WB,
+                            instruc_1.wr_reg, instruc_1.wr_data, instruc_1.ctrl_we_WB,
                             instruc_2.dcd_rs, instruc_2.rt_regNum,
-                            instruc_2.wr_reg_WB, instruc_2.wr_data, instruc_2.ctrl_we_WB,
+                            instruc_2.wr_reg, instruc_2.wr_data, instruc_2.ctrl_we_WB,
                             clk, rst_b, halted);
 
    //HI, LO registers
@@ -674,8 +695,8 @@ module mips_core(/*AUTOARG*/
             instruc_1.se_EX); //Zero extend or sign extend immediate
 
    //rs and rt forwarding
-   mux4to1 fwdrs(instruc_1.rs_fwd, instruc_1.rs_data_EX, instruc_1.alu__out_MEM, instruc_1.wr_dataMem, , instruc_1.fwd_rs_sel_EX);
-   mux4to1 fwdrt(instruc_1.rt_fwd, instruc_1.rt_data_EX, instruc_1.alu__out_MEM, instruc_1.wr_dataMem, , instruc_1.fwd_rt_sel_EX);
+   mux5to1 fwdrs_1(instruc_1.rs_fwd, instruc_1.rs_data_EX, instruc_2.alu__out_MEM, instruc_1.alu__out_MEM, instruc_2.wr_dataMem, instruc_1.wr_dataMem, instruc_1.fwd_rs_sel_EX);
+   mux5to1 fwdrt_1(instruc_1.rt_fwd, instruc_1.rt_data_EX, instruc_2.alu__out_MEM, instruc_1.alu__out_MEM, instruc_2.wr_dataMem, instruc_1.wr_dataMem, instruc_1.fwd_rt_sel_EX);
    
    //Wirings to memory module
    mux4to1 memToReg_1(instruc_1.wr_dataMem, instruc_1.alu__out_WB, load_data_WB,
@@ -689,7 +710,7 @@ module mips_core(/*AUTOARG*/
 
 
    /********PIPELINE2 MUXES**********/
-   mux2to1 #(5) regDest_2(instruc_2.wr_regNum, instruc_2.dcd_rt, instruc_2.dcd_rd, instruc_1.regdst); //register to write to
+   mux2to1 #(5) regDest_2(instruc_2.wr_regNum, instruc_2.dcd_rt, instruc_2.dcd_rd, instruc_2.regdst); //register to write to
    mux2to1 #(5) regRt_2(instruc_2.rt_regNum, instruc_2.dcd_rt, 5'd2, instruc_2.ctrl_Sys); //rt reg to read from (for syscalls)   
 
    //Determines inputs to ALU
@@ -699,8 +720,8 @@ module mips_core(/*AUTOARG*/
                      instruc_2.se_EX); //Zero extend or sign extend immediate
 
    //rs and rt forwarding
-   mux4to1 fwdrs_2(instruc_2.rs_fwd, instruc_2.rs_data_EX, instruc_2.alu__out_MEM, instruc_2.wr_dataMem, , instruc_2.fwd_rs_sel_EX);
-   mux4to1 fwdrt_2(instruc_2.rt_fwd, instruc_2.rt_data_EX, instruc_2.alu__out_MEM, instruc_2.wr_dataMem, , instruc_2.fwd_rt_sel_EX);
+   mux5to1 fwdrs_2(instruc_2.rs_fwd, instruc_2.rs_data_EX, instruc_2.alu__out_MEM, instruc_1.alu__out_MEM, instruc_2.wr_dataMem, instruc_1.wr_dataMem, instruc_2.fwd_rs_sel_EX);
+   mux5to1 fwdrt_2(instruc_2.rt_fwd, instruc_2.rt_data_EX, instruc_2.alu__out_MEM, instruc_1.alu__out_MEM, instruc_2.wr_dataMem, instruc_1.wr_dataMem, instruc_2.fwd_rt_sel_EX);
 
    mux4to1 memToReg_2(instruc_2.wr_dataMem, instruc_2.alu__out_WB, load_data_WB,
                       instruc_2.HIout_WB, instruc_2.LOout_WB, instruc_2.memtoreg_WB);
@@ -947,6 +968,35 @@ module register(q, d, clk, enable, rst_b);
 
 endmodule // register
 
+//// clearRegister: A register which is cleared when not enabled
+////
+//// q      (output) - Current value of register
+//// d      (input)  - Next value of register
+//// clk    (input)  - Clock (positive edge-sensitive)
+//// enable (input)  - Load new value?
+//// reset  (input)  - System reset
+////
+module clearRegister(q, d, clk, enable, rst_b);
+
+   parameter
+            width = 32,
+            reset_value = 0;
+
+   output [(width-1):0] q;
+   reg [(width-1):0]    q;
+   input [(width-1):0]  d;
+   input                 clk, enable, rst_b;
+
+   always @(posedge clk or negedge rst_b)
+     if (~rst_b)
+       q <= reset_value;
+     else if (enable)
+       q <= d;
+     else if (~enable)
+       q <= 32'b0;
+
+endmodule // register
+
 
 //// register2Input: A register which may be reset to one of two arbitrary values
 ////
@@ -1084,67 +1134,67 @@ module forwardData(
   input logic [4:0] wr_reg_EX_1, wr_reg_MEM_1, dcd_rt_1, dcd_rs_1,
   input logic [4:0] wr_reg_EX_2, wr_reg_MEM_2, dcd_rt_2, dcd_rs_2,
   input logic ctrl_we_EX_1, ctrl_we_MEM_1, ctrl_we_EX_2, ctrl_we_MEM_2,
-  output logic [1:0] rsfwd_1, rtfwd_1, rsfwd_2, rtfwd_2);
+  output logic [2:0] rsfwd_1, rtfwd_1, rsfwd_2, rtfwd_2);
 
   always_comb begin
-    rsfwd_1 = 2'b0;
-    rtfwd_1 = 2'b0;
-    rsfwd_2 = 2'b0;
-    rtfwd_2 = 2'b0;
+    rsfwd_1 = 3'b0;
+    rtfwd_1 = 3'b0;
+    rsfwd_2 = 3'b0;
+    rtfwd_2 = 3'b0;
     if (ctrl_we_MEM_1 != 0) begin
       if ((dcd_rs_1 != 0) && (dcd_rs_1 == wr_reg_MEM_1)) begin
-        rsfwd_1 = 2'b11;
+        rsfwd_1 = 3'b100;
       end
       if ((dcd_rt_1 != 0) && (dcd_rt_1 == wr_reg_MEM_1)) begin
-        rtfwd_1 = 2'b11;
+        rtfwd_1 = 3'b100;
       end
       if ((dcd_rs_2 != 0) && (dcd_rs_2 == wr_reg_MEM_1)) begin
-        rsfwd_2 = 2'b11;
+        rsfwd_2 = 3'b100;
       end
       if ((dcd_rs_2 != 0) && (dcd_rt_2 == wr_reg_MEM_1)) begin
-        rtfwd_2 = 2'b11;
+        rtfwd_2 = 3'b100;
       end
     end
     if (ctrl_we_MEM_2 != 0) begin
       if ((dcd_rs_1 != 0) && (dcd_rs_1 == wr_reg_MEM_2)) begin
-        rsfwd_1 = 2'b10;
+        rsfwd_1 = 3'b011;
       end
       if ((dcd_rt_1 != 0) && (dcd_rt_1 == wr_reg_MEM_2)) begin
-        rtfwd_1 = 2'b10;
+        rtfwd_1 = 3'b011;
       end
       if ((dcd_rs_2 != 0) && (dcd_rs_2 == wr_reg_MEM_2)) begin
-        rsfwd_2 = 2'b10;
+        rsfwd_2 = 3'b011;
       end
       if ((dcd_rs_2 != 0) && (dcd_rt_2 == wr_reg_MEM_2)) begin
-        rtfwd_2 = 2'b10;
+        rtfwd_2 = 3'b011;
       end
     end
     if (ctrl_we_EX_1 != 0) begin
       if ((dcd_rs_1 != 0) && (dcd_rs_1 == wr_reg_EX_1)) begin
-        rsfwd_1 = 2'b01;
+        rsfwd_1 = 3'b010;
       end
       if ((dcd_rt_1 != 0) && (dcd_rt_1 == wr_reg_EX_1)) begin
-        rtfwd_1 = 2'b01;
+        rtfwd_1 = 3'b010;
       end
       if ((dcd_rs_2 != 0) && (dcd_rs_2 == wr_reg_EX_1)) begin
-        rsfwd_2 = 2'b01;
+        rsfwd_2 = 3'b010;
       end
       if ((dcd_rs_2 != 0) && (dcd_rt_2 == wr_reg_EX_1)) begin
-        rtfwd_2 = 2'b01;
+        rtfwd_2 = 3'b010;
       end
     end
     if (ctrl_we_EX_2 != 0) begin
       if ((dcd_rs_1 != 0) && (dcd_rs_1 == wr_reg_EX_2)) begin
-        rsfwd_1 = 2'b01;
+        rsfwd_1 = 3'b001;
       end
       if ((dcd_rt_1 != 0) && (dcd_rt_1 == wr_reg_EX_2)) begin
-        rtfwd_1 = 2'b01;
+        rtfwd_1 = 3'b001;
       end
       if ((dcd_rs_2 != 0) && (dcd_rs_2 == wr_reg_EX_2)) begin
-        rsfwd_2 = 2'b01;
+        rsfwd_2 = 3'b001;
       end
       if ((dcd_rs_2 != 0) && (dcd_rt_2 == wr_reg_EX_2)) begin
-        rtfwd_2 = 2'b01;
+        rtfwd_2 = 3'b001;
       end
     end
   end
@@ -1184,7 +1234,7 @@ module stallDetector(
     EXen_1 = 1'b1;
     IFen_2 = 1'b1;
     IDen_2 = 1'b1;
-    IDen_2 = 1'b1;
+    EXen_2 = 1'b1;
     CDen = 1'b0;
     CDAmt = 3'b0;
     if(stall_1==1'b1) begin
@@ -1228,7 +1278,8 @@ module stallDetector(
       end*/
       
     end
-    
+   $display ("we_1: %x, we_2: %x, dcd_rt_2: %x, dcd_rs_2: %x, wr_reg_1: %x", ctrl_we_1, ctrl_we_2, dcd_rt_2, dcd_rs_2, wr_reg_1);
+   $display ("pc_ID_2: %x, pc_ID_1: %x, regdst_2: %x", pc_ID_2, pc_ID_1, regdst_2);
     if(stall_2==1'b1) begin
       IFen_2 = 1'b0;
       IDen_2 = 1'b0;
@@ -1237,7 +1288,14 @@ module stallDetector(
       IDen_1 = 1'b0;
     end
     else if(stall_2==1'b0) begin
-      if(load_stall_EX_2==1'b1) begin
+      if(ctrl_we_1!=0 && ctrl_we_2!=0 && pc_ID_2>pc_ID_1 && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_1)))) begin
+        IFen_2 = 1'b0;
+        IDen_2 = 1'b0;
+        EXen_2 = 1'b0;
+        IFen_1 = 1'b0;
+        IDen_1 = 1'b0;
+      end
+      else if(load_stall_EX_2==1'b1) begin
         if((ctrl_we_EX_2!=0) && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_EX_2)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_EX_2)))) begin
           IFen_2 = 1'b0;
           IDen_2 = 1'b0;
@@ -1247,7 +1305,7 @@ module stallDetector(
         end
       end
       else if(load_stall_EX_1==1'b1 && (pc_ID_2>pc_EX_1)) begin
-        if((ctrl_we_EX_2!=0) && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_EX_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_EX_1)))) begin
+        if((ctrl_we_EX_1!=0) && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_EX_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_EX_1)))) begin
           IFen_2 = 1'b0;
           IDen_2 = 1'b0;
           EXen_2 = 1'b0;
@@ -1386,6 +1444,26 @@ module mux4to1 #(parameter width = 32) (
       input logic [1:0] sel);
 
     assign out = sel[1] ? (sel[0] ? in3 : in2) : (sel[0] ? in1 : in0);
+
+endmodule
+
+////
+//// mux5to1
+////
+//// out (output) - data chosen to be outputted
+//// in0 (input)  - data lines
+//// in1 (input)  - data lines
+//// in2 (input)  - data lines
+//// in3 (input)  - data lines
+//// in4 (input)  - data lines
+//// sel (input)  - selects which data to output
+////
+module mux5to1 #(parameter width = 32) (
+      output logic [width - 1:0] out,
+      input logic [width - 1:0] in0, in1, in2, in3, in4,
+      input logic [2:0] sel);
+
+    assign out = sel[2] ? in4 : (sel[1] ? (sel[0] ? in3 : in2) : (sel[0] ? in1 : in0));
 
 endmodule
 
