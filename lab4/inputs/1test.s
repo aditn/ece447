@@ -1,7 +1,10 @@
 	.text
 main:   
-		nop
-		addiu   $10, $zero, 1
-        sub     $15, $zero, $10
+		addiu   $5, $zero, 1024
+        addu    $3, $5, $5
+        nop
+        nop
+        nop
+        or      $4, $3, $5
         addiu   $v0, $zero, 0xa
         syscall

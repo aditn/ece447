@@ -299,23 +299,27 @@ module mips_core(/*AUTOARG*/
        //$display ("br_target: %x", br_target);*/
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    instruc_1.pc, instruc_1.inst_ID, instruc_1.dcd_op, instruc_1.dcd_rs, instruc_1.dcd_rt, instruc_1.dcd_rd, instruc_1.dcd_imm, instruc_1.dcd_funct2, ~rst_b, halted);
-       $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, mem_en: %x", instruc_1.wr_regNum, instruc_1.wr_data, instruc_1.dcd_rs, instruc_1.dcd_rt, instruc_1.rs_data, instruc_1.rt_data, instruc_1.imm, instruc_1.mem_en);
-       $display ("   rsfwd: %x, rtfwd: %x, fwd_rs_en: %x, fwd_rt_en: %x", instruc_1.rs_fwd, instruc_1.rt_fwd, instruc_1.fwd_rs_sel_EX, instruc_1.fwd_rt_sel_EX);
-       $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", instruc_1.wr_reg_EX, instruc_1.alu_in1, instruc_1.alu_in2, instruc_1.alu__out, instruc_1.ctrl_we_EX, instruc_1.mem_write_en_EX);
-       $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_1.wr_reg_MEM, instruc_1.alu__out_MEM, instruc_1.ctrl_we_MEM, instruc_1.mem_write_en_MEM);
+       $display ("load_data:%x, load_data_WB:%x, store_data:%x", load_data, load_data_WB, store_data);
+       //$display ("instruc_1.wr_dataMem")
+       $display ("mem_addr: %x, mem_data_in:%x, mem_write_en:%x, mem_data_out:%x", mem_addr, mem_data_in, mem_write_en,mem_data_out);
+       //$display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, mem_en: %x", instruc_1.wr_regNum, instruc_1.wr_data, instruc_1.dcd_rs, instruc_1.rt_regNum, instruc_1.rs_data, instruc_1.rt_data, instruc_1.imm, instruc_1.mem_en);
+       //$display ("   rsfwd: %x, rtfwd: %x, fwd_rs_en: %x, fwd_rt_en: %x", instruc_1.rs_fwd, instruc_1.rt_fwd, instruc_1.fwd_rs_sel_EX, instruc_1.fwd_rt_sel_EX);
+       //$display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", instruc_1.wr_reg_EX, instruc_1.alu_in1, instruc_1.alu_in2, instruc_1.alu__out, instruc_1.ctrl_we_EX, instruc_1.mem_write_en_EX);
+       //$display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_1.wr_reg_MEM, instruc_1.alu__out_MEM, instruc_1.ctrl_we_MEM, instruc_1.mem_write_en_MEM);
        //$display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
-       $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_1.wr_reg_WB, instruc_1.alu__out_WB, instruc_1.ctrl_we_WB, instruc_1.mem_write_en_WB);
-       $display ("");
+       //$display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_1.wr_reg_WB, instruc_1.alu__out_WB, instruc_1.ctrl_we_WB, instruc_1.mem_write_en_WB);
+       //$display ("");
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    instruc_2.pc, instruc_2.inst_ID, instruc_2.dcd_op, instruc_2.dcd_rs, instruc_2.dcd_rt, instruc_2.dcd_rd, instruc_2.dcd_imm, instruc_2.dcd_funct2, ~rst_b, halted);
-       $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, mem_en: %x", instruc_2.wr_regNum, instruc_2.wr_data, instruc_2.dcd_rs, instruc_2.dcd_rt, instruc_2.rs_data, instruc_2.rt_data, instruc_2.imm, instruc_2.mem_en);
-       $display ("   rsfwd: %x, rtfwd: %x, fwd_rs_en: %x, fwd_rt_en: %x", instruc_2.rs_fwd, instruc_2.rt_fwd, instruc_2.fwd_rs_sel_EX, instruc_2.fwd_rt_sel_EX);
-       $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, ctrl_we_EX: %x, mem_EX: %x, EXen: %x", instruc_2.wr_reg_EX, instruc_2.alu_in1, instruc_2.alu_in2, instruc_2.alu__out, instruc_2.ctrl_we_EX, instruc_2.mem_write_en_EX, instruc_2.EXen);
-       $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_2.wr_reg_MEM, instruc_2.alu__out_MEM, instruc_2.ctrl_we_MEM, instruc_2.mem_write_en_MEM);
+       ///$display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, mem_en: %x", instruc_2.wr_regNum, instruc_2.wr_data, instruc_2.dcd_rs, instruc_2.rt_regNum, instruc_2.rs_data, instruc_2.rt_data, instruc_2.imm, instruc_2.mem_en);
+       //$display ("   rsfwd: %x, rtfwd: %x, fwd_rs_en: %x, fwd_rt_en: %x", instruc_2.rs_fwd, instruc_2.rt_fwd, instruc_2.fwd_rs_sel_EX, instruc_2.fwd_rt_sel_EX);
+       //$display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, ctrl_we_EX: %x, mem_EX: %x, EXen: %x", instruc_2.wr_reg_EX, instruc_2.alu_in1, instruc_2.alu_in2, instruc_2.alu__out, instruc_2.ctrl_we_EX, instruc_2.mem_write_en_EX, instruc_2.EXen);
+       //$display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_2.wr_reg_MEM, instruc_2.alu__out_MEM, instruc_2.ctrl_we_MEM, instruc_2.mem_write_en_MEM);
        //$display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
-       $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_2.wr_reg_WB, instruc_2.alu__out_WB, instruc_2.ctrl_we_WB, instruc_2.mem_write_en_WB);
-       $display ("instruc_1.syscall_halt, %x instruc_2.syscall_halt: %x, instruc_1.ctrl_Sys_WB:%x,instruc_2.ctrl_Sys_WB:%x",instruc_1.syscall_halt,instruc_2.syscall_halt, instruc_1.ctrl_Sys_WB,instruc_2.ctrl_Sys_WB);
-       $display ("instruc_1.rt_data_WB:%x, instruc_2.rt_data_WB:%x",instruc_1.rt_data_WB,instruc_2.rt_data_WB);
+       //$display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_2.wr_reg_WB, instruc_2.alu__out_WB, instruc_2.ctrl_we_WB, instruc_2.mem_write_en_WB);
+
+       $display ("halt: %x, ctrl_sys_WB: %x, rt_data_WB: %x", internal_halt, instruc_2.ctrl_Sys_WB, instruc_2.rt_data_WB);
+
        $display ("");
        $display ("");
      end
@@ -934,9 +938,11 @@ module setMemValues(
      mem_addr = 30'bx;
      mem_data_in = store_data;
      if (mem_write_en_MEM_1 != 4'd0) begin
+       $display("mem_write_en_MEM_1 != 0");
        mem_addr = alu__out_MEM_1[31:2];
      end
      else if (mem_write_en_MEM_2 != 4'd0) begin
+      $display("mem_write_en_MEM_2 != 0");
        mem_addr = alu__out_MEM_2[31:2];
      end
    end
@@ -1153,7 +1159,7 @@ module forwardData(
       if ((dcd_rs_2 != 0) && (dcd_rs_2 == wr_reg_MEM_1)) begin
         rsfwd_2 = 3'b100;
       end
-      if ((dcd_rs_2 != 0) && (dcd_rt_2 == wr_reg_MEM_1)) begin
+      if ((dcd_rt_2 != 0) && (dcd_rt_2 == wr_reg_MEM_1)) begin
         rtfwd_2 = 3'b100;
       end
     end
@@ -1167,7 +1173,7 @@ module forwardData(
       if ((dcd_rs_2 != 0) && (dcd_rs_2 == wr_reg_MEM_2)) begin
         rsfwd_2 = 3'b011;
       end
-      if ((dcd_rs_2 != 0) && (dcd_rt_2 == wr_reg_MEM_2)) begin
+      if ((dcd_rt_2 != 0) && (dcd_rt_2 == wr_reg_MEM_2)) begin
         rtfwd_2 = 3'b011;
       end
     end
@@ -1181,7 +1187,7 @@ module forwardData(
       if ((dcd_rs_2 != 0) && (dcd_rs_2 == wr_reg_EX_1)) begin
         rsfwd_2 = 3'b010;
       end
-      if ((dcd_rs_2 != 0) && (dcd_rt_2 == wr_reg_EX_1)) begin
+      if ((dcd_rt_2 != 0) && (dcd_rt_2 == wr_reg_EX_1)) begin
         rtfwd_2 = 3'b010;
       end
     end
@@ -1195,7 +1201,7 @@ module forwardData(
       if ((dcd_rs_2 != 0) && (dcd_rs_2 == wr_reg_EX_2)) begin
         rsfwd_2 = 3'b001;
       end
-      if ((dcd_rs_2 != 0) && (dcd_rt_2 == wr_reg_EX_2)) begin
+      if ((dcd_rt_2 != 0) && (dcd_rt_2 == wr_reg_EX_2)) begin
         rtfwd_2 = 3'b001;
       end
     end
@@ -1280,8 +1286,8 @@ module stallDetector(
       end*/
       
     end
-   $display ("we_1: %x, we_2: %x, dcd_rt_2: %x, dcd_rs_2: %x, wr_reg_1: %x", ctrl_we_1, ctrl_we_2, dcd_rt_2, dcd_rs_2, wr_reg_1);
-   $display ("pc_ID_2: %x, pc_ID_1: %x, regdst_2: %x", pc_ID_2, pc_ID_1, regdst_2);
+   //$display ("we_1: %x, we_2: %x, dcd_rt_2: %x, dcd_rs_2: %x, wr_reg_1: %x", ctrl_we_1, ctrl_we_2, dcd_rt_2, dcd_rs_2, wr_reg_1);
+   //$display ("pc_ID_2: %x, pc_ID_1: %x, regdst_2: %x", pc_ID_2, pc_ID_1, regdst_2);
     if(stall_2==1'b1) begin
       IFen_2 = 1'b0;
       IDen_2 = 1'b0;
