@@ -299,7 +299,7 @@ module mips_core(/*AUTOARG*/
        //$display ("br_target: %x", br_target);*/
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    instruc_1.pc, instruc_1.inst_ID, instruc_1.dcd_op, instruc_1.dcd_rs, instruc_1.dcd_rt, instruc_1.dcd_rd, instruc_1.dcd_imm, instruc_1.dcd_funct2, ~rst_b, halted);
-       $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, mem_en: %x, load_stall: %x", instruc_1.wr_regNum, instruc_1.wr_data, instruc_1.dcd_rs, instruc_1.rt_regNum, instruc_1.rs_data, instruc_1.rt_data, instruc_1.imm, instruc_1.mem_en, instruc_1.load_stall);
+       $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, mem_en: %x, load_stall: %x, IDen: %b, IDclr: %b", instruc_1.wr_regNum, instruc_1.wr_data, instruc_1.dcd_rs, instruc_1.rt_regNum, instruc_1.rs_data, instruc_1.rt_data, instruc_1.imm, instruc_1.mem_en, instruc_1.load_stall, instruc_1.IDen, IDclr);
        $display ("   fwd_rs_en: %b, fwd_rt_en: %b", instruc_1.fwd_rs_sel, instruc_1.fwd_rt_sel);
        $display ("   rsfwd: %x, rtfwd: %x, fwd_rs_en_EX: %b, fwd_rt_en_EX: %b", instruc_1.rs_fwd, instruc_1.rt_fwd, instruc_1.fwd_rs_sel_EX, instruc_1.fwd_rt_sel_EX);
        $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", instruc_1.wr_reg_EX, instruc_1.alu_in1, instruc_1.alu_in2, instruc_1.alu__out, instruc_1.ctrl_we_EX, instruc_1.mem_write_en_EX);
@@ -446,7 +446,7 @@ module mips_core(/*AUTOARG*/
    wire IDclr;
    register pcID_1(instruc_1.pc_ID, instruc_1.pc, clk, instruc_1.IDen, rst_b);
    register pcID_2(instruc_2.pc_ID, instruc_2.pc, clk, instruc_2.IDen, rst_b);
-   clearRegister irD_1(instruc_1.inst_ID, instruc_1.inst, clk, instruc_1.IDen, rst_b);
+   clearRegister irD_1(instruc_1.inst_ID, instruc_1.inst, clk, instruc_1.IDen, IDclr, rst_b);
    register irD_2(instruc_2.inst_ID, instruc_2.inst, clk, instruc_2.IDen, rst_b);
 
    //Execute (EX) stage registers
@@ -652,10 +652,10 @@ module mips_core(/*AUTOARG*/
                     instruc_2.wr_regNum, instruc_2.wr_reg_EX, instruc_2.wr_reg_MEM, instruc_2.rt_regNum, instruc_2.dcd_rs,
                     instruc_2.mem_en,
                     instruc_2.ctrl_we, instruc_2.ctrl_we_EX, instruc_2.regdst,
-                    instruc_1.stall, instruc_2.stall, instruc_1.load_stall, instruc_1.load_stall_EX, instruc_2.load_stall, instruc_2.load_stall_EX,
+                    1'b0, instruc_2.stall, instruc_1.load_stall, instruc_1.load_stall_EX, instruc_2.load_stall, instruc_2.load_stall_EX,
                     instruc_1.store_sel,instruc_2.store_sel,
                     IFen, instruc_1.IDen, instruc_1.EXen, , instruc_2.IDen, instruc_2.EXen,
-                    CDen, CDAmt);
+                    IDclr, CDen, CDAmt);
    countdownReg cdReg(CDen, clk, rst_b,
                       CDAmt,
                       instruc_2.stall);
@@ -987,7 +987,7 @@ endmodule // register
 //// enable (input)  - Load new value?
 //// reset  (input)  - System reset
 ////
-module clearRegister(q, d, clk, enable, rst_b);
+module clearRegister(q, d, clk, enable, clr, rst_b);
 
    parameter
             width = 32,
@@ -996,15 +996,17 @@ module clearRegister(q, d, clk, enable, rst_b);
    output [(width-1):0] q;
    reg [(width-1):0]    q;
    input [(width-1):0]  d;
-   input                 clk, enable, rst_b;
+   input                 clk, enable, clr, rst_b;
 
    always @(posedge clk or negedge rst_b)
      if (~rst_b)
        q <= reset_value;
+     else if (~clr)
+       q <= reset_value;
      else if (enable)
        q <= d;
-     else if (~enable)
-       q <= reset_value;
+     /*else if (~enable)
+       q <= reset_value;*/
 
 endmodule // register
 
@@ -1238,19 +1240,21 @@ module stallDetector(
   input logic ctrl_we_2, ctrl_we_EX_2, regdst_2, 
   input logic stall_1, stall_2, load_stall_1, load_stall_EX_1, load_stall_2, load_stall_EX_2,
   input logic [1:0] store_sel_1,store_sel_2,
-  output logic IFen_1, IDen_1, EXen_1, IFen_2, IDen_2, EXen_2,  CDen,
+  output logic IFen_1, IDen_1, EXen_1, IFen_2, IDen_2, EXen_2, IDclr, CDen,
   output logic [2:0] CDAmt);
   
   always_comb begin
     IFen_1 = 1'b1;
     IDen_1 = 1'b1;
+    IDclr = 1'b1;
     EXen_1 = 1'b1;
     IFen_2 = 1'b1;
     IDen_2 = 1'b1;
     EXen_2 = 1'b1;
     CDen = 1'b0;
     CDAmt = 3'b0;
-    $display("stall_1: %b, stall_2: %b, load_stall_1: %x, load_stall_2: %x", stall_1, stall_2, load_stall_1, load_stall_2);
+    $display("stall_1: %b, stall_2: %b, load_stall_1: %x, load_stall_2: %x, lEX1: %x, lEX2: %x", stall_1, stall_2, load_stall_1, load_stall_2, load_stall_EX_1, load_stall_EX_2);
+    $display("IDen1: %b, IDclr: %b", IDen_1, IDclr);
     if(stall_1==1'b1) begin
       IFen_1 = 1'b0;
       IDen_1 = 1'b0;
@@ -1259,7 +1263,7 @@ module stallDetector(
       IDen_2 = 1'b0;
       EXen_2 = 1'b0;
     end
-    else if(stall_1==1'b0) begin 
+    else if(stall_1==1'b0) begin
       if(load_stall_EX_1==1'b1) begin
         if((ctrl_we_EX_1!=0) && (((regdst_1==1) && (dcd_rt_1!=0) && (dcd_rt_1==wr_reg_EX_1)) || ((dcd_rs_1!=0) && (dcd_rs_1==wr_reg_EX_1)))) begin
           IFen_1 = 1'b0;
@@ -1270,8 +1274,8 @@ module stallDetector(
           EXen_2 = 1'b0;
         end
       end
-      else if(load_stall_EX_2==1'b1 && (pc_ID_1>pc_EX_2)) begin
-        if((ctrl_we_EX_1!=0) && (((regdst_1==1) && (dcd_rt_1!=0) && (dcd_rt_1==wr_reg_EX_2)) || ((dcd_rs_1!=0) && (dcd_rs_1==wr_reg_EX_2)))) begin
+      if(load_stall_EX_2==1'b1 && (pc_ID_1>pc_EX_2)) begin
+        if((ctrl_we_EX_2!=0) && (((regdst_1==1) && (dcd_rt_1!=0) && (dcd_rt_1==wr_reg_EX_2)) || ((dcd_rs_1!=0) && (dcd_rs_1==wr_reg_EX_2)))) begin
           IFen_1 = 1'b0;
           IDen_1 = 1'b0;
           EXen_1 = 1'b0;
@@ -1294,12 +1298,13 @@ module stallDetector(
     end
    //$display ("we_1: %x, we_2: %x, dcd_rt_2: %x, dcd_rs_2: %x, wr_reg_1: %x", ctrl_we_1, ctrl_we_2, dcd_rt_2, dcd_rs_2, wr_reg_1);
    //$display ("pc_ID_2: %x, pc_ID_1: %x, regdst_2: %x", pc_ID_2, pc_ID_1, regdst_2);
-    if(stall_2==1'b1) begin
+    else if(stall_2==1'b1) begin
       IFen_2 = 1'b0;
       IDen_2 = 1'b0;
       EXen_2 = 1'b0;
       IFen_1 = 1'b0;
       IDen_1 = 1'b0;
+      IDclr = 1'b0;
     end
     else if(stall_2==1'b0) begin
       if(ctrl_we_1!=0 && ctrl_we_2!=0 && pc_ID_2>pc_ID_1 && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_1)))) begin
@@ -1308,28 +1313,32 @@ module stallDetector(
         EXen_2 = 1'b0;
         IFen_1 = 1'b0;
         IDen_1 = 1'b0;
+        IDclr = 1'b0;
       end
-      else if(load_stall_EX_2==1'b1) begin
+      if(load_stall_EX_2==1'b1) begin
         if((ctrl_we_EX_2!=0) && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_EX_2)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_EX_2)))) begin
           IFen_2 = 1'b0;
           IDen_2 = 1'b0;
           EXen_2 = 1'b0;
           IFen_1 = 1'b0;
           IDen_1 = 1'b0;
+          IDclr = 1'b0;
         end
       end
-      else if(load_stall_EX_1==1'b1 && (pc_ID_2>pc_EX_1)) begin
+      if(load_stall_EX_1==1'b1 && (pc_ID_2>pc_EX_1)) begin
         if((ctrl_we_EX_1!=0) && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_EX_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_EX_1)))) begin
           IFen_2 = 1'b0;
           IDen_2 = 1'b0;
           EXen_2 = 1'b0;
           IFen_1 = 1'b0;
           IDen_1 = 1'b0;
+          IDclr = 1'b0;
         end
       end
       if((load_stall_1==1'b1 || mem_en_1!=4'b0) && (load_stall_2==1'b1 || mem_en_2!=4'b0) && (pc_ID_2>pc_ID_1)) begin
         IFen_1 = 1'b0;
         IDen_1 = 1'b0;
+        IDclr = 1'b0;
         IFen_2 = 1'b0;
         IDen_2 = 1'b0;
         EXen_2 = 1'b0;
@@ -1341,6 +1350,7 @@ module stallDetector(
           EXen_2 = 1'b0;
           IFen_1 = 1'b0;
           IDen_1 = 1'b0;
+          IDclr = 1'b0;
           CDen = 1'b1;
           CDAmt = 3'd2;
         end
