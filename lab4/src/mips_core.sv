@@ -1334,14 +1334,14 @@ module stallDetector(
         IDen_2 = 1'b0;
         EXen_2 = 1'b0;
       end
-      else if ((store_sel_1 != 2'bx) && (store_sel_2 != 2'bx)) begin
+      /*else if ((store_sel_1 != 2'bx) && (store_sel_2 != 2'bx)) begin
         $display("here");
         IFen_1 = 1'b0;
         IDen_1 = 1'b0;
         IFen_2 = 1'b0;
         IDen_2 = 1'b0;
         EXen_2 = 1'b0;
-      end
+      end*/
       if(load_stall_1==1'b1 && (pc_ID_2>pc_ID_1)) begin
         if((ctrl_we_2!=0) && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_EX_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_EX_1)))) begin
           IFen_2 = 1'b0;
