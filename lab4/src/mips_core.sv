@@ -302,10 +302,12 @@ module mips_core(/*AUTOARG*/
        $display ("load_data:%x, load_data_WB:%x, store_data:%x", load_data, load_data_WB, store_data);
        //$display ("instruc_1.wr_dataMem")
        $display ("mem_addr: %x, mem_data_in:%x, mem_write_en:%x, mem_data_out:%x", mem_addr, mem_data_in, mem_write_en,mem_data_out);
+       $display ("store_sel_1: %x", instruc_1.store_sel);
        //$display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, mem_en: %x", instruc_1.wr_regNum, instruc_1.wr_data, instruc_1.dcd_rs, instruc_1.rt_regNum, instruc_1.rs_data, instruc_1.rt_data, instruc_1.imm, instruc_1.mem_en);
        //$display ("   rsfwd: %x, rtfwd: %x, fwd_rs_en: %x, fwd_rt_en: %x", instruc_1.rs_fwd, instruc_1.rt_fwd, instruc_1.fwd_rs_sel_EX, instruc_1.fwd_rt_sel_EX);
        //$display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", instruc_1.wr_reg_EX, instruc_1.alu_in1, instruc_1.alu_in2, instruc_1.alu__out, instruc_1.ctrl_we_EX, instruc_1.mem_write_en_EX);
-       //$display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_1.wr_reg_MEM, instruc_1.alu__out_MEM, instruc_1.ctrl_we_MEM, instruc_1.mem_write_en_MEM);
+       $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_1.wr_reg_MEM, instruc_1.alu__out_MEM, instruc_1.ctrl_we_MEM, instruc_1.mem_write_en_MEM);
+       $display ("M: load_stall_MEM_1:%x", instruc_1.load_sel_MEM);
 
        //$display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
        //$display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_1.wr_reg_WB, instruc_1.alu__out_WB, instruc_1.ctrl_we_WB, instruc_1.mem_write_en_WB);
@@ -315,7 +317,9 @@ module mips_core(/*AUTOARG*/
        ///$display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, mem_en: %x", instruc_2.wr_regNum, instruc_2.wr_data, instruc_2.dcd_rs, instruc_2.rt_regNum, instruc_2.rs_data, instruc_2.rt_data, instruc_2.imm, instruc_2.mem_en);
        //$display ("   rsfwd: %x, rtfwd: %x, fwd_rs_en: %x, fwd_rt_en: %x", instruc_2.rs_fwd, instruc_2.rt_fwd, instruc_2.fwd_rs_sel_EX, instruc_2.fwd_rt_sel_EX);
        //$display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, ctrl_we_EX: %x, mem_EX: %x, EXen: %x", instruc_2.wr_reg_EX, instruc_2.alu_in1, instruc_2.alu_in2, instruc_2.alu__out, instruc_2.ctrl_we_EX, instruc_2.mem_write_en_EX, instruc_2.EXen);
-       //$display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_2.wr_reg_MEM, instruc_2.alu__out_MEM, instruc_2.ctrl_we_MEM, instruc_2.mem_write_en_MEM);
+       $display ("store_sel_2: %x", instruc_2.store_sel);
+       $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_2.wr_reg_MEM, instruc_2.alu__out_MEM, instruc_2.ctrl_we_MEM, instruc_2.mem_write_en_MEM);
+       $display ("M: load_stall_MEM_2:%x", instruc_2.load_sel_MEM);
 
        //$display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
        //$display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_2.wr_reg_WB, instruc_2.alu__out_WB, instruc_2.ctrl_we_WB, instruc_2.mem_write_en_WB);
@@ -656,6 +660,7 @@ module mips_core(/*AUTOARG*/
                     instruc_2.mem_en,
                     instruc_2.ctrl_we, instruc_2.ctrl_we_EX, instruc_2.regdst,
                     instruc_1.stall, instruc_2.stall, instruc_1.load_stall, instruc_1.load_stall_EX, instruc_2.load_stall, instruc_2.load_stall_EX,
+                    instruc_1.store_sel,instruc_2.store_sel,
                     IFen, instruc_1.IDen, instruc_1.EXen, , instruc_2.IDen, instruc_2.EXen,
                     CDen, CDAmt);
    countdownReg cdReg(CDen, clk, rst_b,
@@ -1239,6 +1244,7 @@ module stallDetector(
   input logic [3:0] mem_en_2,
   input logic ctrl_we_2, ctrl_we_EX_2, regdst_2, 
   input logic stall_1, stall_2, load_stall_1, load_stall_EX_1, load_stall_2, load_stall_EX_2,
+  input logic [1:0] store_sel_1,store_sel_2,
   output logic IFen_1, IDen_1, EXen_1, IFen_2, IDen_2, EXen_2, CDen,
   output logic [2:0] CDAmt);
   
@@ -1328,6 +1334,14 @@ module stallDetector(
         end
       end
       else if((load_stall_1==1'b1 || mem_en_1==1'b1) && (load_stall_2==1'b1 || mem_en_2==1'b1) && (pc_ID_2>pc_ID_1)) begin
+        IFen_1 = 1'b0;
+        IDen_1 = 1'b0;
+        IFen_2 = 1'b0;
+        IDen_2 = 1'b0;
+        EXen_2 = 1'b0;
+      end
+      else if ((store_sel_1 != 2'bx) && (store_sel_2 != 2'bx)) begin
+        $display("here");
         IFen_1 = 1'b0;
         IDen_1 = 1'b0;
         IFen_2 = 1'b0;
