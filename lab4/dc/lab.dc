@@ -36,7 +36,7 @@ set real_inputs [remove_from_collection [remove_from_collection [all_inputs] clk
 set_input_delay -clock clk -max 0 $real_inputs
 set_output_delay -clock clk -max 0 [all_outputs]
 
-set_max_delay 10.0 [all_outputs]
+set_max_delay 20.0 [all_outputs]
 
 # =============================== REPORTS ================================
 
