@@ -530,7 +530,7 @@ module mips_core(/*AUTOARG*/
    register #(32, 0) BadVAddrReg(bad_v_addr, pc, clk, load_bva, rst_b);
 
    /* Counters */
-   wire [31:0] cyclesCount, instFetchedCount, instExCount;
+   //wire [31:0] cyclesCount, instFetchedCount, instExCount;
    /*wire [31:0] brExCount_fwd, brExCount_bwd, brNoPred_fwd, brNoPred_bwd;
    wire [31:0] brTakenCount_fwd, brTakenCount_bwd;
    wire [31:0] brTakenCorrect_fwd, brTakenCorrect_bwd;
@@ -541,7 +541,7 @@ module mips_core(/*AUTOARG*/
    assign forward = (pc_EX < newpc) ? 1'b1 : 1'b0;
    assign back = (pc_EX > newpc) ? 1'b1 : 1'b0;*/
    
-   counter cycles(cyclesCount, 1'b1, clk, rst_b);
+   //counter cycles(cyclesCount, 1'b1, clk, rst_b);
    /*counter instFetched(instFetchedCount, IFen, clk, rst_b);
    counter instEx(instExCount, EXen, clk, rst_b);
    counter brExfwd(brExCount_fwd, pcMuxSel_EX==2'b01 && forward, clk, rst_b);

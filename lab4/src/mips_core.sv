@@ -299,27 +299,23 @@ module mips_core(/*AUTOARG*/
        //$display ("br_target: %x", br_target);*/
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    instruc_1.pc, instruc_1.inst_ID, instruc_1.dcd_op, instruc_1.dcd_rs, instruc_1.dcd_rt, instruc_1.dcd_rd, instruc_1.dcd_imm, instruc_1.dcd_funct2, ~rst_b, halted);
-       $display ("load_data:%x, load_data_WB:%x, store_data:%x", load_data, load_data_WB, store_data);
-       //$display ("instruc_1.wr_dataMem")
-       $display ("mem_addr: %x, mem_data_in:%x, mem_write_en:%x, mem_data_out:%x", mem_addr, mem_data_in, mem_write_en,mem_data_out);
-       //$display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, mem_en: %x", instruc_1.wr_regNum, instruc_1.wr_data, instruc_1.dcd_rs, instruc_1.rt_regNum, instruc_1.rs_data, instruc_1.rt_data, instruc_1.imm, instruc_1.mem_en);
-       //$display ("   rsfwd: %x, rtfwd: %x, fwd_rs_en: %x, fwd_rt_en: %x", instruc_1.rs_fwd, instruc_1.rt_fwd, instruc_1.fwd_rs_sel_EX, instruc_1.fwd_rt_sel_EX);
-       //$display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", instruc_1.wr_reg_EX, instruc_1.alu_in1, instruc_1.alu_in2, instruc_1.alu__out, instruc_1.ctrl_we_EX, instruc_1.mem_write_en_EX);
-       //$display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_1.wr_reg_MEM, instruc_1.alu__out_MEM, instruc_1.ctrl_we_MEM, instruc_1.mem_write_en_MEM);
-
-       //$display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
-       //$display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_1.wr_reg_WB, instruc_1.alu__out_WB, instruc_1.ctrl_we_WB, instruc_1.mem_write_en_WB);
-       //$display ("");
+       $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, mem_en: %x", instruc_1.wr_regNum, instruc_1.wr_data, instruc_1.dcd_rs, instruc_1.rt_regNum, instruc_1.rs_data, instruc_1.rt_data, instruc_1.imm, instruc_1.mem_en);
+       $display ("   fwd_rs_en: %b, fwd_rt_en: %b", instruc_1.fwd_rs_sel, instruc_1.fwd_rt_sel);
+       $display ("   rsfwd: %x, rtfwd: %x, fwd_rs_en_EX: %b, fwd_rt_en_EX: %b", instruc_1.rs_fwd, instruc_1.rt_fwd, instruc_1.fwd_rs_sel_EX, instruc_1.fwd_rt_sel_EX);
+       $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", instruc_1.wr_reg_EX, instruc_1.alu_in1, instruc_1.alu_in2, instruc_1.alu__out, instruc_1.ctrl_we_EX, instruc_1.mem_write_en_EX);
+       $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_1.wr_reg_MEM, instruc_1.alu__out_MEM, instruc_1.ctrl_we_MEM, instruc_1.mem_write_en_MEM);
+       $display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, instruc_1.load_sel_EX, mem_data_out, store_data);
+       $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_1.wr_reg_WB, instruc_1.alu__out_WB, instruc_1.ctrl_we_WB, instruc_1.mem_write_en_WB);
+       $display ("");
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    instruc_2.pc, instruc_2.inst_ID, instruc_2.dcd_op, instruc_2.dcd_rs, instruc_2.dcd_rt, instruc_2.dcd_rd, instruc_2.dcd_imm, instruc_2.dcd_funct2, ~rst_b, halted);
-       ///$display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, mem_en: %x", instruc_2.wr_regNum, instruc_2.wr_data, instruc_2.dcd_rs, instruc_2.rt_regNum, instruc_2.rs_data, instruc_2.rt_data, instruc_2.imm, instruc_2.mem_en);
-       //$display ("   rsfwd: %x, rtfwd: %x, fwd_rs_en: %x, fwd_rt_en: %x", instruc_2.rs_fwd, instruc_2.rt_fwd, instruc_2.fwd_rs_sel_EX, instruc_2.fwd_rt_sel_EX);
-       //$display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, ctrl_we_EX: %x, mem_EX: %x, EXen: %x", instruc_2.wr_reg_EX, instruc_2.alu_in1, instruc_2.alu_in2, instruc_2.alu__out, instruc_2.ctrl_we_EX, instruc_2.mem_write_en_EX, instruc_2.EXen);
-       //$display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_2.wr_reg_MEM, instruc_2.alu__out_MEM, instruc_2.ctrl_we_MEM, instruc_2.mem_write_en_MEM);
-
-       //$display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", mem_addr, load_data, load_sel_EX, mem_data_out, store_data);
-       //$display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_2.wr_reg_WB, instruc_2.alu__out_WB, instruc_2.ctrl_we_WB, instruc_2.mem_write_en_WB);
-
+       $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, mem_en: %x", instruc_2.wr_regNum, instruc_2.wr_data, instruc_2.dcd_rs, instruc_2.rt_regNum, instruc_2.rs_data, instruc_2.rt_data, instruc_2.imm, instruc_2.mem_en);
+       $display ("   fwd_rs_en: %b, fwd_rt_en: %b", instruc_2.fwd_rs_sel, instruc_2.fwd_rt_sel);
+       $display ("   rsfwd: %x, rtfwd: %x, fwd_rs_en_EX: %b, fwd_rt_en_EX: %b", instruc_2.rs_fwd, instruc_2.rt_fwd, instruc_2.fwd_rs_sel_EX, instruc_2.fwd_rt_sel_EX);
+       $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, ctrl_we_EX: %x, mem_EX: %x, EXen: %x", instruc_2.wr_reg_EX, instruc_2.alu_in1, instruc_2.alu_in2, instruc_2.alu__out, instruc_2.ctrl_we_EX, instruc_2.mem_write_en_EX, instruc_2.EXen);
+       $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_2.wr_reg_MEM, instruc_2.alu__out_MEM, instruc_2.ctrl_we_MEM, instruc_2.mem_write_en_MEM);
+       $display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x, rt_data_MEM: %x", mem_addr, load_data, instruc_2.load_sel_EX, mem_data_out, store_data, instruc_2.rt_data_MEM);
+       $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_2.wr_reg_WB, instruc_2.alu__out_WB, instruc_2.ctrl_we_WB, instruc_2.mem_write_en_WB);
        $display ("halt: %x, ctrl_sys_WB: %x, rt_data_WB: %x", internal_halt, instruc_2.ctrl_Sys_WB, instruc_2.rt_data_WB);
 
        $display ("");
@@ -678,7 +674,7 @@ module mips_core(/*AUTOARG*/
 
    forwardData fwd(instruc_1.wr_reg_EX, instruc_1.wr_reg_MEM, instruc_1.rt_regNum, instruc_1.dcd_rs,
                    instruc_2.wr_reg_EX, instruc_2.wr_reg_MEM, instruc_2.rt_regNum, instruc_2.dcd_rs,
-                   instruc_1.ctrl_we_EX, instruc_1.ctrl_we_MEM, instruc_2.ctrl_we_EX, instruc_2.ctrl_we_EX,
+                   instruc_1.ctrl_we_EX, instruc_1.ctrl_we_MEM, instruc_2.ctrl_we_EX, instruc_2.ctrl_we_MEM,
                    instruc_1.fwd_rs_sel, instruc_1.fwd_rt_sel, instruc_2.fwd_rs_sel, instruc_2.fwd_rt_sel);
 
    //To read from / write to memory
@@ -752,9 +748,9 @@ module mips_core(/*AUTOARG*/
 
    //sets values for mem_addr and mem_data_in if there is a store
    setMemValues setMemForStore(mem_addr,mem_data_in,
-                    instruc_1.load_sel_MEM, instruc_2.load_sel_MEM,
                     instruc_1.alu__out_MEM, instruc_2.alu__out_MEM, store_data,
-                    instruc_1.mem_write_en_MEM, instruc_2.mem_write_en_MEM);
+                    instruc_1.mem_write_en_MEM, instruc_2.mem_write_en_MEM,
+                    instruc_1.load_sel_MEM, instruc_2.load_sel_MEM);
 
    // Execute
    mips_ALU ALU1(.alu__out(instruc_1.alu__out),
@@ -929,9 +925,9 @@ endmodule
 module setMemValues(
    output logic [29:0] mem_addr,
    output logic [31:0] mem_data_in,
-   input logic [2:0] load_sel_MEM_1, load_sel_MEM_2,
    input logic [31:0] alu__out_MEM_1, alu__out_MEM_2, store_data,
-   input logic [3:0] mem_write_en_MEM_1,mem_write_en_MEM_2);
+   input logic [3:0] mem_write_en_MEM_1,mem_write_en_MEM_2,
+   input logic [2:0] load_sel_MEM_1, load_sel_MEM_2);
    
    /*output [29:0] mem_addr;
    output [31:0] mem_data_in;
@@ -949,6 +945,7 @@ module setMemValues(
       //$display("mem_write_en_MEM_2 != 0");
        mem_addr = alu__out_MEM_2[31:2];
      end
+     
    end
 endmodule
 
@@ -1579,6 +1576,7 @@ module loader (
         `NO_LOAD:
           load_data = 32'hxxxx;
       endcase
+      $display("mem_data: %x, load_sel: %x", mem_data, load_sel);
     end
 endmodule
 
@@ -1619,13 +1617,14 @@ module storer (
       end
       else begin
         mem_en = 3'd0;
-        rt_data = 31'bx;
+        rt_data = 32'bx;
         store_sel = 2'bx;
-        offset = 31'bx;
+        offset = 32'bx;
       end
     end
 
     always_comb begin
+      //$display("mem_en: %x, rt_data: %x, store_sel: %x, offset: %x", mem_write_en, rt_data, store_sel, offset);
       case(store_sel)
         `ST_SB: //place data in top bits of word and shift right by offset number of bytes
           begin
