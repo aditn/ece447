@@ -443,6 +443,7 @@ module mips_core(/*AUTOARG*/
    //Decode (ID) stage registers and wirings
    //wire IDen; //enable for decode stage
    //wire [31:0] pc_ID;
+   wire IDclr;
    register pcID_1(instruc_1.pc_ID, instruc_1.pc, clk, instruc_1.IDen, rst_b);
    register pcID_2(instruc_2.pc_ID, instruc_2.pc, clk, instruc_2.IDen, rst_b);
    clearRegister irD_1(instruc_1.inst_ID, instruc_1.inst, clk, instruc_1.IDen, rst_b);
@@ -978,7 +979,7 @@ module register(q, d, clk, enable, rst_b);
 
 endmodule // register
 
-//// clearRegister: A register which is cleared when not enabled
+//// clearRegister: A register which can be cleared
 ////
 //// q      (output) - Current value of register
 //// d      (input)  - Next value of register
@@ -1003,7 +1004,7 @@ module clearRegister(q, d, clk, enable, rst_b);
      else if (enable)
        q <= d;
      else if (~enable)
-       q <= 32'b0;
+       q <= reset_value;
 
 endmodule // register
 
@@ -1238,7 +1239,7 @@ module stallDetector(
   input logic ctrl_we_2, ctrl_we_EX_2, regdst_2, 
   input logic stall_1, stall_2, load_stall_1, load_stall_EX_1, load_stall_2, load_stall_EX_2,
   input logic [1:0] store_sel_1,store_sel_2,
-  output logic IFen_1, IDen_1, EXen_1, IFen_2, IDen_2, EXen_2, CDen,
+  output logic IFen_1, IDen_1, EXen_1, IFen_2, IDen_2, EXen_2,  CDen,
   output logic [2:0] CDAmt);
   
   always_comb begin
@@ -1279,7 +1280,7 @@ module stallDetector(
           EXen_2 = 1'b0;
         end
       end
-      else if((load_stall_1==1'b1 || mem_en_1==1'b1) && (load_stall_2==1'b1 || mem_en_2==1'b1) && (pc_ID_1>pc_ID_2)) begin
+      else if((load_stall_1==1'b1 || mem_en_1!=4'b0) && (load_stall_2==1'b1 || mem_en_2!=4'b0) && (pc_ID_1>pc_ID_2)) begin
         IFen_1 = 1'b0;
         IDen_1 = 1'b0;
         EXen_1 = 1'b0;
@@ -1326,7 +1327,7 @@ module stallDetector(
           IDen_1 = 1'b0;
         end
       end
-      else if((load_stall_1==1'b1 || mem_en_1==1'b1) && (load_stall_2==1'b1 || mem_en_2==1'b1) && (pc_ID_2>pc_ID_1)) begin
+      else if((load_stall_1==1'b1 || mem_en_1!=4'b0) && (load_stall_2==1'b1 || mem_en_2!=4'b0) && (pc_ID_2>pc_ID_1)) begin
         IFen_1 = 1'b0;
         IDen_1 = 1'b0;
         IFen_2 = 1'b0;
