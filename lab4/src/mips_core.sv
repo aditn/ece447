@@ -316,7 +316,7 @@ module mips_core(/*AUTOARG*/
        $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_2.wr_reg_MEM, instruc_2.alu__out_MEM, instruc_2.ctrl_we_MEM, instruc_2.mem_write_en_MEM);
        $display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x, rt_data_MEM: %x", mem_addr, load_data, instruc_2.load_sel_EX, mem_data_out, store_data, instruc_2.rt_data_MEM);
        $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_2.wr_reg_WB, instruc_2.alu__out_WB, instruc_2.ctrl_we_WB, instruc_2.mem_write_en_WB);
-       $display ("halt: %x, ctrl_sys_WB: %x, rt_data_WB: %x", internal_halt, instruc_2.ctrl_Sys_WB, instruc_2.rt_data_WB);
+             $display ("halt: %x, ctrl_sys_WB: %x, rt_data_WB: %x", internal_halt, instruc_2.ctrl_Sys_WB, instruc_2.rt_data_WB);
 
        $display ("");
        $display ("");
@@ -652,6 +652,7 @@ module mips_core(/*AUTOARG*/
                     instruc_2.mem_en,
                     instruc_2.ctrl_we, instruc_2.ctrl_we_EX, instruc_2.regdst,
                     instruc_1.stall, instruc_2.stall, instruc_1.load_stall, instruc_1.load_stall_EX, instruc_2.load_stall, instruc_2.load_stall_EX,
+                    instruc_1.store_sel,instruc_2.store_sel,
                     IFen, instruc_1.IDen, instruc_1.EXen, , instruc_2.IDen, instruc_2.EXen,
                     CDen, CDAmt);
    countdownReg cdReg(CDen, clk, rst_b,
@@ -1236,6 +1237,7 @@ module stallDetector(
   input logic [3:0] mem_en_2,
   input logic ctrl_we_2, ctrl_we_EX_2, regdst_2, 
   input logic stall_1, stall_2, load_stall_1, load_stall_EX_1, load_stall_2, load_stall_EX_2,
+  input logic [1:0] store_sel_1,store_sel_2,
   output logic IFen_1, IDen_1, EXen_1, IFen_2, IDen_2, EXen_2, CDen,
   output logic [2:0] CDAmt);
   
@@ -1325,6 +1327,14 @@ module stallDetector(
         end
       end
       else if((load_stall_1==1'b1 || mem_en_1==1'b1) && (load_stall_2==1'b1 || mem_en_2==1'b1) && (pc_ID_2>pc_ID_1)) begin
+        IFen_1 = 1'b0;
+        IDen_1 = 1'b0;
+        IFen_2 = 1'b0;
+        IDen_2 = 1'b0;
+        EXen_2 = 1'b0;
+      end
+      else if ((store_sel_1 != 2'bx) && (store_sel_2 != 2'bx)) begin
+        $display("here");
         IFen_1 = 1'b0;
         IDen_1 = 1'b0;
         IFen_2 = 1'b0;
