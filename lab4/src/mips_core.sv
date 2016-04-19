@@ -1263,41 +1263,6 @@ module stallDetector(
       IDen_2 = 1'b0;
       EXen_2 = 1'b0;
     end
-    else if(stall_1==1'b0) begin
-      if(load_stall_EX_1==1'b1) begin
-        if((ctrl_we_EX_1!=0) && (((regdst_1==1) && (dcd_rt_1!=0) && (dcd_rt_1==wr_reg_EX_1)) || ((dcd_rs_1!=0) && (dcd_rs_1==wr_reg_EX_1)))) begin
-          IFen_1 = 1'b0;
-          IDen_1 = 1'b0;
-          EXen_1 = 1'b0;
-          IFen_2 = 1'b0;
-          IDen_2 = 1'b0;
-          EXen_2 = 1'b0;
-        end
-      end
-      if(load_stall_EX_2==1'b1 && (pc_ID_1>pc_EX_2)) begin
-        if((ctrl_we_EX_2!=0) && (((regdst_1==1) && (dcd_rt_1!=0) && (dcd_rt_1==wr_reg_EX_2)) || ((dcd_rs_1!=0) && (dcd_rs_1==wr_reg_EX_2)))) begin
-          IFen_1 = 1'b0;
-          IDen_1 = 1'b0;
-          EXen_1 = 1'b0;
-          IFen_2 = 1'b0;
-          IDen_2 = 1'b0;
-          EXen_2 = 1'b0;
-        end
-      end
-      if((load_stall_1==1'b1 || mem_en_1!=4'b0) && (load_stall_2==1'b1 || mem_en_2!=4'b0) && (pc_ID_1>pc_ID_2)) begin
-        IFen_1 = 1'b0;
-        IDen_1 = 1'b0;
-        EXen_1 = 1'b0;
-        IFen_2 = 1'b0;
-        IDen_2 = 1'b0;
-      end
-      /*if(load_stall_2==1'b1 && (pc_ID_1>pc_ID_2)) begin
-        if((ctrl_we!=0) && (((regdst_1==1) && (dcd_rt_1!=0) && (dcd_rt_1==wr_reg_EX_2)) || ((dcd_rs_1!=0) && (dcd_rs_1==wr_reg_EX_2)))) begin
-      end*/
-      
-    end
-   //$display ("we_1: %x, we_2: %x, dcd_rt_2: %x, dcd_rs_2: %x, wr_reg_1: %x", ctrl_we_1, ctrl_we_2, dcd_rt_2, dcd_rs_2, wr_reg_1);
-   //$display ("pc_ID_2: %x, pc_ID_1: %x, regdst_2: %x", pc_ID_2, pc_ID_1, regdst_2);
     else if(stall_2==1'b1) begin
       IFen_2 = 1'b0;
       IDen_2 = 1'b0;
@@ -1306,17 +1271,54 @@ module stallDetector(
       IDen_1 = 1'b0;
       IDclr = 1'b0;
     end
-    else if(stall_2==1'b0) begin
-      if(ctrl_we_1!=0 && ctrl_we_2!=0 && pc_ID_2>pc_ID_1 && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_1)))) begin
-        IFen_2 = 1'b0;
-        IDen_2 = 1'b0;
-        EXen_2 = 1'b0;
-        IFen_1 = 1'b0;
-        IDen_1 = 1'b0;
-        IDclr = 1'b0;
+    else begin
+      if(stall_1==1'b0) begin
+        if(load_stall_EX_1==1'b1) begin
+          if((ctrl_we_EX_1!=0) && (((regdst_1==1) && (dcd_rt_1!=0) && (dcd_rt_1==wr_reg_EX_1)) || ((dcd_rs_1!=0) && (dcd_rs_1==wr_reg_EX_1)))) begin
+            IFen_1 = 1'b0;
+            IDen_1 = 1'b0;
+            EXen_1 = 1'b0;
+            IFen_2 = 1'b0;
+            IDen_2 = 1'b0;
+            EXen_2 = 1'b0;
+          end
+        end
+        if(load_stall_EX_2==1'b1 && (pc_ID_1>pc_EX_2)) begin
+          if((ctrl_we_EX_2!=0) && (((regdst_1==1) && (dcd_rt_1!=0) && (dcd_rt_1==wr_reg_EX_2)) || ((dcd_rs_1!=0) && (dcd_rs_1==wr_reg_EX_2)))) begin
+            IFen_1 = 1'b0;
+            IDen_1 = 1'b0;
+            EXen_1 = 1'b0;
+            IFen_2 = 1'b0;
+            IDen_2 = 1'b0;
+            EXen_2 = 1'b0;
+          end
+        end
+        if((load_stall_1==1'b1 || mem_en_1!=4'b0) && (load_stall_2==1'b1 || mem_en_2!=4'b0) && (pc_ID_1>pc_ID_2)) begin
+          IFen_1 = 1'b0;
+          IDen_1 = 1'b0;
+          EXen_1 = 1'b0;
+          IFen_2 = 1'b0;
+          IDen_2 = 1'b0;
+        end
+      /*if(load_stall_2==1'b1 && (pc_ID_1>pc_ID_2)) begin
+        if((ctrl_we!=0) && (((regdst_1==1) && (dcd_rt_1!=0) && (dcd_rt_1==wr_reg_EX_2)) || ((dcd_rs_1!=0) && (dcd_rs_1==wr_reg_EX_2)))) begin
+      end*/
+      
       end
-      if(load_stall_EX_2==1'b1) begin
-        if((ctrl_we_EX_2!=0) && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_EX_2)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_EX_2)))) begin
+   //$display ("we_1: %x, we_2: %x, dcd_rt_2: %x, dcd_rs_2: %x, wr_reg_1: %x", ctrl_we_1, ctrl_we_2, dcd_rt_2, dcd_rs_2, wr_reg_1);
+   //$display ("pc_ID_2: %x, pc_ID_1: %x, regdst_2: %x", pc_ID_2, pc_ID_1, regdst_2);
+    /*else if(stall_2==1'b1) begin
+      IFen_2 = 1'b0;
+      IDen_2 = 1'b0;
+      EXen_2 = 1'b0;
+      IFen_1 = 1'b0;
+      IDen_1 = 1'b0;
+      IDclr = 1'b0;
+    end*/
+      if(stall_2==1'b0 && IDen_1==1'b1) begin
+        $display("h1");
+        if(ctrl_we_1!=0 && ctrl_we_2!=0 && pc_ID_2>pc_ID_1 && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_1)))) begin
+          $display("h2");
           IFen_2 = 1'b0;
           IDen_2 = 1'b0;
           EXen_2 = 1'b0;
@@ -1324,35 +1326,45 @@ module stallDetector(
           IDen_1 = 1'b0;
           IDclr = 1'b0;
         end
-      end
-      if(load_stall_EX_1==1'b1 && (pc_ID_2>pc_EX_1)) begin
-        if((ctrl_we_EX_1!=0) && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_EX_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_EX_1)))) begin
-          IFen_2 = 1'b0;
-          IDen_2 = 1'b0;
-          EXen_2 = 1'b0;
-          IFen_1 = 1'b0;
-          IDen_1 = 1'b0;
-          IDclr = 1'b0;
+        if(load_stall_EX_2==1'b1) begin
+          if((ctrl_we_EX_2!=0) && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_EX_2)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_EX_2)))) begin
+            IFen_2 = 1'b0;
+            IDen_2 = 1'b0;
+            EXen_2 = 1'b0;
+            IFen_1 = 1'b0;
+            IDen_1 = 1'b0;
+            IDclr = 1'b0;
+          end
         end
-      end
-      if((load_stall_1==1'b1 || mem_en_1!=4'b0) && (load_stall_2==1'b1 || mem_en_2!=4'b0) && (pc_ID_2>pc_ID_1)) begin
-        IFen_1 = 1'b0;
-        IDen_1 = 1'b0;
-        IDclr = 1'b0;
-        IFen_2 = 1'b0;
-        IDen_2 = 1'b0;
-        EXen_2 = 1'b0;
-      end
-      if(load_stall_1==1'b1 && (pc_ID_2>pc_ID_1)) begin
-        if((ctrl_we_2!=0) && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_EX_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_EX_1)))) begin
-          IFen_2 = 1'b0;
-          IDen_2 = 1'b0;
-          EXen_2 = 1'b0;
+        if(load_stall_EX_1==1'b1 && (pc_ID_2>pc_EX_1)) begin
+          if((ctrl_we_EX_1!=0) && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_EX_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_EX_1)))) begin
+            IFen_2 = 1'b0;
+            IDen_2 = 1'b0;
+            EXen_2 = 1'b0;
+            IFen_1 = 1'b0;
+            IDen_1 = 1'b0;
+            IDclr = 1'b0;
+          end
+        end
+        if((load_stall_1==1'b1 || mem_en_1!=4'b0) && (load_stall_2==1'b1 || mem_en_2!=4'b0) && (pc_ID_2>pc_ID_1)) begin
           IFen_1 = 1'b0;
           IDen_1 = 1'b0;
           IDclr = 1'b0;
-          CDen = 1'b1;
-          CDAmt = 3'd2;
+          IFen_2 = 1'b0;
+          IDen_2 = 1'b0;
+          EXen_2 = 1'b0;
+        end
+        if(load_stall_1==1'b1 && (pc_ID_2>pc_ID_1)) begin
+          if((ctrl_we_2!=0) && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_EX_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_EX_1)))) begin
+            IFen_2 = 1'b0;
+            IDen_2 = 1'b0;
+            EXen_2 = 1'b0;
+            IFen_1 = 1'b0;
+            IDen_1 = 1'b0;
+            IDclr = 1'b0;
+            CDen = 1'b1;
+            CDAmt = 3'd2;
+          end
         end
       end
     end
