@@ -276,7 +276,7 @@ module mips_core(/*AUTOARG*/
 
    // synthesis translate_off
    
-   always @(posedge clk) begin
+   /*always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
        $display ( "=== Simulation Cycle %d ===", $time );
@@ -322,7 +322,7 @@ module mips_core(/*AUTOARG*/
        $display ("");
        $display ("");
      end
-   end
+   end*/
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
