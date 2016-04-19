@@ -276,10 +276,11 @@ module mips_core(/*AUTOARG*/
 
    // synthesis translate_off
    
-   /*always @(posedge clk) begin
+   always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
        $display ( "=== Simulation Cycle %d ===", $time );
+       $display ( "# cycles: %d", cyclesCount);
        //$display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
        //            pc, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
        // $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
@@ -298,7 +299,7 @@ module mips_core(/*AUTOARG*/
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
        //$display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", branchTrue, pcMuxSel, pcMuxSelFinal);
        //$display ("br_target: %x", br_target);
-       $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
+       /*$display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    instruc_1.pc, instruc_1.inst_ID, instruc_1.dcd_op, instruc_1.dcd_rs, instruc_1.dcd_rt, instruc_1.dcd_rd, instruc_1.dcd_imm, instruc_1.dcd_funct2, ~rst_b, halted);
        $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, mem_en: %x, load_stall: %x, IDen: %b, IDclr: %b", instruc_1.wr_regNum, instruc_1.wr_data, instruc_1.dcd_rs, instruc_1.rt_regNum, instruc_1.rs_data, instruc_1.rt_data, instruc_1.imm, instruc_1.mem_en, instruc_1.load_stall, instruc_1.IDen, IDclr);
        $display ("   fwd_rs_en: %b, fwd_rt_en: %b", instruc_1.fwd_rs_sel, instruc_1.fwd_rt_sel);
@@ -320,9 +321,10 @@ module mips_core(/*AUTOARG*/
              $display ("halt: %x, ctrl_sys_WB: %x, rt_data_WB: %x", internal_halt, instruc_2.ctrl_Sys_WB, instruc_2.rt_data_WB);
 
        $display ("");
-       $display ("");
+       $display ("");*/
+       
      end
-   end*/
+   end
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -437,18 +439,28 @@ module mips_core(/*AUTOARG*/
 
 
    //Fetch (IF) stage for pc register
-   wire IFen; //enable for IF stage
+   wire IFen; //enable for IF stage 
+   wire IDswap;
    //wire [31:0] stallpc; //either PC or PC+4 depending on stall conditions
-   mux2to1 stallMux(stallpc, instruc_1.pc, instruc_1.pc+8, IFen);
+   mux4to1 stallMux(stallpc, instruc_1.pc, instruc_1.pc+8, instruc_1.pc+4, instruc_1.pc+4, {IDswap, IFen});
 
    //Decode (ID) stage registers and wirings
    //wire IDen; //enable for decode stage
    //wire [31:0] pc_ID;
+
+   //Muxes for swapping instructions between pipelines
+   wire[31:0] swappc_1, swappc_2, swapinst_1, swapinst_2;
+   mux2to1 pcswpmux1(swappc_1, instruc_1.pc, instruc_2.pc_ID, IDswap);
+   mux2to1 pcswpmux2(swappc_2, instruc_2.pc, instruc_1.pc, IDswap);
+   mux2to1 instswpmux1(swapinst_1, instruc_1.inst, instruc_2.inst_ID, IDswap);
+   mux2to1 instswpmux2(swapinst_2, instruc_2.inst, instruc_1.inst, IDswap);
+
+
    wire IDclr;
-   register pcID_1(instruc_1.pc_ID, instruc_1.pc, clk, instruc_1.IDen, rst_b);
-   register pcID_2(instruc_2.pc_ID, instruc_2.pc, clk, instruc_2.IDen, rst_b);
-   clearRegister irD_1(instruc_1.inst_ID, instruc_1.inst, clk, instruc_1.IDen, IDclr, rst_b);
-   register irD_2(instruc_2.inst_ID, instruc_2.inst, clk, instruc_2.IDen, rst_b);
+   register pcID_1(instruc_1.pc_ID, swappc_1, clk, instruc_1.IDen, rst_b);
+   register pcID_2(instruc_2.pc_ID, swappc_2, clk, instruc_2.IDen, rst_b);
+   clearRegister irD_1(instruc_1.inst_ID, swapinst_1, clk, instruc_1.IDen, IDclr, rst_b);
+   register irD_2(instruc_2.inst_ID, swapinst_2, clk, instruc_2.IDen, rst_b);
 
    //Execute (EX) stage registers
    //wire EXen; //enable for execute stage
@@ -656,7 +668,7 @@ module mips_core(/*AUTOARG*/
                     1'b0, instruc_2.stall, instruc_1.load_stall, instruc_1.load_stall_EX, instruc_2.load_stall, instruc_2.load_stall_EX,
                     instruc_1.store_sel,instruc_2.store_sel,
                     IFen, instruc_1.IDen, instruc_1.EXen, , instruc_2.IDen, instruc_2.EXen,
-                    IDclr, CDen, CDAmt);
+                    IDclr, IDswap, CDen, CDAmt);
    countdownReg cdReg(CDen, clk, rst_b,
                       CDAmt,
                       instruc_2.stall);
@@ -823,6 +835,10 @@ module mips_core(/*AUTOARG*/
    register #(32, 0) BadVAddrReg_1(instruc_1.bad_v_addr, instruc_1.pc, clk, instruc_1.load_bva, rst_b);
    register #(32, 0) BadVAddrReg_2(instruc_2.bad_v_addr, instruc_2.pc, clk, instruc_2.load_bva, rst_b);
 
+   logic[31:0] cyclesCount;
+
+   counter cycles(cyclesCount, 1'b1, clk, rst_b);
+
 endmodule // mips_core
 
 
@@ -908,6 +924,29 @@ module concat (
       input logic [25:0] dcd_target);
 
     assign j_target = {cur_pc[31:28], dcd_target[25:0], 2'b00};
+
+endmodule
+
+////
+//// counter: keep track of counts
+////
+//// en (input)     - enable bit for count
+//// clk (input)    - Clock (positive edge-sensitive)
+//// reset (input)  - System reset
+//// count (output) - current count
+////
+module counter #(parameter reset_value = 32'd0) (
+  output logic [31:0] count,
+  input logic en, clk, rst_b);
+
+  always_ff @(posedge clk or negedge rst_b) begin
+    if (~rst_b) begin
+      count <= reset_value;
+    end
+    else if (en) begin
+      count <= count + 1;
+    end
+  end
 
 endmodule
 
