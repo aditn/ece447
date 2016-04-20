@@ -23,13 +23,14 @@ module stallDetector(
   input logic ctrl_we_2, ctrl_we_EX_2, regdst_2, 
   input logic stall_1, stall_2, load_stall_1, load_stall_EX_1, load_stall_2, load_stall_EX_2,
   input logic [1:0] store_sel_1,store_sel_2,
-  output logic IFen_1, IDen_1, EXen_1, IFen_2, IDen_2, EXen_2, IDclr, CDen,
+  output logic IFen_1, IDen_1, EXen_1, IFen_2, IDen_2, EXen_2, IDclr, IDswap, CDen,
   output logic [2:0] CDAmt);
   
   always_comb begin
     IFen_1 = 1'b1;
     IDen_1 = 1'b1;
     IDclr = 1'b1;
+    IDswap = 1'b0;
     EXen_1 = 1'b1;
     IFen_2 = 1'b1;
     IDen_2 = 1'b1;
@@ -105,13 +106,9 @@ module stallDetector(
       if(stall_2==1'b0 && IDen_1==1'b1) begin
         //$display("h1");
         if(ctrl_we_1!=0 && ctrl_we_2!=0 && pc_ID_2>pc_ID_1 && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_1)))) begin
-          //$display("h2");
-          IFen_2 = 1'b0;
-          IDen_2 = 1'b0;
+          IDswap = 1'b1;
           EXen_2 = 1'b0;
-          IFen_1 = 1'b0;
-          IDen_1 = 1'b0;
-          IDclr = 1'b0;
+          //swap condition
         end
         if(load_stall_EX_2==1'b1) begin
           if((ctrl_we_EX_2!=0) && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_EX_2)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_EX_2)))) begin
