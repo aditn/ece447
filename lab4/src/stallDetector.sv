@@ -103,9 +103,9 @@ module stallDetector(
       IDclr = 1'b0;
     end*/
       if(stall_2==1'b0 && IDen_1==1'b1) begin
-        $display("h1");
+        //$display("h1");
         if(ctrl_we_1!=0 && ctrl_we_2!=0 && pc_ID_2>pc_ID_1 && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_1)))) begin
-          $display("h2");
+          //$display("h2");
           IFen_2 = 1'b0;
           IDen_2 = 1'b0;
           EXen_2 = 1'b0;

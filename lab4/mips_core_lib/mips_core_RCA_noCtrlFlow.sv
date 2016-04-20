@@ -232,8 +232,7 @@ module mips_core(/*AUTOARG*/
    // PC Management
    //register #(32, text_start) PCReg(pc, pcNextFinal, clk, ~internal_halt, rst_b);
    register #(32, text_start) PCReg(instruc_1.pc, stallpc, clk, ~internal_halt, rst_b);
-   //assign instruc_2.pc = instruc_1.pc + 4;
-   parad32 parallel_adder32_1(instruc_2.pc, , instruc_1.pc, 32'd4);
+   assign instruc_2.pc = instruc_1.pc + 4;
    assign inst_addr = instruc_1.pc[31:2];
    //register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
    //                                    ~internal_halt, rst_b);
@@ -455,10 +454,7 @@ module mips_core(/*AUTOARG*/
    //Fetch (IF) stage for pc register
    wire IFen; //enable for IF stage
    //wire [31:0] stallpc; //either PC or PC+4 depending on stall conditions
-   wire [31:0] temp_sum1;
-   parad32 parallel_adder32_2(temp_sum1, , instruc_1.pc, 32'd8);
-   //mux2to1 stallMux(stallpc, instruc_1.pc, instruc_1.pc+8, IFen);
-   mux2to1 stallMux(stallpc, instruc_1.pc, temp_sum1, IFen);
+   mux2to1 stallMux(stallpc, instruc_1.pc, instruc_1.pc+8, IFen);
 
    //Decode (ID) stage registers and wirings
    //wire IDen; //enable for decode stage
