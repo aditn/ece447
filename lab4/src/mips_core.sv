@@ -217,23 +217,25 @@ module mips_core(/*AUTOARG*/
    //wire [31:0] pcNextFinal; 
    //wire [31:0] inst_ID; //instruction progagated to decode stage
 
-   /*wire [3:0] outSum4,p4,q4;
+   wire [31:0] outSum4,p4,q4;
    wire cout4;
-   assign p4 = 4'd7;
-   assign q4 = 4'd10;
-   parad4 parallel_adder4(outSum4, cout4, p4, q4);
+   assign p4 = 31'd2;
+   assign q4 = 31'd10;
+   carry_select cs_1(p4,q4,1'b0,outSum4,cout4);
 
-   wire [31:0] outSum32, p32,q32;
+   /*wire [31:0] outSum32, p32,q32;
    wire cout32;
    assign p32 = 32'd50;
    assign q32 = $signed(32'hffffffff);
-   parad32 parallel_adder32(outSum32, cout32, p32, q32);
-*/
+   carry_select parallel_adder32(outSum32, cout32, p32, q32);*/
+
+
    // PC Management
    //register #(32, text_start) PCReg(pc, pcNextFinal, clk, ~internal_halt, rst_b);
    register #(32, text_start) PCReg(instruc_1.pc, stallpc, clk, ~internal_halt, rst_b);
-   assign instruc_2.pc = instruc_1.pc + 4;
-   //parad32 parallel_adder32_1(instruc_2.pc, , instruc_1.pc, 32'd4);
+   //assign instruc_2.pc = instruc_1.pc + 4;
+
+   carry_select cs_2(instruc_1.pc, 32'd4, , instruc_2.pc, );
    assign inst_addr = instruc_1.pc[31:2];
    //register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
    //                                    ~internal_halt, rst_b);
@@ -294,6 +296,7 @@ module mips_core(/*AUTOARG*/
      if (rst_b) begin
        $display ( "=== Simulation Cycle %d ===", $time );
        $display ( "# cycles: %d", cyclesCount);
+       $display("outSum4:%x,%d,%b cout4: %d", outSum4,outSum4,outSum4,cout4);
        //$display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
        //            pc, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
        // $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
@@ -333,8 +336,8 @@ module mips_core(/*AUTOARG*/
        $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_2.wr_reg_WB, instruc_2.alu__out_WB, instruc_2.ctrl_we_WB, instruc_2.mem_write_en_WB);
              $display ("halt: %x, ctrl_sys_WB: %x, rt_data_WB: %x", internal_halt, instruc_2.ctrl_Sys_WB, instruc_2.rt_data_WB);
 
-       $display ("");
        $display ("");*/
+       $display ("");
        
      end
    end
@@ -457,8 +460,8 @@ module mips_core(/*AUTOARG*/
    //wire [31:0] stallpc; //either PC or PC+4 depending on stall conditions
 
    wire [31:0] temp_sum1,temp_sum2;
-   parad32 parallel_adder32_2(temp_sum1, , instruc_1.pc, 32'd8);
-   parad32 parallel_adder32_4(temp_sum2, , instruc_1.pc, 32'd4);
+   //carry_select cs_3(instruc_1.pc, 32'd8, ,temp_sum1, );
+   //carry_select cs_4(instruc_1.pc, 32'd4, , temp_sum2, );
    //mux2to1 stallMux(stallpc, instruc_1.pc, instruc_1.pc+8, IFen);
    //mux2to1 stallMux(stallpc, instruc_1.pc, temp_sum1, IFen);
 
@@ -746,7 +749,8 @@ module mips_core(/*AUTOARG*/
 
 
    //Set wr_data and wr_reg when there is a jump/branch with link
-   mux2to1 dataToReg_1(instruc_1.wr_data, instruc_1.wr_dataMem, instruc_1.pc+4, instruc_1.jLink_en_WB); 
+   mux2to1 dataToReg_1(instruc_1.wr_data, instruc_1.wr_dataMem, instruc_1.pc+4, instruc_1.jLink_en_WB);
+   //mux2to1 dataToReg_1(instruc_1.wr_data, instruc_1.wr_dataMem, temp_sum2, instruc_1.jLink_en_WB); 
    mux2to1 #(5)regNumber_1(instruc_1.wr_reg, instruc_1.wr_reg_WB, 5'd31, instruc_1.jLink_en_WB);
 
 
@@ -767,7 +771,10 @@ module mips_core(/*AUTOARG*/
    mux4to1 memToReg_2(instruc_2.wr_dataMem, instruc_2.alu__out_WB, load_data_WB,
                       instruc_2.HIout_WB, instruc_2.LOout_WB, instruc_2.memtoreg_WB);
 
-   mux2to1 dataToReg_2(instruc_2.wr_data, instruc_2.wr_dataMem, instruc_2.pc+4, instruc_2.jLink_en_WB); 
+   wire [31:0] temp_sum3;
+   //carry_select cs_5(instruc_2.pc, 32'd4, , temp_sum3,);
+   mux2to1 dataToReg_2(instruc_2.wr_data, instruc_2.wr_dataMem, instruc_2.pc+4, instruc_2.jLink_en_WB);
+   //mux2to1 dataToReg_2(instruc_2.wr_data, instruc_2.wr_dataMem, temp_sum3, instruc_2.jLink_en_WB); 
    mux2to1 #(5)regNumber_2(instruc_2.wr_reg, instruc_2.wr_reg_WB, 5'd31, instruc_2.jLink_en_WB);
 
 
