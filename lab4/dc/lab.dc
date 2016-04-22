@@ -13,7 +13,7 @@ set link_library /afs/ece/class/ece341/setup/Artisan/typical.db
 set search_path [concat $search_path ./447src ./src]
 
 # TODO: Add sources files here. Dependencies should be listed first
-set src [list ./447src/regfile.v ./src/parad32.sv ./src/mips_decode.sv ./src/forwardData.sv ./src/loader.sv ./src/mips_ALU.sv ./src/register.sv ./src/setMemValues.sv ./src/stallDetector.sv ./src/storer.sv ./src/mux2to1.sv ./src/mips_core.sv]
+set src [list ./447src/regfile.v ./src/carry_select.sv ./src/flushMod.sv ./src/mips_decode.sv ./src/forwardData.sv ./src/loader.sv ./src/mips_ALU.sv ./src/register.sv ./src/setMemValues.sv ./src/stallDetector.sv ./src/storer.sv ./src/mux2to1.sv ./src/mips_core.sv]
 
 # Set top module
 set top_module mips_core

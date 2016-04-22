@@ -20,26 +20,26 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
    input logic [3:0]   alu__sel;
    input logic [2:0]   brcond;
 
-   ///wire [31:0] alu__ADD, alu__SUB, negVal;
+   wire [31:0] alu__ADD, alu__SUB, negVal;
 
-   //carry_select cs_3(alu__op1,alu__op2, , alu__ADD,);
+   carry_select cs_3(alu__op1,alu__op2,1'b0 , alu__ADD,);
    
-   //makeNegative mNeg(negVal, alu__op2);
-   //carry_select cs_4(alu__op1,negVal, , alu__SUB,);
+   makeNegative mNeg(negVal, alu__op2);
+   carry_select cs_4(alu__op1,negVal, 1'b0, alu__SUB,);
 
    always_comb begin
     alu__out = 0;
     branchTrue = 0;
     case (alu__sel)
       `ALU_ADD: begin
-        alu__out = alu__op1+alu__op2;
-        //alu__out = alu__ADD;
+        //alu__out = alu__op1+alu__op2;
+        alu__out = alu__ADD;
       end
       `ALU_SUB:
         begin //check if branch condition is met
-          //alu__out = alu__SUB;
-          alu__out = alu__op1-alu__op2;
-          /*case(brcond)
+          alu__out = alu__SUB;
+          //alu__out = alu__op1-alu__op2;
+          case(brcond)
             `BR_BLTZ:
               begin
                 if ($signed(alu__op1)<0)
@@ -67,13 +67,16 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
               end
             `BR_BGTZ:
               begin
-                $display("alu__op1: %d, alu__op2:%d", alu__op1, alu__op2);
+                //$display("alu__op1: %d, alu__op2:%d", alu__op1, alu__op2);
                 if ($signed(alu__op1)>$signed(0))
                   branchTrue = 1'b1;
               end
             default:
-              alu__out = alu__op1-alu__op2;
-          endcase*/
+              begin
+              alu__out = alu__SUB;
+              //alu__out = alu__op1-alu__op2;
+              end
+          endcase
         end
       `ALU_SLL:
         //shift by value in bits [10:6] of immediate
@@ -116,6 +119,6 @@ module makeNegative (neg, valIn);
   wire [31:0] temp;
   
   assign temp = ~valIn;
-  carry_select csNEG(32'hffffffff,temp, , neg,);
+  carry_select csNEG(32'hffffffff,temp,1'b0, neg,);
 
 endmodule

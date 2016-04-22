@@ -117,6 +117,7 @@ typedef struct packed{
   logic [31:0] rt_data_EX;
   logic [31:0] imm_EX;
   logic [4:0] wr_reg_EX;
+  logic [25:0] dcd_target_EX;
 
   logic ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX;
   logic alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, load_stall_EX; 
@@ -221,7 +222,8 @@ module mips_core(/*AUTOARG*/
    wire cout4;
    assign p4 = 31'd2;
    assign q4 = 31'd10;
-   carry_select cs_1(p4,q4,1'b0,outSum4,cout4);
+   //carry_select cs_1(p4,q4,1'b0,outSum4,cout4);
+   //carry_select cs_2(instruc_1.pc, 32'd4, 1'b0, outSum4,cout4 );
 
    /*wire [31:0] outSum32, p32,q32;
    wire cout32;
@@ -232,10 +234,15 @@ module mips_core(/*AUTOARG*/
 
    // PC Management
    //register #(32, text_start) PCReg(pc, pcNextFinal, clk, ~internal_halt, rst_b);
-   register #(32, text_start) PCReg(instruc_1.pc, stallpc, clk, ~internal_halt, rst_b);
+
+//   register #(32, text_start) PCReg(instruc_1.pc, stallpc, clk, ~internal_halt, rst_b);
    //assign instruc_2.pc = instruc_1.pc + 4;
 
-   carry_select cs_2(instruc_1.pc, 32'd4, , instruc_2.pc, );
+   //carry_select cs_2(instruc_1.pc, 32'd4, 1'b0, instruc_2.pc, );
+
+   register #(32, text_start) PCReg(instruc_1.pc, newpc, clk, ~internal_halt, rst_b);
+   assign instruc_2.pc = instruc_1.pc + 4;
+   //parad32 parallel_adder32_1(instruc_2.pc, , instruc_1.pc, 32'd4);
    assign inst_addr = instruc_1.pc[31:2];
    //register #(32, text_start+4) PCReg2(nextpc, newpc, clk,
    //                                    ~internal_halt, rst_b);
@@ -291,7 +298,7 @@ module mips_core(/*AUTOARG*/
 
    // synthesis translate_off
    
-   always @(posedge clk) begin
+   /*always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
        $display ( "=== Simulation Cycle %d ===", $time );
@@ -315,18 +322,22 @@ module mips_core(/*AUTOARG*/
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
        //$display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", branchTrue, pcMuxSel, pcMuxSelFinal);
        //$display ("br_target: %x", br_target);
-       /*$display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
-                   instruc_1.pc, instruc_1.inst_ID, instruc_1.dcd_op, instruc_1.dcd_rs, instruc_1.dcd_rt, instruc_1.dcd_rd, instruc_1.dcd_imm, instruc_1.dcd_funct2, ~rst_b, halted);
+       $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
+                   instruc_1.pc_ID, instruc_1.inst_ID, instruc_1.dcd_op, instruc_1.dcd_rs, instruc_1.dcd_rt, instruc_1.dcd_rd, instruc_1.dcd_imm, instruc_1.dcd_funct2, ~rst_b, halted);
        $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, mem_en: %x, load_stall: %x, IDen: %b, IDclr: %b", instruc_1.wr_regNum, instruc_1.wr_data, instruc_1.dcd_rs, instruc_1.rt_regNum, instruc_1.rs_data, instruc_1.rt_data, instruc_1.imm, instruc_1.mem_en, instruc_1.load_stall, instruc_1.IDen, IDclr);
        $display ("   fwd_rs_en: %b, fwd_rt_en: %b", instruc_1.fwd_rs_sel, instruc_1.fwd_rt_sel);
        $display ("   rsfwd: %x, rtfwd: %x, fwd_rs_en_EX: %b, fwd_rt_en_EX: %b", instruc_1.rs_fwd, instruc_1.rt_fwd, instruc_1.fwd_rs_sel_EX, instruc_1.fwd_rt_sel_EX);
        $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", instruc_1.wr_reg_EX, instruc_1.alu_in1, instruc_1.alu_in2, instruc_1.alu__out, instruc_1.ctrl_we_EX, instruc_1.mem_write_en_EX);
+       $display ("   branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", instruc_1.branchTrue, instruc_1.pcMuxSel, instruc_1.pcMuxSelFinal);
+       $display ("   br_target: %x, flush: %b", instruc_1.br_target, flush);
        $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_1.wr_reg_MEM, instruc_1.alu__out_MEM, instruc_1.ctrl_we_MEM, instruc_1.mem_write_en_MEM);
        $display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", {mem_addr, 2'b0}, load_data, instruc_1.load_sel_EX, mem_data_out, store_data);
-       $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_1.wr_reg_WB, instruc_1.alu__out_WB, instruc_1.ctrl_we_WB, instruc_1.mem_write_en_WB);
+       $display ("W: wr_reg_WB: %x, wr_data: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_1.wr_reg_WB, instruc_1.wr_data, instruc_1.alu__out_WB, instruc_1.ctrl_we_WB, instruc_1.mem_write_en_WB);
+       $display ("halt: %x, ctrl_sys_WB: %x, rt_data_WB: %x", internal_halt, instruc_1.ctrl_Sys_WB, instruc_1.rt_data_WB);
+       $display ("stall: %b", instruc_2.stall);
        $display ("");
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
-                   instruc_2.pc, instruc_2.inst_ID, instruc_2.dcd_op, instruc_2.dcd_rs, instruc_2.dcd_rt, instruc_2.dcd_rd, instruc_2.dcd_imm, instruc_2.dcd_funct2, ~rst_b, halted);
+                   instruc_2.pc_ID, instruc_2.inst_ID, instruc_2.dcd_op, instruc_2.dcd_rs, instruc_2.dcd_rt, instruc_2.dcd_rd, instruc_2.dcd_imm, instruc_2.dcd_funct2, ~rst_b, halted);
        $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, mem_en: %x, load_stall: %x", instruc_2.wr_regNum, instruc_2.wr_data, instruc_2.dcd_rs, instruc_2.rt_regNum, instruc_2.rs_data, instruc_2.rt_data, instruc_2.imm, instruc_2.mem_en, instruc_2.load_stall);
        $display ("   fwd_rs_en: %b, fwd_rt_en: %b", instruc_2.fwd_rs_sel, instruc_2.fwd_rt_sel);
        $display ("   rsfwd: %x, rtfwd: %x, fwd_rs_en_EX: %b, fwd_rt_en_EX: %b", instruc_2.rs_fwd, instruc_2.rt_fwd, instruc_2.fwd_rs_sel_EX, instruc_2.fwd_rt_sel_EX);
@@ -335,12 +346,11 @@ module mips_core(/*AUTOARG*/
        $display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x, rt_data_MEM: %x", {mem_addr, 2'b0}, load_data, instruc_2.load_sel_EX, mem_data_out, store_data, instruc_2.rt_data_MEM);
        $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_2.wr_reg_WB, instruc_2.alu__out_WB, instruc_2.ctrl_we_WB, instruc_2.mem_write_en_WB);
              $display ("halt: %x, ctrl_sys_WB: %x, rt_data_WB: %x", internal_halt, instruc_2.ctrl_Sys_WB, instruc_2.rt_data_WB);
-
-       $display ("");*/
+       $display ("");
        $display ("");
        
      end
-   end
+   end*/
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -460,8 +470,8 @@ module mips_core(/*AUTOARG*/
    //wire [31:0] stallpc; //either PC or PC+4 depending on stall conditions
 
    wire [31:0] temp_sum1,temp_sum2;
-   //carry_select cs_3(instruc_1.pc, 32'd8, ,temp_sum1, );
-   //carry_select cs_4(instruc_1.pc, 32'd4, , temp_sum2, );
+   //carry_select cs_3(instruc_1.pc, 32'd8, 1'b0,temp_sum1, );
+   //carry_select cs_4(instruc_1.pc, 32'd4, 1'b0, temp_sum2, );
    //mux2to1 stallMux(stallpc, instruc_1.pc, instruc_1.pc+8, IFen);
    //mux2to1 stallMux(stallpc, instruc_1.pc, temp_sum1, IFen);
 
@@ -496,6 +506,7 @@ module mips_core(/*AUTOARG*/
    //wire [4:0] wr_reg_EX;
    
    /**********Instruction 1**********/
+   wire IDswap_EX;
    register pcEX_1(instruc_1.pc_EX, instruc_1.pc_ID, clk, instruc_1.EXen, rst_b);
    register rsEX_1(instruc_1.rs_data_EX, instruc_1.rs_data, clk, instruc_1.EXen, rst_b);
    register rtEX_1(instruc_1.rt_data_EX, instruc_1.rt_data, clk, instruc_1.EXen, rst_b);
@@ -503,6 +514,8 @@ module mips_core(/*AUTOARG*/
    register #(5) wrEX_1(instruc_1.wr_reg_EX, instruc_1.wr_regNum, clk, instruc_1.EXen, rst_b);
    register #(3) fwdrsEX_1(instruc_1.fwd_rs_sel_EX, instruc_1.fwd_rs_sel, clk, instruc_1.EXen, rst_b);
    register #(3) fwdrtEX_1(instruc_1.fwd_rt_sel_EX, instruc_1.fwd_rt_sel, clk, instruc_1.EXen, rst_b);
+   register #(26) targetEX(instruc_1.dcd_target_EX, instruc_1.dcd_target, clk, instruc_1.EXen, rst_b);
+   register #(1) swap(IDswap_EX, IDswap, clk, instruc_1.EXen, rst_b);
 
    //wire ctrl_we_EX, ctrl_Sys_EX, ctrl_RI_EX, regdst_EX, jLink_en_EX;
    //wire alusrc1_EX, alusrc2_EX, se_EX, hi_en_EX, lo_en_EX, load_stall_EX; 
@@ -559,7 +572,7 @@ module mips_core(/*AUTOARG*/
    //wire [31:0] imm_MEM;
    //wire [4:0] wr_reg_MEM;
    /************Instruction 1**********/
-   assign instruc_1.MEMen = 1; //MEM stage never disabled
+   //assign instruc_1.MEMen = 1; //MEM stage never disabled
    register pcMEM_1(instruc_1.pc_MEM, instruc_1.pc_EX, clk, instruc_1.MEMen, rst_b);
    register aluMEM_1(instruc_1.alu__out_MEM, instruc_1.alu__out, clk, instruc_1.MEMen, rst_b);
    register rtMEM_1(instruc_1.rt_data_MEM, instruc_1.rt_fwd, clk, instruc_1.MEMen, rst_b);
@@ -587,7 +600,7 @@ module mips_core(/*AUTOARG*/
                         clk, instruc_1.MEMen, rst_b);
    
    /************Instruction 2**********/
-   assign instruc_2.MEMen = 1; //MEM stage never disabled
+   //assign instruc_2.MEMen = 1; //MEM stage never disabled
    register pcMEM_2(instruc_2.pc_MEM, instruc_2.pc_EX, clk, instruc_2.MEMen, rst_b);
    register aluMEM_2(instruc_2.alu__out_MEM, instruc_2.alu__out, clk, instruc_2.MEMen, rst_b);
    register rtMEM_2(instruc_2.rt_data_MEM, instruc_2.rt_fwd, clk, instruc_2.MEMen, rst_b);
@@ -650,7 +663,7 @@ module mips_core(/*AUTOARG*/
                         clk, instruc_1.WBen, rst_b);
 
    /**********Instruction 2**********/
-   assign instruc_2.WBen = 1; //WB stage never disabled
+   //assign instruc_2.WBen = 1; //WB stage never disabled
    //register MDRw_2(instruc_2.load_data_WB, instruc_2.load_data, clk, instruc_2.WBen, rst_b);
    register Aoutw_2(instruc_2.alu__out_WB, instruc_2.alu__out_MEM, clk, instruc_2.WBen, rst_b);
    register HIwb_2(instruc_2.HIout_WB, instruc_2.hi_out, clk, instruc_2.WBen, rst_b); //holds HI val in WB register (may need to have its own en)
@@ -680,19 +693,19 @@ module mips_core(/*AUTOARG*/
     /*******************************/
 
    //check for RAW hazard and Stall
-   wire CDen;
+   wire CDen, EXenStall_1, EXenStall_2, MEMenStall_2;
    wire [2:0] CDAmt;
-   stallDetector sD(instruc_1.pc_ID, instruc_1.pc_EX,
+   stallDetector sD(instruc_1.pc_ID, instruc_1.pc_EX, instruc_1.rt_data_MEM,
                     instruc_1.wr_regNum, instruc_1.wr_reg_EX, instruc_1.wr_reg_MEM, instruc_1.rt_regNum, instruc_1.dcd_rs,
                     instruc_1.mem_en,
-                    instruc_1.ctrl_we, instruc_1.ctrl_we_EX, instruc_1.regdst,
-                    instruc_2.pc_ID, instruc_2.pc_EX,
+                    instruc_1.ctrl_we, instruc_1.ctrl_we_EX, instruc_1.regdst, instruc_1.ctrl_Sys_MEM,
+                    instruc_2.pc_ID, instruc_2.pc_EX, instruc_2.rt_data_MEM,
                     instruc_2.wr_regNum, instruc_2.wr_reg_EX, instruc_2.wr_reg_MEM, instruc_2.rt_regNum, instruc_2.dcd_rs,
                     instruc_2.mem_en,
-                    instruc_2.ctrl_we, instruc_2.ctrl_we_EX, instruc_2.regdst,
+                    instruc_2.ctrl_we, instruc_2.ctrl_we_EX, instruc_2.regdst, instruc_2.ctrl_Sys_MEM,
                     1'b0, instruc_2.stall, instruc_1.load_stall, instruc_1.load_stall_EX, instruc_2.load_stall, instruc_2.load_stall_EX,
-                    instruc_1.store_sel,instruc_2.store_sel,
-                    IFen, instruc_1.IDen, instruc_1.EXen, , instruc_2.IDen, instruc_2.EXen,
+                    instruc_1.store_sel, instruc_2.store_sel, instruc_2.pcMuxSel,
+                    IFen, instruc_1.IDen, EXenStall_1, instruc_1.MEMen, , instruc_2.IDen, EXenStall_2, MEMenStall_2, instruc_2.WBen,
                     IDclr, IDswap, CDen, CDAmt);
    countdownReg cdReg(CDen, clk, rst_b,
                       CDAmt,
@@ -741,7 +754,7 @@ module mips_core(/*AUTOARG*/
    //rs and rt forwarding
    mux5to1 fwdrs_1(instruc_1.rs_fwd, instruc_1.rs_data_EX, instruc_2.alu__out_MEM, instruc_1.alu__out_MEM, instruc_2.wr_dataMem, instruc_1.wr_dataMem, instruc_1.fwd_rs_sel_EX);
    mux5to1 fwdrt_1(instruc_1.rt_fwd, instruc_1.rt_data_EX, instruc_2.alu__out_MEM, instruc_1.alu__out_MEM, instruc_2.wr_dataMem, instruc_1.wr_dataMem, instruc_1.fwd_rt_sel_EX);
-   
+
    //Wirings to memory module
    mux4to1 memToReg_1(instruc_1.wr_dataMem, instruc_1.alu__out_WB, load_data_WB,
                       instruc_1.HIout_WB, instruc_1.LOout_WB, instruc_1.memtoreg_WB);
@@ -772,7 +785,7 @@ module mips_core(/*AUTOARG*/
                       instruc_2.HIout_WB, instruc_2.LOout_WB, instruc_2.memtoreg_WB);
 
    wire [31:0] temp_sum3;
-   //carry_select cs_5(instruc_2.pc, 32'd4, , temp_sum3,);
+   //carry_select cs_5(instruc_2.pc, 32'd4,1'b0 , temp_sum3,);
    mux2to1 dataToReg_2(instruc_2.wr_data, instruc_2.wr_dataMem, instruc_2.pc+4, instruc_2.jLink_en_WB);
    //mux2to1 dataToReg_2(instruc_2.wr_data, instruc_2.wr_dataMem, temp_sum3, instruc_2.jLink_en_WB); 
    mux2to1 #(5)regNumber_2(instruc_2.wr_reg, instruc_2.wr_reg_WB, 5'd31, instruc_2.jLink_en_WB);
@@ -782,10 +795,26 @@ module mips_core(/*AUTOARG*/
 /*****************************************************************************/
 
    //Mux for next state PC
-   //mux4to1 pcMux(newpc, stallpc, br_target, rs_data, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
-   //adder brtarget(br_target, pc + 4, (imm << 2), 1'b0); //get branch target
-   //concat conc(j_target, pc, dcd_target); //get jump target
-   //pcSelector choosePcMuxSel(pcMuxSelFinal,pcMuxSel,branchTrue); //chooses PC on whether branch condition is met
+   mux4to1 pcMux(newpc, stallpc, instruc_1.br_target, instruc_1.rs_fwd, instruc_1.j_target, instruc_1.pcMuxSelFinal); //chooses next PC depending on jump or branch
+   adder brtarget(instruc_1.br_target, instruc_1.pc_EX + 4, (instruc_1.imm_EX << 2), 1'b0); //get branch target
+   concat conc(instruc_1.j_target, instruc_1.pc_EX, instruc_1.dcd_target_EX); //get jump target
+   pcSelector choosePcMuxSel(instruc_1.pcMuxSelFinal, instruc_1.pcMuxSel_EX, instruc_1.branchTrue); //chooses PC on whether branch condition is met
+
+   wire flush, CDFlushen, mispredict, EXenFlush_1, EXenFlush_2, MEMenFlush_2;
+   wire [2:0] CDFlushAmt; 
+   flushMod fMod(instruc_1.pcMuxSelFinal, instruc_1.pcMuxSel_EX,
+                 instruc_1.pc_ID, instruc_1.pc_EX, instruc_1.br_target, instruc_1.rs_fwd, instruc_1.j_target,
+                 IDswap_EX, flush,
+                 EXenFlush_1, EXenFlush_2, MEMenFlush_2, CDFlushen, mispredict,
+                 CDFlushAmt);
+   countdownReg cdFlushReg(CDFlushen, clk, rst_b,
+                           CDFlushAmt,
+                           flush);
+
+   assign instruc_1.EXen = EXenStall_1 & EXenFlush_2;
+   assign instruc_2.EXen = EXenStall_2 & EXenFlush_2;
+   assign instruc_2.MEMen = MEMenStall_2 & MEMenFlush_2;
+                  
 
    //propogate load_data to WB stage
    register MDRw(load_data_WB, load_data, clk, instruc_2.WBen | instruc_1.WBen, rst_b);
