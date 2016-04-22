@@ -13,17 +13,17 @@
 //// CDAmt (output) - number of clock cycles to stall
 ////
 module stallDetector(
-  input logic [31:0] pc_ID_1, pc_EX_1,
+  input logic [31:0] pc_ID_1, pc_EX_1, rt_data_MEM_1,
   input logic [4:0] wr_reg_1, wr_reg_EX_1, wr_reg_MEM_1, dcd_rt_1, dcd_rs_1,
   input logic [3:0] mem_en_1,
-  input logic ctrl_we_1, ctrl_we_EX_1, regdst_1, ctrl_Sys_1,
-  input logic [31:0] pc_ID_2, pc_EX_2,
+  input logic ctrl_we_1, ctrl_we_EX_1, regdst_1, ctrl_Sys_MEM_1,
+  input logic [31:0] pc_ID_2, pc_EX_2, rt_data_MEM_2,
   input logic [4:0] wr_reg_2, wr_reg_EX_2, wr_reg_MEM_2, dcd_rt_2, dcd_rs_2,
   input logic [3:0] mem_en_2,
-  input logic ctrl_we_2, ctrl_we_EX_2, regdst_2, ctrl_Sys_2,
+  input logic ctrl_we_2, ctrl_we_EX_2, regdst_2, ctrl_Sys_MEM_2,
   input logic stall_1, stall_2, load_stall_1, load_stall_EX_1, load_stall_2, load_stall_EX_2,
   input logic [1:0] store_sel_1, store_sel_2, pcMuxSel_2,
-  output logic IFen_1, IDen_1, EXen_1, IFen_2, IDen_2, EXen_2, IDclr, IDswap, CDen,
+  output logic IFen_1, IDen_1, EXen_1, MEMen_1, IFen_2, IDen_2, EXen_2, MEMen_2, WBen_2, IDclr, IDswap, CDen,
   output logic [2:0] CDAmt);
   
   always_comb begin
@@ -32,9 +32,12 @@ module stallDetector(
     IDclr = 1'b1;
     IDswap = 1'b0;
     EXen_1 = 1'b1;
+    MEMen_1 = 1'b1;
     IFen_2 = 1'b1;
     IDen_2 = 1'b1;
     EXen_2 = 1'b1;
+    MEMen_2 = 1'b1;
+    WBen_2 = 1'b1;
     CDen = 1'b0;
     CDAmt = 3'b0;
 
@@ -60,24 +63,15 @@ module stallDetector(
     end
     else begin
       if(stall_1==1'b0 && stall_2==1'b0) begin
-        if(ctrl_Sys_1==1'b1) begin
-          IFen_2 = 1'b0;
-          IDen_2 = 1'b0;
-          EXen_2 = 1'b0;
-          IFen_1 = 1'b0;
-          IDen_1 = 1'b0;
-          IDclr = 1'b0;
-          CDen = 1'b1;
-          CDAmt = 3'd3;
+        if(ctrl_Sys_MEM_1==1'b1 && rt_data_MEM_1==32'ha) begin
+          $display("1");
+          MEMen_1 = 1'b0;
+          MEMen_2 = 1'b0;
+          WBen_2 = 1'b0;
         end
-        else if(ctrl_Sys_2==1'b1) begin
-          IFen_2 = 1'b0;
-          IDen_2 = 1'b0;
-          IFen_1 = 1'b0;
-          IDen_1 = 1'b0;
-          IDclr = 1'b0;
-          CDen = 1'b1;
-          CDAmt = 3'd3;
+        else if(ctrl_Sys_MEM_2==1'b1 && rt_data_MEM_2==32'ha) begin
+          MEMen_1 = 1'b0;
+          MEMen_2 = 1'b0;
         end
       end
       if(stall_1==1'b0) begin
