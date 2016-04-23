@@ -11,7 +11,13 @@ module mux2to1 #(parameter width = 32) (
       input logic [width - 1:0] in0, in1, 
       input logic sel);
     
-    assign out = sel ? in1 : in0;
+    always_comb begin
+      if (sel == 1'b0)
+        out = in0;
+      else if (sel == 1'b1)
+        out = in1;
+    end
+    //assign out = sel ? in1 : in0;
 
 endmodule
 
@@ -31,7 +37,17 @@ module mux4to1 #(parameter width = 32) (
       input logic [width - 1:0] in0, in1, in2, in3,
       input logic [1:0] sel);
 
-    assign out = sel[1] ? (sel[0] ? in3 : in2) : (sel[0] ? in1 : in0);
+    always_comb begin
+      if (sel == 2'b00)
+        out = in0;
+      else if (sel == 2'b01)
+        out = in1;
+      else if (sel == 2'b10)
+        out = in2;
+      else if (sel == 2'b11)
+        out = in3;
+    end
+    //assign out = sel[1] ? (sel[0] ? in3 : in2) : (sel[0] ? in1 : in0);
 
 endmodule
 
@@ -51,6 +67,18 @@ module mux5to1 #(parameter width = 32) (
       input logic [width - 1:0] in0, in1, in2, in3, in4,
       input logic [2:0] sel);
 
-    assign out = sel[2] ? in4 : (sel[1] ? (sel[0] ? in3 : in2) : (sel[0] ? in1 : in0));
+    always_comb begin
+      if (sel == 3'b000)
+        out = in0;
+      else if (sel == 3'b001)
+        out = in1;
+      else if (sel == 3'b010)
+        out = in2;
+      else if (sel == 3'b011)
+        out = in3;
+      else if (sel == 3'b100)
+        out = in4;
+    end
+    //assign out = sel[2] ? in4 : (sel[1] ? (sel[0] ? in3 : in2) : (sel[0] ? in1 : in0));
 
 endmodule

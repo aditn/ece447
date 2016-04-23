@@ -796,7 +796,8 @@ module mips_core(/*AUTOARG*/
 
    //Mux for next state PC
    mux4to1 pcMux(newpc, stallpc, instruc_1.br_target, instruc_1.rs_fwd, instruc_1.j_target, instruc_1.pcMuxSelFinal); //chooses next PC depending on jump or branch
-   adder brtarget(instruc_1.br_target, instruc_1.pc_EX + 4, (instruc_1.imm_EX << 2), 1'b0); //get branch target
+   carry_select cs_brTarget(instruc_1.pc_EX + 4,(instruc_1.imm_EX << 2),1'b0,instruc_1.br_target,);
+   //adder brtarget(instruc_1.br_target, instruc_1.pc_EX + 4, (instruc_1.imm_EX << 2), 1'b0); //get branch target
    concat conc(instruc_1.j_target, instruc_1.pc_EX, instruc_1.dcd_target_EX); //get jump target
    pcSelector choosePcMuxSel(instruc_1.pcMuxSelFinal, instruc_1.pcMuxSel_EX, instruc_1.branchTrue); //chooses PC on whether branch condition is met
 
