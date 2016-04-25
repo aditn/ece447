@@ -302,8 +302,8 @@ module mips_core(/*AUTOARG*/
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
        $display ( "=== Simulation Cycle %d ===", $time );
-       $display ( "# cycles: %d", cyclesCount);
-       $display("outSum4:%x,%d,%b cout4: %d", outSum4,outSum4,outSum4,cout4);
+       //$display ( "# cycles: %d", cyclesCount);
+       //$display("outSum4:%x,%d,%b cout4: %d", outSum4,outSum4,outSum4,cout4);
        //$display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
        //            pc, inst_ID, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
        // $display ("Store address: %d, %d, Store word: %d, ALUOUT: %d, en: %d", rt_data, mem_addr, mem_data_in, alu__out, mem_write_en);
@@ -469,14 +469,14 @@ module mips_core(/*AUTOARG*/
    wire IDswap;
    //wire [31:0] stallpc; //either PC or PC+4 depending on stall conditions
 
-   wire [31:0] temp_sum1,temp_sum2;
-   //carry_select cs_3(instruc_1.pc, 32'd8, 1'b0,temp_sum1, );
-   //carry_select cs_4(instruc_1.pc, 32'd4, 1'b0, temp_sum2, );
+   wire [31:0] pc1Plus8,pc1Plus4;
+   carry_select cs_3(instruc_1.pc, 32'd8, 1'b0,pc1Plus8, );
+   carry_select cs_4(instruc_1.pc, 32'd4, 1'b0, pc1Plus4, );
    //mux2to1 stallMux(stallpc, instruc_1.pc, instruc_1.pc+8, IFen);
    //mux2to1 stallMux(stallpc, instruc_1.pc, temp_sum1, IFen);
 
-   mux4to1 stallMux(stallpc, instruc_1.pc, instruc_1.pc+8, instruc_1.pc+4, instruc_1.pc+4, {IDswap, IFen});
-   //mux4to1 stallMux(stallpc, instruc_1.pc, temp_sum1, temp_sum2, temp_sum2, {IDswap, IFen});
+   //mux4to1 stallMux(stallpc, instruc_1.pc, instruc_1.pc+8, instruc_1.pc+4, instruc_1.pc+4, {IDswap, IFen});
+   mux4to1 stallMux(stallpc, instruc_1.pc, pc1Plus8, pc1Plus4, pc1Plus4, {IDswap, IFen});
 
 
    //Decode (ID) stage registers and wirings
@@ -748,8 +748,7 @@ module mips_core(/*AUTOARG*/
    //Determines inputs to ALU
    mux2to1 aluSrc1(instruc_1.alu_in1, instruc_1.rs_fwd, instruc_1.rt_fwd, instruc_1.alusrc1_EX); //ALUSrc1
    mux2to1 aluSrc2(instruc_1.alu_in2, instruc_1.rt_fwd, instruc_1.imm_EX, instruc_1.alusrc2_EX); //ALUSrc2
-   mux2to1 signext_1(instruc_1.imm, instruc_1.dcd_e_imm, instruc_1.dcd_se_imm,
-            instruc_1.se); //Zero extend or sign extend immediate
+   mux2to1 signext_1(instruc_1.imm, instruc_1.dcd_e_imm, instruc_1.dcd_se_imm,instruc_1.se); //Zero extend or sign extend immediate
 
    //rs and rt forwarding
    mux5to1 fwdrs_1(instruc_1.rs_fwd, instruc_1.rs_data_EX, instruc_2.alu__out_MEM, instruc_1.alu__out_MEM, instruc_2.wr_dataMem, instruc_1.wr_dataMem, instruc_1.fwd_rs_sel_EX);
@@ -762,8 +761,8 @@ module mips_core(/*AUTOARG*/
 
 
    //Set wr_data and wr_reg when there is a jump/branch with link
-   mux2to1 dataToReg_1(instruc_1.wr_data, instruc_1.wr_dataMem, instruc_1.pc+4, instruc_1.jLink_en_WB);
-   //mux2to1 dataToReg_1(instruc_1.wr_data, instruc_1.wr_dataMem, temp_sum2, instruc_1.jLink_en_WB); 
+   //mux2to1 dataToReg_1(instruc_1.wr_data, instruc_1.wr_dataMem, instruc_1.pc+4, instruc_1.jLink_en_WB);
+   mux2to1 dataToReg_1(instruc_1.wr_data, instruc_1.wr_dataMem, pc1Plus4, instruc_1.jLink_en_WB); 
    mux2to1 #(5)regNumber_1(instruc_1.wr_reg, instruc_1.wr_reg_WB, 5'd31, instruc_1.jLink_en_WB);
 
 
@@ -784,10 +783,10 @@ module mips_core(/*AUTOARG*/
    mux4to1 memToReg_2(instruc_2.wr_dataMem, instruc_2.alu__out_WB, load_data_WB,
                       instruc_2.HIout_WB, instruc_2.LOout_WB, instruc_2.memtoreg_WB);
 
-   wire [31:0] temp_sum3;
-   //carry_select cs_5(instruc_2.pc, 32'd4,1'b0 , temp_sum3,);
-   mux2to1 dataToReg_2(instruc_2.wr_data, instruc_2.wr_dataMem, instruc_2.pc+4, instruc_2.jLink_en_WB);
-   //mux2to1 dataToReg_2(instruc_2.wr_data, instruc_2.wr_dataMem, temp_sum3, instruc_2.jLink_en_WB); 
+   wire [31:0] pc2Plus4;
+   carry_select cs_6(instruc_2.pc, 32'd4,1'b0 , pc2Plus4,);
+   //mux2to1 dataToReg_2(instruc_2.wr_data, instruc_2.wr_dataMem, instruc_2.pc+4, instruc_2.jLink_en_WB);
+   mux2to1 dataToReg_2(instruc_2.wr_data, instruc_2.wr_dataMem, pc2Plus4, instruc_2.jLink_en_WB); 
    mux2to1 #(5)regNumber_2(instruc_2.wr_reg, instruc_2.wr_reg_WB, 5'd31, instruc_2.jLink_en_WB);
 
 
@@ -796,7 +795,10 @@ module mips_core(/*AUTOARG*/
 
    //Mux for next state PC
    mux4to1 pcMux(newpc, stallpc, instruc_1.br_target, instruc_1.rs_fwd, instruc_1.j_target, instruc_1.pcMuxSelFinal); //chooses next PC depending on jump or branch
-   carry_select cs_brTarget(instruc_1.pc_EX + 4,(instruc_1.imm_EX << 2),1'b0,instruc_1.br_target,);
+   wire [31:0] pc1EXPlus4;
+   carry_select cs_7(instruc_1.pc_EX, 32'd4,1'b0 , pc1EXPlus4,);
+   //carry_select cs_brTarget(instruc_1.pc_EX + 4,(instruc_1.imm_EX << 2),1'b0,instruc_1.br_target,);
+   carry_select cs_brTarget(pc1EXPlus4,(instruc_1.imm_EX << 2),1'b0,instruc_1.br_target,);
    //adder brtarget(instruc_1.br_target, instruc_1.pc_EX + 4, (instruc_1.imm_EX << 2), 1'b0); //get branch target
    concat conc(instruc_1.j_target, instruc_1.pc_EX, instruc_1.dcd_target_EX); //get jump target
    pcSelector choosePcMuxSel(instruc_1.pcMuxSelFinal, instruc_1.pcMuxSel_EX, instruc_1.branchTrue); //chooses PC on whether branch condition is met

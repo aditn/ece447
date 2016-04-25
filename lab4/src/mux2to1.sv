@@ -11,13 +11,7 @@ module mux2to1 #(parameter width = 32) (
       input logic [width - 1:0] in0, in1, 
       input logic sel);
     
-    always_comb begin
-      if (sel == 1'b0)
-        out = in0;
-      else if (sel == 1'b1)
-        out = in1;
-    end
-    //assign out = sel ? in1 : in0;
+    assign out = sel ? in1 : in0;
 
 endmodule
 
