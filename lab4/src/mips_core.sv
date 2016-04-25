@@ -139,7 +139,7 @@ typedef struct packed{
   logic [2:0] load_sel_MEM, brcond_MEM;
 
   logic WBen; //enable for WB stage
-  logic [31:0] HIout_WB, LOout_WB, alu__out_WB;
+  logic [31:0] pc_WB, HIout_WB, LOout_WB, alu__out_WB;
   logic [31:0] rt_data_WB;
   logic [4:0] wr_reg_WB;
   logic ctrl_we_WB, ctrl_Sys_WB, ctrl_RI_WB, regdst_WB, jLink_en_WB;
@@ -324,15 +324,15 @@ module mips_core(/*AUTOARG*/
        //$display ("br_target: %x", br_target);
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    instruc_1.pc_ID, instruc_1.inst_ID, instruc_1.dcd_op, instruc_1.dcd_rs, instruc_1.dcd_rt, instruc_1.dcd_rd, instruc_1.dcd_imm, instruc_1.dcd_funct2, ~rst_b, halted);
-       $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, mem_en: %x, load_stall: %x, IDen: %b, IDclr: %b", instruc_1.wr_regNum, instruc_1.wr_data, instruc_1.dcd_rs, instruc_1.rt_regNum, instruc_1.rs_data, instruc_1.rt_data, instruc_1.imm, instruc_1.mem_en, instruc_1.load_stall, instruc_1.IDen, IDclr);
+       $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, ctrl_we: %b, mem_en: %x, load_stall: %x, IDen: %b, IDclr: %b", instruc_1.wr_regNum, instruc_1.wr_data, instruc_1.dcd_rs, instruc_1.rt_regNum, instruc_1.rs_data, instruc_1.rt_data, instruc_1.imm, instruc_1.ctrl_we, instruc_1.mem_en, instruc_1.load_stall, instruc_1.IDen, IDclr);
        $display ("   fwd_rs_en: %b, fwd_rt_en: %b", instruc_1.fwd_rs_sel, instruc_1.fwd_rt_sel);
        $display ("   rsfwd: %x, rtfwd: %x, fwd_rs_en_EX: %b, fwd_rt_en_EX: %b", instruc_1.rs_fwd, instruc_1.rt_fwd, instruc_1.fwd_rs_sel_EX, instruc_1.fwd_rt_sel_EX);
-       $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x", instruc_1.wr_reg_EX, instruc_1.alu_in1, instruc_1.alu_in2, instruc_1.alu__out, instruc_1.ctrl_we_EX, instruc_1.mem_write_en_EX);
+       $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x ctrl_we_EX: %x, mem_EX: %x, EXen: %b", instruc_1.wr_reg_EX, instruc_1.alu_in1, instruc_1.alu_in2, instruc_1.alu__out, instruc_1.ctrl_we_EX, instruc_1.mem_write_en_EX, instruc_1.EXen);
        $display ("   branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", instruc_1.branchTrue, instruc_1.pcMuxSel, instruc_1.pcMuxSelFinal);
-       $display ("   br_target: %x, flush: %b", instruc_1.br_target, flush);
+       $display ("   br_target: %h, rs_fwd: %h, j_target: %h, flush: %b", instruc_1.br_target, instruc_1.rs_fwd, instruc_1.j_target, flush);
        $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_1.wr_reg_MEM, instruc_1.alu__out_MEM, instruc_1.ctrl_we_MEM, instruc_1.mem_write_en_MEM);
        $display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x", {mem_addr, 2'b0}, load_data, instruc_1.load_sel_EX, mem_data_out, store_data);
-       $display ("W: wr_reg_WB: %x, wr_data: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_1.wr_reg_WB, instruc_1.wr_data, instruc_1.alu__out_WB, instruc_1.ctrl_we_WB, instruc_1.mem_write_en_WB);
+       $display ("W: wr_reg: %x, wr_data: %x, alu__out_wb: %x, jLink_en_WB: %b, ctrl_we_WB: %x, mem_WB: %x", instruc_1.wr_reg, instruc_1.wr_data, instruc_1.alu__out_WB, instruc_1.jLink_en_WB, instruc_1.ctrl_we_WB, instruc_1.mem_write_en_WB);
        $display ("halt: %x, ctrl_sys_WB: %x, rt_data_WB: %x", internal_halt, instruc_1.ctrl_Sys_WB, instruc_1.rt_data_WB);
        $display ("stall: %b", instruc_2.stall);
        $display ("");
@@ -636,6 +636,7 @@ module mips_core(/*AUTOARG*/
    /**********Instruction 1********/
    assign instruc_1.WBen = 1; //WB stage never disabled
    //register MDRw_1(instruc_1.load_data_WB, instruc_1.load_data, clk, instruc_1.WBen, rst_b);
+   register pcWB_1(instruc_1.pc_WB, instruc_1.pc_MEM, clk, instruc_1.WBen, rst_b);
    register Aoutw_1(instruc_1.alu__out_WB, instruc_1.alu__out_MEM, clk, instruc_1.WBen, rst_b);
    register HIwb_1(instruc_1.HIout_WB, instruc_1.hi_out, clk, instruc_1.WBen, rst_b); //holds HI val in WB register (may need to have its own en)
    register LOwb_1(instruc_1.LOout_WB, instruc_1.lo_out, clk, instruc_1.WBen, rst_b); //holds LO val in WB register (may need to have its own en)
@@ -793,6 +794,8 @@ module mips_core(/*AUTOARG*/
 
 /*****************************************************************************/
 
+   wire flush;
+
    //Mux for next state PC
    mux4to1 pcMux(newpc, stallpc, instruc_1.br_target, instruc_1.rs_fwd, instruc_1.j_target, instruc_1.pcMuxSelFinal); //chooses next PC depending on jump or branch
    wire [31:0] pc1EXPlus4;
@@ -801,9 +804,9 @@ module mips_core(/*AUTOARG*/
    carry_select cs_brTarget(pc1EXPlus4,(instruc_1.imm_EX << 2),1'b0,instruc_1.br_target,);
    //adder brtarget(instruc_1.br_target, instruc_1.pc_EX + 4, (instruc_1.imm_EX << 2), 1'b0); //get branch target
    concat conc(instruc_1.j_target, instruc_1.pc_EX, instruc_1.dcd_target_EX); //get jump target
-   pcSelector choosePcMuxSel(instruc_1.pcMuxSelFinal, instruc_1.pcMuxSel_EX, instruc_1.branchTrue); //chooses PC on whether branch condition is met
+   pcSelector choosePcMuxSel(instruc_1.pcMuxSelFinal, instruc_1.pcMuxSel_EX, instruc_1.branchTrue, flush); //chooses PC on whether branch condition is met
 
-   wire flush, CDFlushen, mispredict, EXenFlush_1, EXenFlush_2, MEMenFlush_2;
+   wire CDFlushen, mispredict, EXenFlush_1, EXenFlush_2, MEMenFlush_2;
    wire [2:0] CDFlushAmt; 
    flushMod fMod(instruc_1.pcMuxSelFinal, instruc_1.pcMuxSel_EX,
                  instruc_1.pc_ID, instruc_1.pc_EX, instruc_1.br_target, instruc_1.rs_fwd, instruc_1.j_target,
@@ -957,12 +960,12 @@ endmodule // adder
 module pcSelector #(parameter width = 2) (
       output logic [width - 1:0] pcMuxSelFinal,
       input logic [width - 1:0] pcMuxSel,
-      input logic branchTrue);
+      input logic branchTrue, EXen_1);
 
     always_comb
       begin
         pcMuxSelFinal=2'b00;
-        if (branchTrue == 1'b0 && pcMuxSel == 2'b01)
+        if ((branchTrue == 1'b0 && pcMuxSel == 2'b01) || EXen_1==1'b1)
           pcMuxSelFinal = 2'b00;
         else
           pcMuxSelFinal = pcMuxSel;
