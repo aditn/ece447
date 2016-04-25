@@ -20,7 +20,7 @@ module stallDetector(
   input logic [31:0] pc_ID_2, pc_EX_2, rt_data_MEM_2,
   input logic [4:0] wr_reg_2, wr_reg_EX_2, wr_reg_MEM_2, dcd_rt_2, dcd_rs_2,
   input logic [3:0] mem_en_2,
-  input logic ctrl_we_2, ctrl_we_EX_2, regdst_2, ctrl_Sys_MEM_2,
+  input logic ctrl_we_2, ctrl_we_EX_2, regdst_2, ctrl_Sys_MEM_2, EXenFlush_2,
   input logic stall_1, stall_2, load_stall_1, load_stall_EX_1, load_stall_2, load_stall_EX_2,
   input logic [1:0] store_sel_1, store_sel_2, pcMuxSel_2,
   output logic IFen_1, IDen_1, EXen_1, MEMen_1, IFen_2, IDen_2, EXen_2, MEMen_2, WBen_2, IDclr, IDswap, CDen,
@@ -119,7 +119,7 @@ module stallDetector(
           EXen_2 = 1'b0;
           //swap condition
         end
-        if(pcMuxSel_2!=2'b00) begin
+        if(pcMuxSel_2!=2'b00 && EXenFlush_2==1'b1) begin
           IDswap = 1'b1;
           EXen_2 = 1'b0;
         end

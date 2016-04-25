@@ -144,11 +144,11 @@ module makeNegative (neg, valIn);
   output [31:0] neg;
 
   wire [31:0] temp;
-  always_comb begin
+  /*always_comb begin
     $display("valIn:%x,%d,%b",valIn,valIn,valIn);
     $display("temp:%x,%d,%b",temp,temp,temp);
     $display("neg:%x,%d,%b",neg,neg,neg);
-  end
+  end*/
   assign temp = ~valIn;
   carry_select csNEG(32'd1,temp,1'b0, neg,);
 
