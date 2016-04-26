@@ -345,7 +345,7 @@ module mips_core(/*AUTOARG*/
        $display ("E: wr_reg_EX: %x, alu_in1: %x, alu_in2: %x, alu__out: %x, ctrl_we_EX: %x, mem_EX: %x, EXen: %x", instruc_2.wr_reg_EX, instruc_2.alu_in1, instruc_2.alu_in2, instruc_2.alu__out, instruc_2.ctrl_we_EX, instruc_2.mem_write_en_EX, instruc_2.EXen);
        $display ("M: wr_reg_MEM: %x, alu__outMEM: %x, ctrl_we_MEM: %x, mem_MEM: %x", instruc_2.wr_reg_MEM, instruc_2.alu__out_MEM, instruc_2.ctrl_we_MEM, instruc_2.mem_write_en_MEM);
        $display ("   mem_addr: %x, load_data: %x, load_sel: %x, mem_data_out: %x, store_data: %x, rt_data_MEM: %x", {mem_addr, 2'b0}, load_data, instruc_2.load_sel_EX, mem_data_out, store_data, instruc_2.rt_data_MEM);
-       $display ("W: wr_reg_WB: %x, alu__out_wb: %x, ctrl_we_WB: %x, mem_WB: %x", instruc_2.wr_reg_WB, instruc_2.alu__out_WB, instruc_2.ctrl_we_WB, instruc_2.mem_write_en_WB);
+       $display ("W: wr_reg: %x, wr_data: %x, alu__out_wb: %x, ctrl_we_WB: %x, memtoreg_WB: %x", instruc_2.wr_reg, instruc_2.wr_data, instruc_2.alu__out_WB, instruc_2.ctrl_we_WB, instruc_2.memtoreg_WB);
              $display ("halt: %x, ctrl_sys_WB: %x, rt_data_WB: %x", internal_halt, instruc_2.ctrl_Sys_WB, instruc_2.rt_data_WB);
        $display ("");
        $display ("");
@@ -478,7 +478,7 @@ module mips_core(/*AUTOARG*/
    //mux2to1 stallMux(stallpc, instruc_1.pc, temp_sum1, IFen);
 
    //mux4to1 stallMux(stallpc, instruc_1.pc, instruc_1.pc+8, instruc_1.pc+4, instruc_1.pc+4, {IDswap, IFen});
-   mux4to1 stallMux(stallpc, instruc_1.pc, pc1Plus8, pc1Plus4, pc1Plus4, {IDswap, IFen});
+   mux4to1 stallMux(stallpc, instruc_1.pc, pc1Plus8, instruc_1.pc, pc1Plus4, {IDswap, IFen});
 
 
    //Decode (ID) stage registers and wirings

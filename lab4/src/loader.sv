@@ -38,7 +38,7 @@ module loader (
       else begin
         load_sel = `NO_LOAD;
         offset = 31'd0;
-      end
+      end  
     end
 
     assign data = (mem_data >> ((offset & 32'h3) * 8));
