@@ -322,6 +322,7 @@ module mips_core(/*AUTOARG*/
        //$display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
        //$display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", branchTrue, pcMuxSel, pcMuxSelFinal);
        //$display ("br_target: %x", br_target);
+       $display ("F: pc: %x", instruc_1.pc);
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    instruc_1.pc_ID, instruc_1.inst_ID, instruc_1.dcd_op, instruc_1.dcd_rs, instruc_1.dcd_rt, instruc_1.dcd_rd, instruc_1.dcd_imm, instruc_1.dcd_funct2, ~rst_b, halted);
        $display ("D: wr_reg: %x, wr_data: %x, reg1: %x, reg2: %x, rs_data: %x, rt_data: %x, imm: %x, ctrl_we: %b, mem_en: %x, load_stall: %x, IDen: %b, IDclr: %b", instruc_1.wr_regNum, instruc_1.wr_data, instruc_1.dcd_rs, instruc_1.rt_regNum, instruc_1.rs_data, instruc_1.rt_data, instruc_1.imm, instruc_1.ctrl_we, instruc_1.mem_en, instruc_1.load_stall, instruc_1.IDen, IDclr);
@@ -469,9 +470,10 @@ module mips_core(/*AUTOARG*/
    wire IDswap;
    //wire [31:0] stallpc; //either PC or PC+4 depending on stall conditions
 
-   wire [31:0] pc1Plus8,pc1Plus4;
+   wire [31:0] pc1Plus8, pc1Plus4, pc_WBPlus4;
    carry_select cs_3(instruc_1.pc, 32'd8, 1'b0,pc1Plus8, );
    carry_select cs_4(instruc_1.pc, 32'd4, 1'b0, pc1Plus4, );
+   carry_select EXPCplus4(instruc_1.pc_WB, 32'd4, 1'b0, pc_WBPlus4, );
    //mux2to1 stallMux(stallpc, instruc_1.pc, instruc_1.pc+8, IFen);
    //mux2to1 stallMux(stallpc, instruc_1.pc, temp_sum1, IFen);
 
@@ -694,7 +696,7 @@ module mips_core(/*AUTOARG*/
     /*******************************/
 
    //check for RAW hazard and Stall
-   wire CDen, EXenStall_1, EXenStall_2, MEMenStall_2;
+   wire CDen, EXenStall_1, EXenStall_2, MEMenStall_2, EXenFlush_2;
    wire [2:0] CDAmt;
    stallDetector sD(instruc_1.pc_ID, instruc_1.pc_EX, instruc_1.rt_data_MEM,
                     instruc_1.wr_regNum, instruc_1.wr_reg_EX, instruc_1.wr_reg_MEM, instruc_1.rt_regNum, instruc_1.dcd_rs,
@@ -703,7 +705,7 @@ module mips_core(/*AUTOARG*/
                     instruc_2.pc_ID, instruc_2.pc_EX, instruc_2.rt_data_MEM,
                     instruc_2.wr_regNum, instruc_2.wr_reg_EX, instruc_2.wr_reg_MEM, instruc_2.rt_regNum, instruc_2.dcd_rs,
                     instruc_2.mem_en,
-                    instruc_2.ctrl_we, instruc_2.ctrl_we_EX, instruc_2.regdst, instruc_2.ctrl_Sys_MEM,
+                    instruc_2.ctrl_we, instruc_2.ctrl_we_EX, instruc_2.regdst, instruc_2.ctrl_Sys_MEM, EXenFlush_2,
                     1'b0, instruc_2.stall, instruc_1.load_stall, instruc_1.load_stall_EX, instruc_2.load_stall, instruc_2.load_stall_EX,
                     instruc_1.store_sel, instruc_2.store_sel, instruc_2.pcMuxSel,
                     IFen, instruc_1.IDen, EXenStall_1, instruc_1.MEMen, , instruc_2.IDen, EXenStall_2, MEMenStall_2, instruc_2.WBen,
@@ -763,7 +765,7 @@ module mips_core(/*AUTOARG*/
 
    //Set wr_data and wr_reg when there is a jump/branch with link
    //mux2to1 dataToReg_1(instruc_1.wr_data, instruc_1.wr_dataMem, instruc_1.pc+4, instruc_1.jLink_en_WB);
-   mux2to1 dataToReg_1(instruc_1.wr_data, instruc_1.wr_dataMem, pc1Plus4, instruc_1.jLink_en_WB); 
+   mux2to1 dataToReg_1(instruc_1.wr_data, instruc_1.wr_dataMem, pc_WBPlus4, instruc_1.jLink_en_WB); 
    mux2to1 #(5)regNumber_1(instruc_1.wr_reg, instruc_1.wr_reg_WB, 5'd31, instruc_1.jLink_en_WB);
 
 
@@ -806,7 +808,7 @@ module mips_core(/*AUTOARG*/
    concat conc(instruc_1.j_target, instruc_1.pc_EX, instruc_1.dcd_target_EX); //get jump target
    pcSelector choosePcMuxSel(instruc_1.pcMuxSelFinal, instruc_1.pcMuxSel_EX, instruc_1.branchTrue, flush); //chooses PC on whether branch condition is met
 
-   wire CDFlushen, mispredict, EXenFlush_1, EXenFlush_2, MEMenFlush_2;
+   wire CDFlushen, mispredict, EXenFlush_1, MEMenFlush_2;
    wire [2:0] CDFlushAmt; 
    flushMod fMod(instruc_1.pcMuxSelFinal, instruc_1.pcMuxSel_EX,
                  instruc_1.pc_ID, instruc_1.pc_EX, instruc_1.br_target, instruc_1.rs_fwd, instruc_1.j_target,
