@@ -694,7 +694,7 @@ module mips_core(/*AUTOARG*/
     /*******************************/
 
    //check for RAW hazard and Stall
-   wire CDen, EXenStall_1, EXenStall_2, MEMenStall_2;
+   wire CDen, EXenStall_1, EXenStall_2, MEMenStall_2, EXenFlush_2;
    wire [2:0] CDAmt;
    stallDetector sD(instruc_1.pc_ID, instruc_1.pc_EX, instruc_1.rt_data_MEM,
                     instruc_1.wr_regNum, instruc_1.wr_reg_EX, instruc_1.wr_reg_MEM, instruc_1.rt_regNum, instruc_1.dcd_rs,
@@ -703,7 +703,7 @@ module mips_core(/*AUTOARG*/
                     instruc_2.pc_ID, instruc_2.pc_EX, instruc_2.rt_data_MEM,
                     instruc_2.wr_regNum, instruc_2.wr_reg_EX, instruc_2.wr_reg_MEM, instruc_2.rt_regNum, instruc_2.dcd_rs,
                     instruc_2.mem_en,
-                    instruc_2.ctrl_we, instruc_2.ctrl_we_EX, instruc_2.regdst, instruc_2.ctrl_Sys_MEM,
+                    instruc_2.ctrl_we, instruc_2.ctrl_we_EX, instruc_2.regdst, instruc_2.ctrl_Sys_MEM, EXenFlush_2,
                     1'b0, instruc_2.stall, instruc_1.load_stall, instruc_1.load_stall_EX, instruc_2.load_stall, instruc_2.load_stall_EX,
                     instruc_1.store_sel, instruc_2.store_sel, instruc_2.pcMuxSel,
                     IFen, instruc_1.IDen, EXenStall_1, instruc_1.MEMen, , instruc_2.IDen, EXenStall_2, MEMenStall_2, instruc_2.WBen,
@@ -806,7 +806,7 @@ module mips_core(/*AUTOARG*/
    concat conc(instruc_1.j_target, instruc_1.pc_EX, instruc_1.dcd_target_EX); //get jump target
    pcSelector choosePcMuxSel(instruc_1.pcMuxSelFinal, instruc_1.pcMuxSel_EX, instruc_1.branchTrue, flush); //chooses PC on whether branch condition is met
 
-   wire CDFlushen, mispredict, EXenFlush_1, EXenFlush_2, MEMenFlush_2;
+   wire CDFlushen, mispredict, EXenFlush_1, MEMenFlush_2;
    wire [2:0] CDFlushAmt; 
    flushMod fMod(instruc_1.pcMuxSelFinal, instruc_1.pcMuxSel_EX,
                  instruc_1.pc_ID, instruc_1.pc_EX, instruc_1.br_target, instruc_1.rs_fwd, instruc_1.j_target,
