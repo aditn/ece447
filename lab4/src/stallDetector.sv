@@ -96,6 +96,7 @@ module stallDetector(
           end
         end
         if((load_stall_1==1'b1 || mem_en_1!=4'b0) && (load_stall_2==1'b1 || mem_en_2!=4'b0) && (pc_ID_1>pc_ID_2)) begin
+          $display("this");
           IFen_1 = 1'b0;
           IDen_1 = 1'b0;
           EXen_1 = 1'b0;

@@ -1,0 +1,1815 @@
+[1;32m18-477 Makefile: [0mCopying Verilog into outputs/0426-161302...
+[1;32m18-477 Makefile: [0mCompiling Verilog...
+cd outputs/0426-161302/sim; ncvlog -SV -linedebug -messages -incdir src src/*.v src/carry_select.sv src/cla32.sv src/flushMod.sv src/forwardData.sv src/loader.sv src/mips_ALU.sv src/mips_core.sv src/mips_decode.sv src/mux2to1.sv src/parad32.sv src/register.sv src/setMemValues.sv src/stallDetector.sv src/storer.sv
+ncvlog: 08.20-s015: (c) Copyright 1995-2009 Cadence Design Systems, Inc.
+file: src/exception_unit.v
+	module worklib.exception_unit
+		errors: 0, warnings: 0
+file: src/mips_mem.v
+	module worklib.mips_mem
+		errors: 0, warnings: 0
+file: src/regfile.v
+	module worklib.regfile2_forward
+		errors: 0, warnings: 0
+	module worklib.btbsram
+		errors: 0, warnings: 0
+file: src/syscall_unit.v
+	module worklib.syscall_unit
+		errors: 0, warnings: 0
+file: src/testbench.v
+	module worklib.testbench
+		errors: 0, warnings: 0
+	module worklib.clock
+		errors: 0, warnings: 0
+file: src/carry_select.sv
+	module worklib.carry_select
+		errors: 0, warnings: 0
+	module worklib.mux
+		errors: 0, warnings: 0
+file: src/cla32.sv
+	module worklib.cla32
+		errors: 0, warnings: 0
+	module worklib.cla4
+		errors: 0, warnings: 0
+file: src/flushMod.sv
+	module worklib.flushMod
+		errors: 0, warnings: 0
+file: src/forwardData.sv
+	module worklib.forwardData
+		errors: 0, warnings: 0
+file: src/loader.sv
+	module worklib.loader
+		errors: 0, warnings: 0
+file: src/mips_ALU.sv
+	module worklib.mips_ALU
+		errors: 0, warnings: 0
+	module worklib.shiftRightAr
+		errors: 0, warnings: 0
+	module worklib.mux2to1L32
+		errors: 0, warnings: 0
+	module worklib.makeNegative
+		errors: 0, warnings: 0
+file: src/mips_core.sv
+	module worklib.mips_core
+		errors: 0, warnings: 0
+	module worklib.adder
+		errors: 0, warnings: 0
+	module worklib.add_const
+		errors: 0, warnings: 0
+	module worklib.pcSelector
+		errors: 0, warnings: 0
+	module worklib.concat
+		errors: 0, warnings: 0
+	module worklib.counter
+		errors: 0, warnings: 0
+file: src/mips_decode.sv
+	module worklib.mips_decode
+		errors: 0, warnings: 0
+file: src/mux2to1.sv
+	module worklib.mux2to1
+		errors: 0, warnings: 0
+	module worklib.mux4to1
+		errors: 0, warnings: 0
+	module worklib.mux5to1
+		errors: 0, warnings: 0
+file: src/parad32.sv
+	module worklib.parad32
+		errors: 0, warnings: 0
+	module worklib.parad4_full
+		errors: 0, warnings: 0
+	module worklib.parad4
+		errors: 0, warnings: 0
+	module worklib.fa
+		errors: 0, warnings: 0
+	module worklib.ha
+		errors: 0, warnings: 0
+file: src/register.sv
+	module worklib.register
+		errors: 0, warnings: 0
+	module worklib.clearRegister
+		errors: 0, warnings: 0
+	module worklib.register2Input
+		errors: 0, warnings: 0
+	module worklib.cntlRegister
+		errors: 0, warnings: 0
+	module worklib.countdownReg
+		errors: 0, warnings: 0
+file: src/setMemValues.sv
+	module worklib.setMemValues
+		errors: 0, warnings: 0
+file: src/stallDetector.sv
+	module worklib.stallDetector
+		errors: 0, warnings: 0
+file: src/storer.sv
+	module worklib.storer
+		errors: 0, warnings: 0
+[1;32m18-477 Makefile: [0mElaborating Verilog...
+cd outputs/0426-161302/sim; ncelab +access+rwc -messages worklib.testbench
+ncelab: 08.20-s015: (c) Copyright 1995-2009 Cadence Design Systems, Inc.
+	Elaborating the design hierarchy:
+		Caching library 'worklib' ....... Done
+	Building instance overlay tables: .................... Done
+	Generating native compiled code:
+		worklib.carry_select:module <0x45057200>
+			streams:   2, words:   300
+		worklib.clearRegister:module <0x7d38a602>
+			streams:   4, words:  1005
+		worklib.clock:module <0x377c85b8>
+			streams:   2, words:   699
+		worklib.cntlRegister:module <0x7324859f>
+			streams:  55, words: 15472
+		worklib.concat:module <0x4b99f450>
+			streams:   1, words:   281
+		worklib.countdownReg:module <0x655784f7>
+			streams:   5, words:  1443
+		worklib.counter:module <0x7ea404b4>
+			streams:   3, words:   748
+		worklib.exception_unit:module <0x7df707ab>
+			streams:   6, words:  5940
+		worklib.fa:module <0x4ccd944a>
+			streams:   2, words:   390
+		worklib.flushMod:module <0x43b9ecc4>
+			streams:   1, words:  2614
+		worklib.forwardData:module <0x08d2e6ba>
+			streams:   1, words:  4724
+		worklib.loader:module <0x46ed22cf>
+			streams:   3, words:  4328
+		worklib.makeNegative:module <0x3427295f>
+			streams:   3, words:   770
+		worklib.mips_ALU:module <0x6e4c3402>
+			streams:   5, words:  7700
+		worklib.mips_core:module <0x3d858457>
+			streams: 727, words: 243379
+		worklib.mips_decode:module <0x2f5a5483>
+			streams:   1, words: 21550
+		worklib.mips_mem:module <0x6801c2f9>
+			streams: 119, words: 53739
+		worklib.mux2to1:module <0x3b0ef5ef>
+			streams:   1, words:   347
+		worklib.mux2to1:module <0x3b19af1f>
+			streams:   1, words:   400
+		worklib.mux2to1:module <0x6da98d97>
+			streams:   1, words:   362
+		worklib.mux2to1L32:module <0x5d768584>
+			streams:   1, words:   302
+		worklib.mux4to1:module <0x28e72014>
+			streams:   1, words:   785
+		worklib.mux4to1:module <0x3d30551c>
+			streams:   1, words:  1124
+		worklib.mux5to1:module <0x58862cc5>
+			streams:   1, words:   936
+		worklib.mux:module <0x34b1a9fa>
+			streams:   1, words:   244
+		worklib.pcSelector:module <0x4ef062d2>
+			streams:   1, words:   671
+		worklib.regfile2_forward:module <0x6fae0d79>
+			streams:   9, words: 10292
+		worklib.register2Input:module <0x5d851061>
+			streams:   4, words:  1050
+		worklib.register:module <0x0022f257>
+			streams:   3, words:   716
+		worklib.register:module <0x2a175a2e>
+			streams:   3, words:   734
+		worklib.register:module <0x51e58131>
+			streams:   3, words:   740
+		worklib.register:module <0x5a58c433>
+			streams:   3, words:   740
+		worklib.register:module <0x5fd178a1>
+			streams:   3, words:   714
+		worklib.register:module <0x792b41a7>
+			streams:   3, words:   756
+		worklib.setMemValues:module <0x0b41b261>
+			streams:   1, words:   962
+		worklib.shiftRightAr:module <0x77e946a5>
+			streams:   6, words:  1213
+		worklib.stallDetector:module <0x041afacb>
+			streams:   1, words: 13528
+		worklib.storer:module <0x28ff36cc>
+			streams:   2, words:  4467
+		worklib.syscall_unit:module <0x7f15c105>
+			streams:   2, words:   728
+		worklib.testbench:module <0x216a05b1>
+			streams:   8, words:  1861
+	Loading native compiled code:     .................... Done
+	Building instance specific data structures.
+                     .RI(ctrl_RI),
+                               |
+ncelab: *W,CSINFI (./src/mips_core.sv,859|31): implicit wire has no fanin (testbench.core.ctrl_RI).
+	Design hierarchy summary:
+		                Instances  Unique
+		Modules:             1310      32
+		Registers:            296     111
+		Scalar wires:        2388       -
+		Expanded wires:       640      20
+		Vectored wires:       650       -
+		Named events:           2       2
+		Always blocks:         98      32
+		Initial blocks:         3       3
+		Cont. assignments:   2040      65
+		Pseudo assignments:   743     700
+		Compilation units:      1       1
+	Writing initial simulation snapshot: worklib.testbench:module
+[1;32m18-477 Makefile: [0m[1;31mElaborator log has warnings![0m
+[1;32m18-477 Makefile: [0mCopying inputs/rep.s into outputs/0426-161302...
+[1;32m18-477 Makefile: [0mAssemblying input in outputs/0426-161302...
+spim447 -notrap -vasm inputs/rep.s outputs/0426-161302/sim/mem;
+SPIM Version 6.2 of January 11, 1999
+Copyright 1990-1998 by James R. Larus (larus@cs.wisc.edu).
+All Rights Reserved.
+See the file README for a full copyright notice.
+[1;32m18-477 Makefile: [0mCopying NCSim configuration into outputs/0426-161302...
+[1;32m18-477 Makefile: [0mSimulating Verilog in outputs/0426-161302...
+cd outputs/0426-161302/sim; ncsim worklib.testbench:module -input 447ncsim.tcl -input ncsim.tcl
+ncsim: 08.20-s015: (c) Copyright 1995-2009 Cadence Design Systems, Inc.
+ncsim> database -open -shm -default waveforms
+Created default SHM database waveforms
+ncsim> probe -shm -create -depth all -all 
+Created probe 1
+ncsim> run 
+offset: 00000000
+load1
+offset: 00000000
+=== Simulation Cycle                  150 ===
+F: pc: 00400000
+[pc=00000000, inst=00000000] [op=00, rs= 0, rt= 0, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000000, reg1: 00, reg2: 00, rs_data: 00000000, rt_data: 00000000, imm: 00000000, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00000004, rs_fwd: 00000000, j_target: 00000000, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: 00000000, load_data: 00000000, load_sel: 0, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00000000, inst=00000000] [op=00, rs= 0, rt= 0, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000000, reg1: 00, reg2: 00, rs_data: 00000000, rt_data: 00000000, imm: 00000000, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000, ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: 00000000, load_data: 00000000, load_sel: 0, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+=== Simulation Cycle                  250 ===
+F: pc: 00400008
+[pc=00400000, inst=3c021000] [op=0f, rs= 0, rt= 2, rd= 2, imm=1000, f2=00] [reset=0, halted=0]
+D: wr_reg: 02, wr_data: 00000000, reg1: 00, reg2: 02, rs_data: 00000000, rt_data: 00000000, imm: 00001000, ctrl_we: 1, mem_en: 0, load_stall: 1, IDen: 0, IDswap: 0, IDclr: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00000004, rs_fwd: 00000000, j_target: 00000000, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: 00000000, load_data: 00000000, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400004, inst=3c035040] [op=0f, rs= 0, rt= 3, rd=10, imm=5040, f2=00] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 00000000, reg1: 00, reg2: 03, rs_data: 00000000, rt_data: 00000000, imm: 00005040, mem_en: 0, load_stall: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000, ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: 00000000, load_data: 00000000, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+offset: 00000000
+=== Simulation Cycle                  350 ===
+F: pc: 00400008
+[pc=00400000, inst=00000000] [op=00, rs= 0, rt= 0, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000000, reg1: 00, reg2: 00, rs_data: 00000000, rt_data: 00000000, imm: 00000000, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00404004, rs_fwd: 00000000, j_target: 00084000, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 0, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400004, inst=3c035040] [op=0f, rs= 0, rt= 3, rd=10, imm=5040, f2=00] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 00000000, reg1: 00, reg2: 03, rs_data: 00000000, rt_data: 00000000, imm: 00005040, mem_en: 0, load_stall: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000, ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+load1
+offset: 00000000
+=== Simulation Cycle                  450 ===
+F: pc: 00400010
+[pc=00400008, inst=34633020] [op=0d, rs= 3, rt= 3, rd= 6, imm=3020, f2=20] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 00000000, reg1: 03, reg2: 03, rs_data: 00000000, rt_data: 00000000, imm: 00003020, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 0, IDswap: 0, IDclr: 1
+   fwd_rs_en: 001, fwd_rt_en: 001
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00400004, rs_fwd: 00000000, j_target: 00000000, flush: 0
+M: wr_reg_MEM: 02, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: 00000000, load_data: 10000000, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=0040000c, inst=24040001] [op=09, rs= 0, rt= 4, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 00000000, reg1: 00, reg2: 04, rs_data: 00000000, rt_data: 00000000, imm: 00000001, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 03, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000, ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: 00000000, load_data: 10000000, load_sel: 0, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, ctrl_we_WB: 1, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+load2
+offset: 00000000
+=== Simulation Cycle                  550 ===
+F: pc: 00400010
+[pc=00400008, inst=34633020] [op=0d, rs= 3, rt= 3, rd= 6, imm=3020, f2=20] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 10000000, reg1: 03, reg2: 03, rs_data: 00000000, rt_data: 00000000, imm: 00003020, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 011, fwd_rt_en: 011
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00400004, rs_fwd: 00000000, j_target: 00000000, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: 00000000, load_data: 50400000, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 02, wr_data: 10000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=0040000c, inst=24040001] [op=09, rs= 0, rt= 4, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 10000000, reg1: 00, reg2: 04, rs_data: 00000000, rt_data: 00000000, imm: 00000001, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 03, alu_in1: 00000000, alu_in2: 00005040, alu__out: 00005040, ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 03, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: 00000000, load_data: 50400000, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 00, wr_data: 10000000, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 1
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+offset: 00000000
+=== Simulation Cycle                  650 ===
+F: pc: 00400018
+[pc=00400010, inst=ac430000] [op=2b, rs= 2, rt= 3, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000000, reg1: 02, reg2: 03, rs_data: 10000000, rt_data: 50400000, imm: 00000000, ctrl_we: 0, mem_en: f, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 010
+   rsfwd: 50400000, rtfwd: 50400000, fwd_rs_en_EX: 011, fwd_rt_en_EX: 011
+E: wr_reg_EX: 03, alu_in1: 50400000, alu_in2: 00003020, alu__out: 50403020 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 0040c08c, rs_fwd: 50400000, j_target: 018cc080, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400014, inst=24420004] [op=09, rs= 2, rt= 2, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+D: wr_reg: 02, wr_data: 50400000, reg1: 02, reg2: 02, rs_data: 10000000, rt_data: 10000000, imm: 00000004, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 04, alu_in1: 00000000, alu_in2: 00000001, alu__out: 00000001, ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 03, alu__outMEM: 00005040, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 03, wr_data: 50400000, alu__out_wb: 00000000, ctrl_we_WB: 1, memtoreg_WB: 1
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+offset: 00000000
+=== Simulation Cycle                  750 ===
+F: pc: 00400020
+[pc=00400018, inst=2484ffff] [op=09, rs= 4, rt= 4, rd=31, imm=ffff, f2=3f] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 00000000, reg1: 04, reg2: 04, rs_data: 00000000, rt_data: 00000000, imm: ffffffff, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 1, IDclr: 1
+   fwd_rs_en: 011, fwd_rt_en: 011
+   rsfwd: 10000000, rtfwd: 50403020, fwd_rs_en_EX: 000, fwd_rt_en_EX: 010
+E: wr_reg_EX: 00, alu_in1: 10000000, alu_in2: 00000000, alu__out: 10000000 ctrl_we_EX: 0, mem_EX: f, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00400014, rs_fwd: 10000000, j_target: 010c0000, flush: 0
+M: wr_reg_MEM: 03, alu__outMEM: 50403020, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=0040001c, inst=1480fffc] [op=05, rs= 4, rt= 0, rd=31, imm=fffc, f2=3c] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00005040, reg1: 04, reg2: 00, rs_data: 00000000, rt_data: 00000000, imm: fffffffc, mem_en: 0, load_stall: 0
+   fwd_rs_en: 011, fwd_rt_en: 000
+   rsfwd: 10000000, rtfwd: 10000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 02, alu_in1: 10000000, alu_in2: 00000004, alu__out: 10000004, ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 04, alu__outMEM: 00000001, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 03, wr_data: 00005040, alu__out_wb: 00005040, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+offset: 00000000
+=== Simulation Cycle                  850 ===
+F: pc: 00400024
+[pc=0040001c, inst=1480fffc] [op=05, rs= 4, rt= 0, rd=31, imm=fffc, f2=3c] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 50403020, reg1: 04, reg2: 00, rs_data: 00000001, rt_data: 00000000, imm: fffffffc, ctrl_we: 0, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 010, fwd_rt_en: 000
+   rsfwd: 00000001, rtfwd: 00000001, fwd_rs_en_EX: 011, fwd_rt_en_EX: 011
+E: wr_reg_EX: 04, alu_in1: 00000001, alu_in2: ffffffff, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 01, pcMuxSelFinal: 00
+   br_target: 00400018, rs_fwd: 00000001, j_target: 0213fffc, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 10000000, ctrl_we_MEM: 0, mem_MEM: f
+   mem_addr: 10000000, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: 50403020
+W: wr_reg: 03, wr_data: 50403020, alu__out_wb: 50403020, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 50400000
+stall: 0
+
+[pc=00400020, inst=24020004] [op=09, rs= 0, rt= 2, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+D: wr_reg: 02, wr_data: 00000001, reg1: 00, reg2: 02, rs_data: 00000000, rt_data: 10000000, imm: 00000004, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 011
+   rsfwd: 10000000, rtfwd: 10000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 02, alu_in1: 10000000, alu_in2: 10000000, alu__out: 00000000, ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 02, alu__outMEM: 10000004, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: 10000000, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: 50403020, rt_data_MEM: 10000000
+W: wr_reg: 04, wr_data: 00000001, alu__out_wb: 00000001, ctrl_we_WB: 1, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+offset: 00000000
+=== Simulation Cycle                  950 ===
+F: pc: 0040002c
+[pc=00400024, inst=3c031000] [op=0f, rs= 0, rt= 3, rd= 2, imm=1000, f2=00] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 10000000, reg1: 00, reg2: 03, rs_data: 00000000, rt_data: 50403020, imm: 00001000, ctrl_we: 1, mem_en: 0, load_stall: 1, IDen: 1, IDswap: 1, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 010, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00400010, rs_fwd: 00000000, j_target: 0203fff0, flush: 0
+M: wr_reg_MEM: 04, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: 10000000, alu__out_wb: 10000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: f
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 50403020
+stall: 0
+
+[pc=00400028, inst=34640004] [op=0d, rs= 3, rt= 4, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 10000004, reg1: 03, reg2: 04, rs_data: 50403020, rt_data: 00000001, imm: 00000004, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 100
+   rsfwd: 00000000, rtfwd: 10000004, fwd_rs_en_EX: 000, fwd_rt_en_EX: 011
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000004, alu__out: 00000004, ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 02, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 10000000
+W: wr_reg: 02, wr_data: 10000004, alu__out_wb: 10000004, ctrl_we_WB: 1, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000000
+
+
+offset: 00000000
+=== Simulation Cycle                 1050 ===
+F: pc: 00400030
+[pc=00400028, inst=34640004] [op=0d, rs= 3, rt= 4, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 00000000, reg1: 03, reg2: 04, rs_data: 50403020, rt_data: 00000000, imm: 00000004, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 0, IDswap: 0, IDclr: 1
+   fwd_rs_en: 010, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 50403020, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 03, alu_in1: 00000000, alu_in2: 50403020, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00404028, rs_fwd: 00000000, j_target: 000c4000, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 0, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 04, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000001
+stall: 0
+
+[pc=0040002c, inst=80650000] [op=20, rs= 3, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 05, wr_data: 00000000, reg1: 03, reg2: 05, rs_data: 50403020, rt_data: 00000000, imm: 00000000, mem_en: 0, load_stall: 1
+   fwd_rs_en: 010, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 011
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000004, alu__out: 00000004, ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 02, alu__outMEM: 00000004, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 10000004
+W: wr_reg: 02, wr_data: 00000000, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000000
+
+
+load1
+offset: 00000000
+=== Simulation Cycle                 1150 ===
+F: pc: 00400030
+[pc=00400028, inst=34640004] [op=0d, rs= 3, rt= 4, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 00000000, reg1: 03, reg2: 04, rs_data: 50403020, rt_data: 00000000, imm: 00000004, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 100, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 50403020, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 03, alu_in1: 00000000, alu_in2: 00001000, alu__out: 00001000 ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00404028, rs_fwd: 00000000, j_target: 000c4000, flush: 0
+M: wr_reg_MEM: 03, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: 00000000, load_data: 10000000, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=0040002c, inst=80650000] [op=20, rs= 3, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 05, wr_data: 00000004, reg1: 03, reg2: 05, rs_data: 50403020, rt_data: 00000000, imm: 00000000, mem_en: 0, load_stall: 1
+   fwd_rs_en: 100, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000004, fwd_rs_en_EX: 000, fwd_rt_en_EX: 011
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000004, alu__out: 00000004, ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 02, alu__outMEM: 00000004, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: 00000000, load_data: 10000000, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 02, wr_data: 00000004, alu__out_wb: 00000004, ctrl_we_WB: 1, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000004
+
+
+offset: 00000000
+=== Simulation Cycle                 1250 ===
+F: pc: 00400038
+[pc=00400030, inst=a0850000] [op=28, rs= 4, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 10000000, reg1: 04, reg2: 05, rs_data: 00000000, rt_data: 00000000, imm: 00000000, ctrl_we: 0, mem_en: 8, load_stall: 0, IDen: 0, IDswap: 0, IDclr: 1
+   fwd_rs_en: 010, fwd_rt_en: 001
+   rsfwd: 10000000, rtfwd: 00000000, fwd_rs_en_EX: 100, fwd_rt_en_EX: 000
+E: wr_reg_EX: 04, alu_in1: 10000000, alu_in2: 00000004, alu__out: 10000004 ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 0040003c, rs_fwd: 10000000, j_target: 01900010, flush: 0
+M: wr_reg_MEM: 03, alu__outMEM: 00001000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 03, wr_data: 10000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 50403020
+stall: 0
+
+[pc=00400034, inst=24630001] [op=09, rs= 3, rt= 3, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 00000004, reg1: 03, reg2: 03, rs_data: 10000000, rt_data: 10000000, imm: 00000001, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 10000000, rtfwd: 00000000, fwd_rs_en_EX: 100, fwd_rt_en_EX: 000
+E: wr_reg_EX: 05, alu_in1: 10000000, alu_in2: 00000000, alu__out: 10000000, ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 02, alu__outMEM: 00000004, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 1, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 00000004
+W: wr_reg: 02, wr_data: 00000004, alu__out_wb: 00000004, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+load2
+offset: 10000000
+=== Simulation Cycle                 1350 ===
+F: pc: 00400038
+[pc=00400030, inst=a0850000] [op=28, rs= 4, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00001000, reg1: 04, reg2: 05, rs_data: 00000000, rt_data: 00000000, imm: 00000000, ctrl_we: 0, mem_en: 8, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 100, fwd_rt_en: 011
+   rsfwd: 00001000, rtfwd: 00000000, fwd_rs_en_EX: 100, fwd_rt_en_EX: 000
+E: wr_reg_EX: 04, alu_in1: 00001000, alu_in2: 00000004, alu__out: 00001004 ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 0040003c, rs_fwd: 00001000, j_target: 01900010, flush: 0
+M: wr_reg_MEM: 04, alu__outMEM: 10000004, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: 10000000, load_data: 00000020, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx
+W: wr_reg: 03, wr_data: 00001000, alu__out_wb: 00001000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 50403020
+stall: 0
+
+[pc=00400034, inst=24630001] [op=09, rs= 3, rt= 3, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: xxxxxxxx, reg1: 03, reg2: 03, rs_data: 10000000, rt_data: 10000000, imm: 00000001, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00001000, rtfwd: 00000000, fwd_rs_en_EX: 100, fwd_rt_en_EX: 000
+E: wr_reg_EX: 05, alu_in1: 00001000, alu_in2: 00000000, alu__out: 00001000, ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 05, alu__outMEM: 10000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: 10000000, load_data: 00000020, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 02, wr_data: xxxxxxxx, alu__out_wb: 00000004, ctrl_we_WB: 0, memtoreg_WB: 1
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000004
+
+
+offset: 00000000
+=== Simulation Cycle                 1450 ===
+F: pc: 00400040
+[pc=00400038, inst=24840001] [op=09, rs= 4, rt= 4, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 10000004, reg1: 04, reg2: 04, rs_data: 10000004, rt_data: 10000004, imm: 00000001, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 10000004, rtfwd: 00000020, fwd_rs_en_EX: 100, fwd_rt_en_EX: 011
+E: wr_reg_EX: 00, alu_in1: 10000004, alu_in2: 00000000, alu__out: 10000004 ctrl_we_EX: 0, mem_EX: 8, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00400034, rs_fwd: 10000004, j_target: 02140000, flush: 0
+M: wr_reg_MEM: 04, alu__outMEM: 00001004, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx
+W: wr_reg: 04, wr_data: 10000004, alu__out_wb: 10000004, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=0040003c, inst=2442ffff] [op=09, rs= 2, rt= 2, rd=31, imm=ffff, f2=3f] [reset=0, halted=0]
+D: wr_reg: 02, wr_data: 00000020, reg1: 02, reg2: 02, rs_data: 00000004, rt_data: 00000004, imm: ffffffff, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 10000000, rtfwd: 10000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 03, alu_in1: 10000000, alu_in2: 00000001, alu__out: 10000001, ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 05, alu__outMEM: 00001000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 05, wr_data: 00000020, alu__out_wb: 10000000, ctrl_we_WB: 1, memtoreg_WB: 1
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+offset: 00000000
+=== Simulation Cycle                 1550 ===
+F: pc: 00400048
+[pc=00400040, inst=1440fffa] [op=05, rs= 2, rt= 0, rd=31, imm=fffa, f2=3a] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00001004, reg1: 02, reg2: 00, rs_data: 00000004, rt_data: 00000000, imm: fffffffa, ctrl_we: 0, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 001, fwd_rt_en: 000
+   rsfwd: 10000004, rtfwd: 10000004, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 04, alu_in1: 10000004, alu_in2: 00000001, alu__out: 10000005 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 01, pcMuxSelFinal: 00
+   br_target: 00400040, rs_fwd: 10000004, j_target: 02100004, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 10000004, ctrl_we_MEM: 0, mem_MEM: 8
+   mem_addr: 10000004, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: 00000020
+W: wr_reg: 04, wr_data: 00001004, alu__out_wb: 00001004, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400044, inst=24020001] [op=09, rs= 0, rt= 2, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+D: wr_reg: 02, wr_data: 00001000, reg1: 00, reg2: 02, rs_data: 00000000, rt_data: 00000004, imm: 00000001, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 001
+   rsfwd: 00000004, rtfwd: 00000004, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 02, alu_in1: 00000004, alu_in2: ffffffff, alu__out: 00000003, ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 03, alu__outMEM: 10000001, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: 10000004, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: 00000020, rt_data_MEM: 10000000
+W: wr_reg: 05, wr_data: 00001000, alu__out_wb: 00001000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+offset: 00000000
+=== Simulation Cycle                 1650 ===
+F: pc: 00400050
+[pc=00400048, inst=3c035040] [op=0f, rs= 0, rt= 3, rd=10, imm=5040, f2=00] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 10000004, reg1: 00, reg2: 03, rs_data: 00000000, rt_data: 10000001, imm: 00005040, ctrl_we: 1, mem_en: 0, load_stall: 1, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000003, rtfwd: 00000000, fwd_rs_en_EX: 001, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000003, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+   branchTrue: 1, pcMuxSel: 00, pcMuxSelFinal: 01
+   br_target: 0040002c, rs_fwd: 00000003, j_target: 0103ffe8, flush: 0
+M: wr_reg_MEM: 04, alu__outMEM: 10000005, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: 10000004, alu__out_wb: 10000004, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 8
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000020
+stall: 0
+
+[pc=0040004c, inst=34633020] [op=0d, rs= 3, rt= 3, rd= 6, imm=3020, f2=20] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 10000001, reg1: 03, reg2: 03, rs_data: 10000001, rt_data: 10000001, imm: 00003020, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000003, fwd_rs_en_EX: 000, fwd_rt_en_EX: 001
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000001, alu__out: 00000001, ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 02, alu__outMEM: 00000003, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 00000004
+W: wr_reg: 03, wr_data: 10000001, alu__out_wb: 10000001, ctrl_we_WB: 1, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000000
+
+
+offset: 00000000
+=== Simulation Cycle                 1750 ===
+F: pc: 0040002c
+[pc=00400050, inst=3c041000] [op=0f, rs= 0, rt= 4, rd= 2, imm=1000, f2=00] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 10000005, reg1: 00, reg2: 04, rs_data: 00000000, rt_data: 10000005, imm: 00001000, ctrl_we: 1, mem_en: 0, load_stall: 1, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000003, rtfwd: 00000000, fwd_rs_en_EX: 001, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000003, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 0040002c, rs_fwd: 00000003, j_target: 0103ffe8, flush: 1
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 04, wr_data: 10000005, alu__out_wb: 10000005, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000004
+stall: 0
+
+[pc=00400054, inst=34840004] [op=0d, rs= 4, rt= 4, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 00000003, reg1: 04, reg2: 04, rs_data: 10000005, rt_data: 10000005, imm: 00000004, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000003, fwd_rs_en_EX: 000, fwd_rt_en_EX: 001
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000001, alu__out: 00000001, ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 02, alu__outMEM: 00000003, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 00000004
+W: wr_reg: 02, wr_data: 00000003, alu__out_wb: 00000003, ctrl_we_WB: 1, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000004
+
+
+=== Simulation Cycle                 1850 ===
+F: pc: 00400034
+[pc=0040002c, inst=80650000] [op=20, rs= 3, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 05, wr_data: 00000000, reg1: 03, reg2: 05, rs_data: 10000001, rt_data: 00000020, imm: 00000000, ctrl_we: 1, mem_en: 0, load_stall: 1, IDen: 0, IDswap: 1, IDclr: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000003, rtfwd: 00000000, fwd_rs_en_EX: 001, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000003, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 0040002c, rs_fwd: 00000003, j_target: 0103ffe8, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400030, inst=a0850000] [op=28, rs= 4, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000003, reg1: 04, reg2: 05, rs_data: 10000005, rt_data: 00000020, imm: 00000000, mem_en: 8, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000003, fwd_rs_en_EX: 000, fwd_rt_en_EX: 001
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000001, alu__out: 00000001, ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 02, alu__outMEM: 00000003, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 00000004
+W: wr_reg: 02, wr_data: 00000003, alu__out_wb: 00000003, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000004
+
+
+offset: 00000000
+=== Simulation Cycle                 1950 ===
+F: pc: 00400034
+[pc=0040002c, inst=00000000] [op=00, rs= 0, rt= 0, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: xxxxxxxx, reg1: 00, reg2: 00, rs_data: 00000000, rt_data: 00000000, imm: 00000000, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 0, IDswap: 0, IDclr: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 10000001, rtfwd: 00000020, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 05, alu_in1: 10000001, alu_in2: 00000000, alu__out: 10000001 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00400030, rs_fwd: 10000001, j_target: 01940000, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 1, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: xxxxxxxx, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400030, inst=a0850000] [op=28, rs= 4, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000003, reg1: 04, reg2: 05, rs_data: 10000005, rt_data: 00000020, imm: 00000000, mem_en: 8, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 010
+   rsfwd: 00000000, rtfwd: 00000001, fwd_rs_en_EX: 000, fwd_rt_en_EX: 001
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000001, alu__out: 00000001, ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 02, alu__outMEM: 00000001, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 00000003
+W: wr_reg: 02, wr_data: 00000003, alu__out_wb: 00000003, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000004
+
+
+load1
+offset: 10000001
+=== Simulation Cycle                 2050 ===
+F: pc: 00400034
+[pc=0040002c, inst=00000000] [op=00, rs= 0, rt= 0, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: xxxxxxxx, reg1: 00, reg2: 00, rs_data: 00000000, rt_data: 00000000, imm: 00000000, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00400030, rs_fwd: 00000000, j_target: 00000000, flush: 0
+M: wr_reg_MEM: 05, alu__outMEM: 10000001, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: 10000000, load_data: 00000030, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: xxxxxxxx, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400030, inst=a0850000] [op=28, rs= 4, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000001, reg1: 04, reg2: 05, rs_data: 10000005, rt_data: 00000020, imm: 00000000, mem_en: 8, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 100
+   rsfwd: 00000000, rtfwd: 00000001, fwd_rs_en_EX: 000, fwd_rt_en_EX: 001
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000001, alu__out: 00000001, ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 02, alu__outMEM: 00000001, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: 10000000, load_data: 00000030, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx, rt_data_MEM: 00000001
+W: wr_reg: 02, wr_data: 00000001, alu__out_wb: 00000001, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000003
+
+
+offset: 00000000
+=== Simulation Cycle                 2150 ===
+F: pc: 0040003c
+[pc=00400034, inst=24630001] [op=09, rs= 3, rt= 3, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 00000030, reg1: 03, reg2: 03, rs_data: 10000001, rt_data: 10000001, imm: 00000001, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00400030, rs_fwd: 00000000, j_target: 00000000, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx
+W: wr_reg: 05, wr_data: 00000030, alu__out_wb: 10000001, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000020
+stall: 0
+
+[pc=00400038, inst=24840001] [op=09, rs= 4, rt= 4, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 00000001, reg1: 04, reg2: 04, rs_data: 10000005, rt_data: 10000005, imm: 00000001, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 10000005, rtfwd: 00000030, fwd_rs_en_EX: 000, fwd_rt_en_EX: 100
+E: wr_reg_EX: 00, alu_in1: 10000005, alu_in2: 00000000, alu__out: 10000005, ctrl_we_EX: 0, mem_EX: 8, EXen: 1
+M: wr_reg_MEM: 02, alu__outMEM: 00000001, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx, rt_data_MEM: 00000001
+W: wr_reg: 02, wr_data: 00000001, alu__out_wb: 00000001, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000001
+
+
+offset: 00000000
+=== Simulation Cycle                 2250 ===
+F: pc: 00400044
+[pc=0040003c, inst=2442ffff] [op=09, rs= 2, rt= 2, rd=31, imm=ffff, f2=3f] [reset=0, halted=0]
+D: wr_reg: 02, wr_data: 00000000, reg1: 02, reg2: 02, rs_data: 00000003, rt_data: 00000003, imm: ffffffff, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 1, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 10000001, rtfwd: 10000001, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 03, alu_in1: 10000001, alu_in2: 00000001, alu__out: 10000002 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 0040003c, rs_fwd: 10000001, j_target: 018c0004, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: 10000004, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: 00003000
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400040, inst=1440fffa] [op=05, rs= 2, rt= 0, rd=31, imm=fffa, f2=3a] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000001, reg1: 02, reg2: 00, rs_data: 00000003, rt_data: 00000000, imm: fffffffa, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 10000005, rtfwd: 10000005, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 04, alu_in1: 10000005, alu_in2: 00000001, alu__out: 10000006, ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 00, alu__outMEM: 10000005, ctrl_we_MEM: 0, mem_MEM: 8
+   mem_addr: 10000004, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: 00003000, rt_data_MEM: 00000030
+W: wr_reg: 02, wr_data: 00000001, alu__out_wb: 00000001, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000001
+
+
+offset: 00000000
+=== Simulation Cycle                 2350 ===
+F: pc: 00400048
+[pc=00400040, inst=1440fffa] [op=05, rs= 2, rt= 0, rd=31, imm=fffa, f2=3a] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000000, reg1: 02, reg2: 00, rs_data: 00000003, rt_data: 00000000, imm: fffffffa, ctrl_we: 0, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 010, fwd_rt_en: 000
+   rsfwd: 00000003, rtfwd: 00000003, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 02, alu_in1: 00000003, alu_in2: ffffffff, alu__out: 00000002 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 01, pcMuxSelFinal: 00
+   br_target: 0040003c, rs_fwd: 00000003, j_target: 010bfffc, flush: 0
+M: wr_reg_MEM: 03, alu__outMEM: 10000002, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400044, inst=24020001] [op=09, rs= 0, rt= 2, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+D: wr_reg: 02, wr_data: 10000005, reg1: 00, reg2: 02, rs_data: 00000000, rt_data: 00000003, imm: 00000001, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 010
+   rsfwd: 10000005, rtfwd: 10000005, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 04, alu_in1: 10000005, alu_in2: 10000005, alu__out: 00000000, ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 04, alu__outMEM: 10000006, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 10000005
+W: wr_reg: 00, wr_data: 10000005, alu__out_wb: 10000005, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000030
+
+
+offset: 00000000
+=== Simulation Cycle                 2450 ===
+F: pc: 00400050
+[pc=00400048, inst=3c035040] [op=0f, rs= 0, rt= 3, rd=10, imm=5040, f2=00] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 10000002, reg1: 00, reg2: 03, rs_data: 00000000, rt_data: 10000002, imm: 00005040, ctrl_we: 1, mem_en: 0, load_stall: 1, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000002, rtfwd: 00000000, fwd_rs_en_EX: 010, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000002, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+   branchTrue: 1, pcMuxSel: 00, pcMuxSelFinal: 01
+   br_target: 0040002c, rs_fwd: 00000002, j_target: 0103ffe8, flush: 0
+M: wr_reg_MEM: 02, alu__outMEM: 00000002, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 03, wr_data: 10000002, alu__out_wb: 10000002, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000001
+stall: 0
+
+[pc=0040004c, inst=34633020] [op=0d, rs= 3, rt= 3, rd= 6, imm=3020, f2=20] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 10000006, reg1: 03, reg2: 03, rs_data: 10000002, rt_data: 10000002, imm: 00003020, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000002, fwd_rs_en_EX: 000, fwd_rt_en_EX: 010
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000001, alu__out: 00000001, ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 04, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 10000005
+W: wr_reg: 04, wr_data: 10000006, alu__out_wb: 10000006, ctrl_we_WB: 1, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000005
+
+
+offset: 00000000
+=== Simulation Cycle                 2550 ===
+F: pc: 0040002c
+[pc=00400050, inst=3c041000] [op=0f, rs= 0, rt= 4, rd= 2, imm=1000, f2=00] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 00000002, reg1: 00, reg2: 04, rs_data: 00000000, rt_data: 10000006, imm: 00001000, ctrl_we: 1, mem_en: 0, load_stall: 1, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 010, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 0040002c, rs_fwd: 00000000, j_target: 0103ffe8, flush: 1
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 02, wr_data: 00000002, alu__out_wb: 00000002, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000003
+stall: 0
+
+[pc=00400054, inst=34840004] [op=0d, rs= 4, rt= 4, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 00000000, reg1: 04, reg2: 04, rs_data: 10000006, rt_data: 10000006, imm: 00000004, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 010
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000001, alu__out: 00000001, ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 04, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 10000005
+W: wr_reg: 04, wr_data: 00000000, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000005
+
+
+=== Simulation Cycle                 2650 ===
+F: pc: 00400034
+[pc=0040002c, inst=80650000] [op=20, rs= 3, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 05, wr_data: 00000000, reg1: 03, reg2: 05, rs_data: 10000002, rt_data: 00000030, imm: 00000000, ctrl_we: 1, mem_en: 0, load_stall: 1, IDen: 0, IDswap: 1, IDclr: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 010, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 0040002c, rs_fwd: 00000000, j_target: 0103ffe8, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400030, inst=a0850000] [op=28, rs= 4, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000000, reg1: 04, reg2: 05, rs_data: 10000006, rt_data: 00000030, imm: 00000000, mem_en: 8, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 010
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000001, alu__out: 00000001, ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 04, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 10000005
+W: wr_reg: 04, wr_data: 00000000, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000005
+
+
+offset: 00000000
+=== Simulation Cycle                 2750 ===
+F: pc: 00400034
+[pc=0040002c, inst=00000000] [op=00, rs= 0, rt= 0, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: xxxxxxxx, reg1: 00, reg2: 00, rs_data: 00000000, rt_data: 00000000, imm: 00000000, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 0, IDswap: 0, IDclr: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 10000002, rtfwd: 00000030, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 05, alu_in1: 10000002, alu_in2: 00000000, alu__out: 10000002 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00400030, rs_fwd: 10000002, j_target: 01940000, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 1, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: xxxxxxxx, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400030, inst=a0850000] [op=28, rs= 4, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000000, reg1: 04, reg2: 05, rs_data: 10000006, rt_data: 00000030, imm: 00000000, mem_en: 8, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 010
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 010
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000001, alu__out: 00000001, ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 02, alu__outMEM: 00000001, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 04, wr_data: 00000000, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000005
+
+
+load1
+offset: 10000002
+=== Simulation Cycle                 2850 ===
+F: pc: 00400034
+[pc=0040002c, inst=00000000] [op=00, rs= 0, rt= 0, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: xxxxxxxx, reg1: 00, reg2: 00, rs_data: 00000000, rt_data: 00000000, imm: 00000000, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00400030, rs_fwd: 00000000, j_target: 00000000, flush: 0
+M: wr_reg_MEM: 05, alu__outMEM: 10000002, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: 10000000, load_data: 00000040, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: xxxxxxxx, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400030, inst=a0850000] [op=28, rs= 4, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000001, reg1: 04, reg2: 05, rs_data: 10000006, rt_data: 00000030, imm: 00000000, mem_en: 8, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 100
+   rsfwd: 00000000, rtfwd: 10000002, fwd_rs_en_EX: 000, fwd_rt_en_EX: 010
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000001, alu__out: 00000001, ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 02, alu__outMEM: 00000001, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: 10000000, load_data: 00000040, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 02, wr_data: 00000001, alu__out_wb: 00000001, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+offset: 00000000
+=== Simulation Cycle                 2950 ===
+F: pc: 0040003c
+[pc=00400034, inst=24630001] [op=09, rs= 3, rt= 3, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 00000040, reg1: 03, reg2: 03, rs_data: 10000002, rt_data: 10000002, imm: 00000001, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00400030, rs_fwd: 00000000, j_target: 00000000, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx
+W: wr_reg: 05, wr_data: 00000040, alu__out_wb: 10000002, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000030
+stall: 0
+
+[pc=00400038, inst=24840001] [op=09, rs= 4, rt= 4, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 00000001, reg1: 04, reg2: 04, rs_data: 10000006, rt_data: 10000006, imm: 00000001, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 10000006, rtfwd: 00000040, fwd_rs_en_EX: 000, fwd_rt_en_EX: 100
+E: wr_reg_EX: 00, alu_in1: 10000006, alu_in2: 00000000, alu__out: 10000006, ctrl_we_EX: 0, mem_EX: 8, EXen: 1
+M: wr_reg_MEM: 02, alu__outMEM: 00000001, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx, rt_data_MEM: 10000002
+W: wr_reg: 02, wr_data: 00000001, alu__out_wb: 00000001, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+offset: 00000000
+=== Simulation Cycle                 3050 ===
+F: pc: 00400044
+[pc=0040003c, inst=2442ffff] [op=09, rs= 2, rt= 2, rd=31, imm=ffff, f2=3f] [reset=0, halted=0]
+D: wr_reg: 02, wr_data: 00000000, reg1: 02, reg2: 02, rs_data: 00000002, rt_data: 00000002, imm: ffffffff, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 1, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 10000002, rtfwd: 10000002, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 03, alu_in1: 10000002, alu_in2: 00000001, alu__out: 10000003 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 0040003c, rs_fwd: 10000002, j_target: 018c0004, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: 10000004, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: 00400000
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400040, inst=1440fffa] [op=05, rs= 2, rt= 0, rd=31, imm=fffa, f2=3a] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000001, reg1: 02, reg2: 00, rs_data: 00000002, rt_data: 00000000, imm: fffffffa, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 10000006, rtfwd: 10000006, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 04, alu_in1: 10000006, alu_in2: 00000001, alu__out: 10000007, ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 00, alu__outMEM: 10000006, ctrl_we_MEM: 0, mem_MEM: 8
+   mem_addr: 10000004, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: 00400000, rt_data_MEM: 00000040
+W: wr_reg: 02, wr_data: 00000001, alu__out_wb: 00000001, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000002
+
+
+offset: 00000000
+=== Simulation Cycle                 3150 ===
+F: pc: 00400048
+[pc=00400040, inst=1440fffa] [op=05, rs= 2, rt= 0, rd=31, imm=fffa, f2=3a] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000000, reg1: 02, reg2: 00, rs_data: 00000002, rt_data: 00000000, imm: fffffffa, ctrl_we: 0, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 010, fwd_rt_en: 000
+   rsfwd: 00000002, rtfwd: 00000002, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 02, alu_in1: 00000002, alu_in2: ffffffff, alu__out: 00000001 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 01, pcMuxSelFinal: 00
+   br_target: 0040003c, rs_fwd: 00000002, j_target: 010bfffc, flush: 0
+M: wr_reg_MEM: 03, alu__outMEM: 10000003, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400044, inst=24020001] [op=09, rs= 0, rt= 2, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+D: wr_reg: 02, wr_data: 10000006, reg1: 00, reg2: 02, rs_data: 00000000, rt_data: 00000002, imm: 00000001, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 010
+   rsfwd: 10000006, rtfwd: 10000006, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 04, alu_in1: 10000006, alu_in2: 10000006, alu__out: 00000000, ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 04, alu__outMEM: 10000007, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 10000006
+W: wr_reg: 00, wr_data: 10000006, alu__out_wb: 10000006, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000040
+
+
+offset: 00000000
+=== Simulation Cycle                 3250 ===
+F: pc: 00400050
+[pc=00400048, inst=3c035040] [op=0f, rs= 0, rt= 3, rd=10, imm=5040, f2=00] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 10000003, reg1: 00, reg2: 03, rs_data: 00000000, rt_data: 10000003, imm: 00005040, ctrl_we: 1, mem_en: 0, load_stall: 1, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000001, rtfwd: 00000000, fwd_rs_en_EX: 010, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000001, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+   branchTrue: 1, pcMuxSel: 00, pcMuxSelFinal: 01
+   br_target: 0040002c, rs_fwd: 00000001, j_target: 0103ffe8, flush: 0
+M: wr_reg_MEM: 02, alu__outMEM: 00000001, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 03, wr_data: 10000003, alu__out_wb: 10000003, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000002
+stall: 0
+
+[pc=0040004c, inst=34633020] [op=0d, rs= 3, rt= 3, rd= 6, imm=3020, f2=20] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 10000007, reg1: 03, reg2: 03, rs_data: 10000003, rt_data: 10000003, imm: 00003020, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000001, fwd_rs_en_EX: 000, fwd_rt_en_EX: 010
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000001, alu__out: 00000001, ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 04, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 10000006
+W: wr_reg: 04, wr_data: 10000007, alu__out_wb: 10000007, ctrl_we_WB: 1, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000006
+
+
+offset: 00000000
+=== Simulation Cycle                 3350 ===
+F: pc: 0040002c
+[pc=00400050, inst=3c041000] [op=0f, rs= 0, rt= 4, rd= 2, imm=1000, f2=00] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 00000001, reg1: 00, reg2: 04, rs_data: 00000000, rt_data: 10000007, imm: 00001000, ctrl_we: 1, mem_en: 0, load_stall: 1, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 010, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 0040002c, rs_fwd: 00000000, j_target: 0103ffe8, flush: 1
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 02, wr_data: 00000001, alu__out_wb: 00000001, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000002
+stall: 0
+
+[pc=00400054, inst=34840004] [op=0d, rs= 4, rt= 4, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 00000000, reg1: 04, reg2: 04, rs_data: 10000007, rt_data: 10000007, imm: 00000004, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 010
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000001, alu__out: 00000001, ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 04, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 10000006
+W: wr_reg: 04, wr_data: 00000000, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000006
+
+
+=== Simulation Cycle                 3450 ===
+F: pc: 00400034
+[pc=0040002c, inst=80650000] [op=20, rs= 3, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 05, wr_data: 00000000, reg1: 03, reg2: 05, rs_data: 10000003, rt_data: 00000040, imm: 00000000, ctrl_we: 1, mem_en: 0, load_stall: 1, IDen: 0, IDswap: 1, IDclr: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 010, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 0040002c, rs_fwd: 00000000, j_target: 0103ffe8, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400030, inst=a0850000] [op=28, rs= 4, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000000, reg1: 04, reg2: 05, rs_data: 10000007, rt_data: 00000040, imm: 00000000, mem_en: 8, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 010
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000001, alu__out: 00000001, ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 04, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 10000006
+W: wr_reg: 04, wr_data: 00000000, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000006
+
+
+offset: 00000000
+=== Simulation Cycle                 3550 ===
+F: pc: 00400034
+[pc=0040002c, inst=00000000] [op=00, rs= 0, rt= 0, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: xxxxxxxx, reg1: 00, reg2: 00, rs_data: 00000000, rt_data: 00000000, imm: 00000000, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 0, IDswap: 0, IDclr: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 10000003, rtfwd: 00000040, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 05, alu_in1: 10000003, alu_in2: 00000000, alu__out: 10000003 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00400030, rs_fwd: 10000003, j_target: 01940000, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 1, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: xxxxxxxx, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400030, inst=a0850000] [op=28, rs= 4, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000000, reg1: 04, reg2: 05, rs_data: 10000007, rt_data: 00000040, imm: 00000000, mem_en: 8, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 010
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 010
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000001, alu__out: 00000001, ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 02, alu__outMEM: 00000001, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 04, wr_data: 00000000, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000006
+
+
+load1
+offset: 10000003
+=== Simulation Cycle                 3650 ===
+F: pc: 00400034
+[pc=0040002c, inst=00000000] [op=00, rs= 0, rt= 0, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: xxxxxxxx, reg1: 00, reg2: 00, rs_data: 00000000, rt_data: 00000000, imm: 00000000, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00400030, rs_fwd: 00000000, j_target: 00000000, flush: 0
+M: wr_reg_MEM: 05, alu__outMEM: 10000003, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: 10000000, load_data: 00000050, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: xxxxxxxx, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400030, inst=a0850000] [op=28, rs= 4, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000001, reg1: 04, reg2: 05, rs_data: 10000007, rt_data: 00000040, imm: 00000000, mem_en: 8, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 100
+   rsfwd: 00000000, rtfwd: 10000003, fwd_rs_en_EX: 000, fwd_rt_en_EX: 010
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000001, alu__out: 00000001, ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 02, alu__outMEM: 00000001, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: 10000000, load_data: 00000050, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 02, wr_data: 00000001, alu__out_wb: 00000001, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+offset: 00000000
+=== Simulation Cycle                 3750 ===
+F: pc: 0040003c
+[pc=00400034, inst=24630001] [op=09, rs= 3, rt= 3, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 00000050, reg1: 03, reg2: 03, rs_data: 10000003, rt_data: 10000003, imm: 00000001, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00400030, rs_fwd: 00000000, j_target: 00000000, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx
+W: wr_reg: 05, wr_data: 00000050, alu__out_wb: 10000003, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000040
+stall: 0
+
+[pc=00400038, inst=24840001] [op=09, rs= 4, rt= 4, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 00000001, reg1: 04, reg2: 04, rs_data: 10000007, rt_data: 10000007, imm: 00000001, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 10000007, rtfwd: 00000050, fwd_rs_en_EX: 000, fwd_rt_en_EX: 100
+E: wr_reg_EX: 00, alu_in1: 10000007, alu_in2: 00000000, alu__out: 10000007, ctrl_we_EX: 0, mem_EX: 8, EXen: 1
+M: wr_reg_MEM: 02, alu__outMEM: 00000001, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx, rt_data_MEM: 10000003
+W: wr_reg: 02, wr_data: 00000001, alu__out_wb: 00000001, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+offset: 00000000
+=== Simulation Cycle                 3850 ===
+F: pc: 00400044
+[pc=0040003c, inst=2442ffff] [op=09, rs= 2, rt= 2, rd=31, imm=ffff, f2=3f] [reset=0, halted=0]
+D: wr_reg: 02, wr_data: 00000000, reg1: 02, reg2: 02, rs_data: 00000001, rt_data: 00000001, imm: ffffffff, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 1, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 10000003, rtfwd: 10000003, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 03, alu_in1: 10000003, alu_in2: 00000001, alu__out: 10000004 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 0040003c, rs_fwd: 10000003, j_target: 018c0004, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: 10000004, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: 50000000
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400040, inst=1440fffa] [op=05, rs= 2, rt= 0, rd=31, imm=fffa, f2=3a] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000001, reg1: 02, reg2: 00, rs_data: 00000001, rt_data: 00000000, imm: fffffffa, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 10000007, rtfwd: 10000007, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 04, alu_in1: 10000007, alu_in2: 00000001, alu__out: 10000008, ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 00, alu__outMEM: 10000007, ctrl_we_MEM: 0, mem_MEM: 8
+   mem_addr: 10000004, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: 50000000, rt_data_MEM: 00000050
+W: wr_reg: 02, wr_data: 00000001, alu__out_wb: 00000001, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000003
+
+
+offset: 00000000
+=== Simulation Cycle                 3950 ===
+F: pc: 00400048
+[pc=00400040, inst=1440fffa] [op=05, rs= 2, rt= 0, rd=31, imm=fffa, f2=3a] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000000, reg1: 02, reg2: 00, rs_data: 00000001, rt_data: 00000000, imm: fffffffa, ctrl_we: 0, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 010, fwd_rt_en: 000
+   rsfwd: 00000001, rtfwd: 00000001, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 02, alu_in1: 00000001, alu_in2: ffffffff, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 01, pcMuxSelFinal: 00
+   br_target: 0040003c, rs_fwd: 00000001, j_target: 010bfffc, flush: 0
+M: wr_reg_MEM: 03, alu__outMEM: 10000004, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400044, inst=24020001] [op=09, rs= 0, rt= 2, rd= 0, imm=0001, f2=01] [reset=0, halted=0]
+D: wr_reg: 02, wr_data: 10000007, reg1: 00, reg2: 02, rs_data: 00000000, rt_data: 00000001, imm: 00000001, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 010
+   rsfwd: 10000007, rtfwd: 10000007, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 04, alu_in1: 10000007, alu_in2: 10000007, alu__out: 00000000, ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 04, alu__outMEM: 10000008, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 10000007
+W: wr_reg: 00, wr_data: 10000007, alu__out_wb: 10000007, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000050
+
+
+offset: 00000000
+=== Simulation Cycle                 4050 ===
+F: pc: 00400050
+[pc=00400048, inst=3c035040] [op=0f, rs= 0, rt= 3, rd=10, imm=5040, f2=00] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 10000004, reg1: 00, reg2: 03, rs_data: 00000000, rt_data: 10000004, imm: 00005040, ctrl_we: 1, mem_en: 0, load_stall: 1, IDen: 1, IDswap: 1, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 010, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 0040002c, rs_fwd: 00000000, j_target: 0103ffe8, flush: 0
+M: wr_reg_MEM: 02, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 03, wr_data: 10000004, alu__out_wb: 10000004, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000003
+stall: 0
+
+[pc=0040004c, inst=34633020] [op=0d, rs= 3, rt= 3, rd= 6, imm=3020, f2=20] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 10000008, reg1: 03, reg2: 03, rs_data: 10000004, rt_data: 10000004, imm: 00003020, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 010
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000001, alu__out: 00000001, ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 04, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 10000007
+W: wr_reg: 04, wr_data: 10000008, alu__out_wb: 10000008, ctrl_we_WB: 1, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000007
+
+
+offset: 00000000
+=== Simulation Cycle                 4150 ===
+F: pc: 00400054
+[pc=0040004c, inst=34633020] [op=0d, rs= 3, rt= 3, rd= 6, imm=3020, f2=20] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 00000000, reg1: 03, reg2: 03, rs_data: 10000004, rt_data: 10000004, imm: 00003020, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 0, IDswap: 0, IDclr: 1
+   fwd_rs_en: 010, fwd_rt_en: 010
+   rsfwd: 00000000, rtfwd: 10000004, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 03, alu_in1: 00000000, alu_in2: 10000004, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 0041414c, rs_fwd: 00000000, j_target: 000d4100, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 0, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 02, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000001
+stall: 0
+
+[pc=00400050, inst=3c041000] [op=0f, rs= 0, rt= 4, rd= 2, imm=1000, f2=00] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 00000000, reg1: 00, reg2: 04, rs_data: 00000000, rt_data: 10000008, imm: 00001000, mem_en: 0, load_stall: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 010
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000001, alu__out: 00000001, ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 02, alu__outMEM: 00000001, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 04, wr_data: 00000000, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000007
+
+
+load1
+offset: 00000000
+=== Simulation Cycle                 4250 ===
+F: pc: 00400054
+[pc=0040004c, inst=34633020] [op=0d, rs= 3, rt= 3, rd= 6, imm=3020, f2=20] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 00000000, reg1: 03, reg2: 03, rs_data: 10000004, rt_data: 10000004, imm: 00003020, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 100, fwd_rt_en: 100
+   rsfwd: 00000000, rtfwd: 10000004, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 03, alu_in1: 00000000, alu_in2: 00005040, alu__out: 00005040 ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 0041414c, rs_fwd: 00000000, j_target: 000d4100, flush: 0
+M: wr_reg_MEM: 03, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: 00000000, load_data: 50400000, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400050, inst=3c041000] [op=0f, rs= 0, rt= 4, rd= 2, imm=1000, f2=00] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 00000001, reg1: 00, reg2: 04, rs_data: 00000000, rt_data: 10000008, imm: 00001000, mem_en: 0, load_stall: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 010
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000, ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 02, alu__outMEM: 00000001, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: 00000000, load_data: 50400000, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 02, wr_data: 00000001, alu__out_wb: 00000001, ctrl_we_WB: 1, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+offset: 00000000
+=== Simulation Cycle                 4350 ===
+F: pc: 0040005c
+[pc=00400054, inst=34840004] [op=0d, rs= 4, rt= 4, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 50400000, reg1: 04, reg2: 04, rs_data: 10000008, rt_data: 10000008, imm: 00000004, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 0, IDswap: 0, IDclr: 1
+   fwd_rs_en: 001, fwd_rt_en: 001
+   rsfwd: 50400000, rtfwd: 50400000, fwd_rs_en_EX: 100, fwd_rt_en_EX: 100
+E: wr_reg_EX: 03, alu_in1: 50400000, alu_in2: 00003020, alu__out: 50403020 ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 0040c0d0, rs_fwd: 50400000, j_target: 018cc080, flush: 0
+M: wr_reg_MEM: 03, alu__outMEM: 00005040, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 03, wr_data: 50400000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000004
+stall: 0
+
+[pc=00400058, inst=8c850000] [op=23, rs= 4, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 05, wr_data: 00000001, reg1: 04, reg2: 05, rs_data: 10000008, rt_data: 00000050, imm: 00000000, mem_en: 0, load_stall: 1
+   fwd_rs_en: 001, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 10000008, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 04, alu_in1: 00000000, alu_in2: 10000008, alu__out: 00000000, ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 02, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 0, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 02, wr_data: 00000001, alu__out_wb: 00000001, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+load2
+offset: 00000000
+=== Simulation Cycle                 4450 ===
+F: pc: 0040005c
+[pc=00400054, inst=34840004] [op=0d, rs= 4, rt= 4, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: 00005040, reg1: 04, reg2: 04, rs_data: 10000008, rt_data: 10000008, imm: 00000004, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 1, IDclr: 1
+   fwd_rs_en: 011, fwd_rt_en: 011
+   rsfwd: 00005040, rtfwd: 00005040, fwd_rs_en_EX: 100, fwd_rt_en_EX: 100
+E: wr_reg_EX: 03, alu_in1: 00005040, alu_in2: 00003020, alu__out: 00007060 ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 0040c0d0, rs_fwd: 00005040, j_target: 018cc080, flush: 0
+M: wr_reg_MEM: 03, alu__outMEM: 50403020, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: 00000000, load_data: 10000000, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 03, wr_data: 00005040, alu__out_wb: 00005040, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000004
+stall: 0
+
+[pc=00400058, inst=8c850000] [op=23, rs= 4, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 05, wr_data: xxxxxxxx, reg1: 04, reg2: 05, rs_data: 10000008, rt_data: 00000050, imm: 00000000, mem_en: 0, load_stall: 1
+   fwd_rs_en: 011, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 10000008, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 04, alu_in1: 00000000, alu_in2: 00001000, alu__out: 00001000, ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 04, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: 00000000, load_data: 10000000, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 10000008
+W: wr_reg: 02, wr_data: xxxxxxxx, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 1
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+offset: 00000000
+=== Simulation Cycle                 4550 ===
+F: pc: 00400060
+[pc=00400058, inst=8c850000] [op=23, rs= 4, rt= 5, rd= 0, imm=0000, f2=00] [reset=0, halted=0]
+D: wr_reg: 05, wr_data: 50403020, reg1: 04, reg2: 05, rs_data: 10000000, rt_data: 00000050, imm: 00000000, ctrl_we: 1, mem_en: 0, load_stall: 1, IDen: 1, IDswap: 1, IDclr: 1
+   fwd_rs_en: 010, fwd_rt_en: 000
+   rsfwd: 10000000, rtfwd: 10000000, fwd_rs_en_EX: 011, fwd_rt_en_EX: 011
+E: wr_reg_EX: 04, alu_in1: 10000000, alu_in2: 00000004, alu__out: 10000004 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00400068, rs_fwd: 10000000, j_target: 02100010, flush: 0
+M: wr_reg_MEM: 03, alu__outMEM: 00007060, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 03, wr_data: 50403020, alu__out_wb: 50403020, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 50400000
+stall: 0
+
+[pc=0040005c, inst=14a30004] [op=05, rs= 5, rt= 3, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 10000000, reg1: 05, reg2: 03, rs_data: 00000050, rt_data: 50403020, imm: 00000004, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 10000008, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 04, alu_in1: 00000000, alu_in2: 00001000, alu__out: 00001000, ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 04, alu__outMEM: 00001000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 10000008
+W: wr_reg: 04, wr_data: 10000000, alu__out_wb: 00000000, ctrl_we_WB: 1, memtoreg_WB: 1
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000008
+
+
+offset: 00000000
+=== Simulation Cycle                 4650 ===
+F: pc: 00400064
+[pc=0040005c, inst=14a30004] [op=05, rs= 5, rt= 3, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 00007060, reg1: 05, reg2: 03, rs_data: 00000050, rt_data: 50403020, imm: 00000004, ctrl_we: 0, mem_en: 0, load_stall: 0, IDen: 0, IDswap: 0, IDclr: 1
+   fwd_rs_en: 010, fwd_rt_en: 000
+   rsfwd: 10000004, rtfwd: 00000050, fwd_rs_en_EX: 010, fwd_rt_en_EX: 000
+E: wr_reg_EX: 05, alu_in1: 10000004, alu_in2: 00000000, alu__out: 10000004 ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+   branchTrue: 0, pcMuxSel: 01, pcMuxSelFinal: 00
+   br_target: 0040005c, rs_fwd: 10000004, j_target: 02140000, flush: 0
+M: wr_reg_MEM: 04, alu__outMEM: 10000004, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 3, mem_data_out: xxxxxxxx, store_data: xxxxxxxx
+W: wr_reg: 03, wr_data: 00007060, alu__out_wb: 00007060, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00005040
+stall: 0
+
+[pc=00400060, inst=24840004] [op=09, rs= 4, rt= 4, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: xxxxxxxx, reg1: 04, reg2: 04, rs_data: 10000000, rt_data: 10000000, imm: 00000004, mem_en: 0, load_stall: 0
+   fwd_rs_en: 100, fwd_rt_en: 100
+   rsfwd: 00000000, rtfwd: 10000008, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 04, alu_in1: 00000000, alu_in2: 10000008, alu__out: 00000000, ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 04, alu__outMEM: 00001000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: xxxxxxxx, store_data: xxxxxxxx, rt_data_MEM: 10000008
+W: wr_reg: 04, wr_data: xxxxxxxx, alu__out_wb: 00001000, ctrl_we_WB: 0, memtoreg_WB: 1
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000008
+
+
+load1
+offset: 10000004
+=== Simulation Cycle                 4750 ===
+F: pc: 00400064
+[pc=0040005c, inst=14a30004] [op=05, rs= 5, rt= 3, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+D: wr_reg: 03, wr_data: 10000004, reg1: 05, reg2: 03, rs_data: 00000050, rt_data: 50403020, imm: 00000004, ctrl_we: 0, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 100, fwd_rt_en: 000
+   rsfwd: 10000004, rtfwd: 00000050, fwd_rs_en_EX: 010, fwd_rt_en_EX: 000
+E: wr_reg_EX: 05, alu_in1: 10000004, alu_in2: 00000050, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+   branchTrue: 1, pcMuxSel: 01, pcMuxSelFinal: 00
+   br_target: 0040005c, rs_fwd: 10000004, j_target: 02140000, flush: 0
+M: wr_reg_MEM: 05, alu__outMEM: 10000004, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: 10000004, load_data: 50403020, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx
+W: wr_reg: 04, wr_data: 10000004, alu__out_wb: 10000004, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000000
+stall: 0
+
+[pc=00400060, inst=24840004] [op=09, rs= 4, rt= 4, rd= 0, imm=0004, f2=04] [reset=0, halted=0]
+D: wr_reg: 04, wr_data: xxxxxxxx, reg1: 04, reg2: 04, rs_data: 10000004, rt_data: 10000004, imm: 00000004, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 10000008, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 04, alu_in1: 00000000, alu_in2: 00001000, alu__out: 00001000, ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 04, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: 10000004, load_data: 50403020, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx, rt_data_MEM: 10000008
+W: wr_reg: 04, wr_data: xxxxxxxx, alu__out_wb: 00001000, ctrl_we_WB: 0, memtoreg_WB: 1
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000008
+
+
+offset: 00000000
+=== Simulation Cycle                 4850 ===
+F: pc: 0040006c
+[pc=00400064, inst=2442ffff] [op=09, rs= 2, rt= 2, rd=31, imm=ffff, f2=3f] [reset=0, halted=0]
+D: wr_reg: 02, wr_data: 50403020, reg1: 02, reg2: 02, rs_data: 00000001, rt_data: 00000001, imm: ffffffff, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 1, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 50403020, rtfwd: 50403020, fwd_rs_en_EX: 100, fwd_rt_en_EX: 000
+E: wr_reg_EX: 03, alu_in1: 50403020, alu_in2: 50403020, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 00400070, rs_fwd: 50403020, j_target: 028c0010, flush: 0
+M: wr_reg_MEM: 05, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx
+W: wr_reg: 05, wr_data: 50403020, alu__out_wb: 10000004, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000050
+stall: 0
+
+[pc=00400068, inst=1440fffb] [op=05, rs= 2, rt= 0, rd=31, imm=fffb, f2=3b] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000000, reg1: 02, reg2: 00, rs_data: 00000001, rt_data: 00000000, imm: fffffffb, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 10000004, rtfwd: 10000004, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 04, alu_in1: 10000004, alu_in2: 00000004, alu__out: 10000008, ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 04, alu__outMEM: 00001000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx, rt_data_MEM: 10000008
+W: wr_reg: 04, wr_data: 00000000, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000008
+
+
+offset: 00000000
+=== Simulation Cycle                 4950 ===
+F: pc: 00400070
+[pc=00400068, inst=1440fffb] [op=05, rs= 2, rt= 0, rd=31, imm=fffb, f2=3b] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 00000000, reg1: 02, reg2: 00, rs_data: 00000001, rt_data: 00000000, imm: fffffffb, ctrl_we: 0, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 1, IDclr: 1
+   fwd_rs_en: 010, fwd_rt_en: 000
+   rsfwd: 00000001, rtfwd: 00000001, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 02, alu_in1: 00000001, alu_in2: ffffffff, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 01, pcMuxSelFinal: 00
+   br_target: 00400064, rs_fwd: 00000001, j_target: 010bfffc, flush: 0
+M: wr_reg_MEM: 03, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx
+W: wr_reg: 05, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000050
+stall: 0
+
+[pc=0040006c, inst=0810001f] [op=02, rs= 0, rt=16, rd= 0, imm=001f, f2=1f] [reset=0, halted=0]
+D: wr_reg: 10, wr_data: 00001000, reg1: 00, reg2: 10, rs_data: 00000000, rt_data: 00000000, imm: 0000001f, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 10000004, rtfwd: 10000004, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 04, alu_in1: 10000004, alu_in2: 10000004, alu__out: 00000000, ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 04, alu__outMEM: 10000008, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx, rt_data_MEM: 10000004
+W: wr_reg: 04, wr_data: 00001000, alu__out_wb: 00001000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000008
+
+
+offset: 00000000
+=== Simulation Cycle                 5050 ===
+F: pc: 00400074
+[pc=0040006c, inst=0810001f] [op=02, rs= 0, rt=16, rd= 0, imm=001f, f2=1f] [reset=0, halted=0]
+D: wr_reg: 10, wr_data: 00000000, reg1: 00, reg2: 10, rs_data: 00000000, rt_data: 00000000, imm: 0000001f, ctrl_we: 0, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 010, fwd_rt_en_EX: 000
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 11, pcMuxSelFinal: 00
+   br_target: 00400058, rs_fwd: 00000000, j_target: 0103ffec, flush: 0
+M: wr_reg_MEM: 02, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx
+W: wr_reg: 03, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 50403020
+stall: 0
+
+[pc=00400070, inst=3c01baad] [op=0f, rs= 0, rt= 1, rd=23, imm=baad, f2=2d] [reset=0, halted=0]
+D: wr_reg: 01, wr_data: 10000008, reg1: 00, reg2: 01, rs_data: 00000000, rt_data: 00000000, imm: 0000baad, mem_en: 0, load_stall: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 10000004, rtfwd: 10000004, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 04, alu_in1: 10000004, alu_in2: 10000004, alu__out: 00000000, ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 04, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx, rt_data_MEM: 10000004
+W: wr_reg: 04, wr_data: 10000008, alu__out_wb: 10000008, ctrl_we_WB: 1, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000004
+
+
+offset: 00000000
+=== Simulation Cycle                 5150 ===
+F: pc: 0040007c
+[pc=00400074, inst=3421baad] [op=0d, rs= 1, rt= 1, rd=23, imm=baad, f2=2d] [reset=0, halted=0]
+D: wr_reg: 01, wr_data: 00000000, reg1: 01, reg2: 01, rs_data: 00000000, rt_data: 00000000, imm: 0000baad, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 0, IDswap: 0, IDclr: 1
+   fwd_rs_en: 001, fwd_rt_en: 001
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 10, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 11
+   br_target: 004000ec, rs_fwd: 00000000, j_target: 0040007c, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx
+W: wr_reg: 02, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000001
+stall: 0
+
+[pc=00400078, inst=01415021] [op=00, rs=10, rt= 1, rd=10, imm=5021, f2=21] [reset=0, halted=0]
+D: wr_reg: 0a, wr_data: 00000000, reg1: 0a, reg2: 01, rs_data: 00000000, rt_data: 00000000, imm: 00005021, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 001
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 01, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000, ctrl_we_EX: 1, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 04, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 0, mem_data_out: 50403020, store_data: xxxxxxxx, rt_data_MEM: 10000004
+W: wr_reg: 04, wr_data: 00000000, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000004
+
+
+offset: 00000000
+=== Simulation Cycle                 5250 ===
+F: pc: 0040007c
+[pc=00400074, inst=3421baad] [op=0d, rs= 1, rt= 1, rd=23, imm=baad, f2=2d] [reset=0, halted=0]
+D: wr_reg: 01, wr_data: 00000000, reg1: 01, reg2: 01, rs_data: 00000000, rt_data: 00000000, imm: 0000baad, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 10, alu_in1: 00000000, alu_in2: 0000001f, alu__out: 0000001f ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 004000ec, rs_fwd: 00000000, j_target: 0040007c, flush: 1
+M: wr_reg_MEM: 10, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400078, inst=01415021] [op=00, rs=10, rt= 1, rd=10, imm=5021, f2=21] [reset=0, halted=0]
+D: wr_reg: 0a, wr_data: 00000000, reg1: 0a, reg2: 01, rs_data: 00000000, rt_data: 00000000, imm: 00005021, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 01, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000, ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 04, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx, rt_data_MEM: 10000004
+W: wr_reg: 04, wr_data: 00000000, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000004
+
+
+offset: 00000000
+=== Simulation Cycle                 5350 ===
+F: pc: 00400084
+[pc=0040007c, inst=2402000a] [op=09, rs= 0, rt= 2, rd= 0, imm=000a, f2=0a] [reset=0, halted=0]
+D: wr_reg: 02, wr_data: 00000000, reg1: 00, reg2: 02, rs_data: 00000000, rt_data: 00000000, imm: 0000000a, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 1, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 10, alu_in1: 00000000, alu_in2: 0000001f, alu__out: 0000001f ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 004000ec, rs_fwd: 00000000, j_target: 0040007c, flush: 0
+M: wr_reg_MEM: 10, alu__outMEM: 0000001f, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx
+W: wr_reg: 10, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400080, inst=0000000c] [op=00, rs= 0, rt= 0, rd= 0, imm=000c, f2=0c] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: xxxxxxxx, reg1: 00, reg2: 02, rs_data: 00000000, rt_data: 00000000, imm: 0000000c, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 01, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000, ctrl_we_EX: 0, mem_EX: 0, EXen: 0
+M: wr_reg_MEM: 04, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx, rt_data_MEM: 10000004
+W: wr_reg: 04, wr_data: xxxxxxxx, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 1
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000004
+
+
+offset: 00000000
+=== Simulation Cycle                 5450 ===
+F: pc: 00400088
+[pc=00400080, inst=0000000c] [op=00, rs= 0, rt= 0, rd= 0, imm=000c, f2=0c] [reset=0, halted=0]
+D: wr_reg: 00, wr_data: 0000001f, reg1: 00, reg2: 02, rs_data: 00000000, rt_data: 00000000, imm: 0000000c, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 010
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 02, alu_in1: 00000000, alu_in2: 0000000a, alu__out: 0000000a ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 004000a8, rs_fwd: 00000000, j_target: 00080028, flush: 0
+M: wr_reg_MEM: 10, alu__outMEM: 0000001f, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx
+W: wr_reg: 10, wr_data: 0000001f, alu__out_wb: 0000001f, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400084, inst=deadbeef] [op=37, rs=21, rt=13, rd=23, imm=beef, f2=2f] [reset=0, halted=0]
+D: wr_reg: 0d, wr_data: 00000000, reg1: 15, reg2: 0d, rs_data: 00000000, rt_data: 00000000, imm: 0000beef, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 000
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 01, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000, ctrl_we_EX: 0, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 01, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 04, wr_data: 00000000, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 10000004
+
+
+offset: 00000000
+=== Simulation Cycle                 5550 ===
+F: pc: 00400090
+[pc=00400088, inst=deadbeef] [op=37, rs=21, rt=13, rd=23, imm=beef, f2=2f] [reset=0, halted=0]
+D: wr_reg: 0d, wr_data: 0000001f, reg1: 15, reg2: 0d, rs_data: 00000000, rt_data: 00000000, imm: 0000beef, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 001
+   rsfwd: 00000000, rtfwd: 0000000a, fwd_rs_en_EX: 000, fwd_rt_en_EX: 010
+E: wr_reg_EX: 00, alu_in1: 00000000, alu_in2: 0000000a, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 004000b4, rs_fwd: 00000000, j_target: 00000030, flush: 0
+M: wr_reg_MEM: 02, alu__outMEM: 0000000a, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx
+W: wr_reg: 10, wr_data: 0000001f, alu__out_wb: 0000001f, jLink_en_WB: 0, ctrl_we_WB: 0, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=0040008c, inst=deadbeef] [op=37, rs=21, rt=13, rd=23, imm=beef, f2=2f] [reset=0, halted=0]
+D: wr_reg: 0d, wr_data: 00000000, reg1: 15, reg2: 0d, rs_data: 00000000, rt_data: 00000000, imm: 0000beef, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 001
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 000
+E: wr_reg_EX: 0d, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000, ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 01, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 01, wr_data: 00000000, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+offset: 00000000
+=== Simulation Cycle                 5650 ===
+F: pc: 00400098
+[pc=00400090, inst=deadbeef] [op=37, rs=21, rt=13, rd=23, imm=beef, f2=2f] [reset=0, halted=0]
+D: wr_reg: 0d, wr_data: 0000000a, reg1: 15, reg2: 0d, rs_data: 00000000, rt_data: 00000000, imm: 0000beef, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 001
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 001
+E: wr_reg_EX: 0d, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 0042fc48, rs_fwd: 00000000, j_target: 0ab6fbbc, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx
+W: wr_reg: 02, wr_data: 0000000a, alu__out_wb: 0000000a, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 0, ctrl_sys_WB: 0, rt_data_WB: 00000000
+stall: 0
+
+[pc=00400094, inst=deadbeef] [op=37, rs=21, rt=13, rd=23, imm=beef, f2=2f] [reset=0, halted=0]
+D: wr_reg: 0d, wr_data: 00000000, reg1: 15, reg2: 0d, rs_data: 00000000, rt_data: 00000000, imm: 0000beef, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 001
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 001
+E: wr_reg_EX: 0d, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000, ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 0d, alu__outMEM: 00000000, ctrl_we_MEM: 1, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 01, wr_data: 00000000, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 0, ctrl_sys_WB: 1, rt_data_WB: 00000000
+
+
+[End of program at 0x004000a0]
+=== Simulation Cycle                 5750 ===
+F: pc: 004000a0
+[pc=00400098, inst=deadbeef] [op=37, rs=21, rt=13, rd=23, imm=beef, f2=2f] [reset=0, halted=0]
+D: wr_reg: 0d, wr_data: 00000000, reg1: 15, reg2: 0d, rs_data: 00000000, rt_data: 00000000, imm: 0000beef, ctrl_we: 1, mem_en: 0, load_stall: 0, IDen: 1, IDswap: 0, IDclr: 1
+   fwd_rs_en: 000, fwd_rt_en: 001
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 001
+E: wr_reg_EX: 0d, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000 ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+   branchTrue: 0, pcMuxSel: 00, pcMuxSelFinal: 00
+   br_target: 0042fc50, rs_fwd: 00000000, j_target: 0ab6fbbc, flush: 0
+M: wr_reg_MEM: 00, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx
+W: wr_reg: 00, wr_data: 00000000, alu__out_wb: 00000000, jLink_en_WB: 0, ctrl_we_WB: 1, mem_WB: 0
+halt: 1, ctrl_sys_WB: 1, rt_data_WB: 0000000a
+stall: 0
+
+[pc=0040009c, inst=deadbeef] [op=37, rs=21, rt=13, rd=23, imm=beef, f2=2f] [reset=0, halted=0]
+D: wr_reg: 0d, wr_data: 00000000, reg1: 15, reg2: 0d, rs_data: 00000000, rt_data: 00000000, imm: 0000beef, mem_en: 0, load_stall: 0
+   fwd_rs_en: 000, fwd_rt_en: 001
+   rsfwd: 00000000, rtfwd: 00000000, fwd_rs_en_EX: 000, fwd_rt_en_EX: 001
+E: wr_reg_EX: 0d, alu_in1: 00000000, alu_in2: 00000000, alu__out: 00000000, ctrl_we_EX: 1, mem_EX: 0, EXen: 1
+M: wr_reg_MEM: 0d, alu__outMEM: 00000000, ctrl_we_MEM: 0, mem_MEM: 0
+   mem_addr: xxxxxxxX, load_data: xxxxxxxx, load_sel: 6, mem_data_out: 50403020, store_data: xxxxxxxx, rt_data_MEM: 00000000
+W: wr_reg: 01, wr_data: 00000000, alu__out_wb: 00000000, ctrl_we_WB: 0, memtoreg_WB: 0
+halt: 1, ctrl_sys_WB: 0, rt_data_WB: 00000000
+
+
+--- 18-447 Register file dump ---
+=== Simulation Cycle                 5750 ===
+R          0	= 0x00000000	( 0 )
+R          1	= 0x00000000	( 0 )
+R          2	= 0x0000000a	( 10 )
+R          3	= 0x50403020	( 1346383904 )
+R          4	= 0x10000008	( 268435464 )
+R          5	= 0x50403020	( 1346383904 )
+R          6	= 0x00000000	( 0 )
+R          7	= 0x00000000	( 0 )
+R          8	= 0x00000000	( 0 )
+R          9	= 0x00000000	( 0 )
+R         10	= 0x00000000	( 0 )
+R         11	= 0x00000000	( 0 )
+R         12	= 0x00000000	( 0 )
+R         13	= 0x00000000	( 0 )
+R         14	= 0x00000000	( 0 )
+R         15	= 0x00000000	( 0 )
+R         16	= 0x00000000	( 0 )
+R         17	= 0x00000000	( 0 )
+R         18	= 0x00000000	( 0 )
+R         19	= 0x00000000	( 0 )
+R         20	= 0x00000000	( 0 )
+R         21	= 0x00000000	( 0 )
+R         22	= 0x00000000	( 0 )
+R         23	= 0x00000000	( 0 )
+R         24	= 0x00000000	( 0 )
+R         25	= 0x00000000	( 0 )
+R         26	= 0x00000000	( 0 )
+R         27	= 0x00000000	( 0 )
+R         28	= 0x00000000	( 0 )
+R         29	= 0x00000000	( 0 )
+R         30	= 0x00000000	( 0 )
+R         31	= 0x00000000	( 0 )
+--- End register file dump ---
+Simulation complete via $finish(1) at time 5750 NS + 4
+./src/testbench.v:87 	  $finish;
+ncsim> exit 
+[1;32m18-477 Makefile: [0mSimulation of inputs/rep.s has completed in outputs/0426-161302.
+[1;32m18-477 Makefile: [0mTo view waveforms, execute the following command: [1msimvision outputs/0426-161302/sim/waveforms.shm[0m
