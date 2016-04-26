@@ -64,7 +64,6 @@ module stallDetector(
     else begin
       if(stall_1==1'b0 && stall_2==1'b0) begin
         if(ctrl_Sys_MEM_1==1'b1 && rt_data_MEM_1==32'ha) begin
-          $display("1");
           MEMen_1 = 1'b0;
           MEMen_2 = 1'b0;
           WBen_2 = 1'b0;
@@ -107,8 +106,7 @@ module stallDetector(
    //$display ("we_1: %x, we_2: %x, dcd_rt_2: %x, dcd_rs_2: %x, wr_reg_1: %x", ctrl_we_1, ctrl_we_2, dcd_rt_2, dcd_rs_2, wr_reg_1);
    //$display ("pc_ID_2: %x, pc_ID_1: %x, regdst_2: %x", pc_ID_2, pc_ID_1, regdst_2);
       if(stall_2==1'b0 && IDen_1==1'b1) begin
-        //$display("h1");
-        if(ctrl_we_1!=0 && ctrl_we_2!=0 && pc_ID_2>pc_ID_1 && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_1)))) begin
+        if(ctrl_we_1!=0 /*&& ctrl_we_2!=0*/ && pc_ID_2>pc_ID_1 && EXenFlush_2==1'b1 && (((regdst_2==1) && (dcd_rt_2!=0) && (dcd_rt_2==wr_reg_1)) || ((dcd_rs_2!=0) && (dcd_rs_2==wr_reg_1)))) begin
           /*IFen_2 = 1'b0;
           IDen_2 = 1'b0;
           EXen_2 = 1'b0;

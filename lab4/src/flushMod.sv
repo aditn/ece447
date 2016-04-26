@@ -37,7 +37,6 @@ module flushMod(
                                                   (pcMuxSelFinal==2'b01 && pc_ID!=br_target) ||
                                                   (pcMuxSelFinal==2'b10 && pc_ID!=rs_fwd) ||
                                                   (pcMuxSelFinal==2'b11 && pc_ID!=j_target))) begin
-      $display("here");
       CDFlushen = 1'b1;
       EXen_1 = 1'b0;
       EXen_2 = 1'b0;
