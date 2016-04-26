@@ -124,14 +124,14 @@ module shiftRightAr(a, shiftCnt, z);
   wire [31:0] d0, d1, d2, d3, notA;
   
   assign notA = ~a;
-  mux2to1L32 m21_0 (notA,{notA[31], notA[31:1]}, shiftCnt[0], d0);
-  mux2to1L32 m21_1 (d0,{{ 2{a[31]}}, d0[31:2]}, shiftCnt[1], d1);
-  mux2to1L32 m21_2 (d1,{{ 4{notA[31]}}, d1[31:4]}, shiftCnt[2],d2);
-  mux2to1L32 m21_3 (d2,{{ 8{a[31]}}, d2[31:8]}, shiftCnt[3], d3);
-  mux2to1L32 m21_4 (d3,{{16{notA[31]}}, d3[31:16]},shiftCnt[4],z);
+  mux2to1_2 m21_0 (notA,{notA[31], notA[31:1]}, shiftCnt[0], d0);
+  mux2to1_2 m21_1 (d0,{{ 2{a[31]}}, d0[31:2]}, shiftCnt[1], d1);
+  mux2to1_2 m21_2 (d1,{{ 4{notA[31]}}, d1[31:4]}, shiftCnt[2],d2);
+  mux2to1_2 m21_3 (d2,{{ 8{a[31]}}, d2[31:8]}, shiftCnt[3], d3);
+  mux2to1_2 m21_4 (d3,{{16{notA[31]}}, d3[31:16]},shiftCnt[4],z);
 endmodule
 
-module mux2to1L32 (a, b, s, z);
+module mux2to1_2 (a, b, s, z);
   input [31:0] a, b;
   input s;
   output [31:0] z;
