@@ -135,10 +135,10 @@ module mips_core(/*AUTOARG*/
    assign        dcd_code = inst[25:6];       // Breakpoint code
 
    // synthesis translate_off
-   always @(posedge clk) begin
+   /*always @(posedge clk) begin
      // useful for debugging, you will want to comment this out for long programs
      if (rst_b) begin
-      /*
+      
        $display ( "=== Simulation Cycle %d ===", $time );
        $display ( "[pc=%x, inst=%x] [op=%x, rs=%d, rt=%d, rd=%d, imm=%x, f2=%x] [reset=%d, halted=%d]",
                    pc, inst, dcd_op, dcd_rs, dcd_rt, dcd_rd, dcd_imm, dcd_funct2, ~rst_b, halted);
@@ -149,11 +149,11 @@ module mips_core(/*AUTOARG*/
        $display ("alu_in1: %d, alu_in2: %d, brcond: %b", alu_in1, alu_in2,brcond);
        $display ("branchTrue: %b, pcMuxSel: %b, pcMuxSelFinal: %b", branchTrue, pcMuxSel, pcMuxSelFinal);
        $display ("br_target: %x", br_target);
-       $display ("");*/
+       $display ("");
        $display ("cyclesCount:%d", cyclesCount);
        $display ("CFtaken: %d", cfTaken);
      end
-   end
+   end*/
    // synthesis translate_on
 
    // Let Verilog-Mode pipe wires through for us.  This is another example
@@ -297,8 +297,11 @@ module mips_core(/*AUTOARG*/
    storer storer(store_data, mem_write_en, rt_data, store_sel, alu__out); //operates on data to write to memory
 
    //Mux for next state PC
-   mux4to1 pcMux(newpc, pc + 4, br_target, rs_data, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
-   adder brtarget(br_target, pc + 4, (imm << 2), 1'b0); //get branch target
+   //wire [31:0] pcPlus4;
+   //carry_select cs_1(pc,32'd4,1'b0,pcPlus4,);
+   carry_select cs_2(pc+4,(imm << 2),1'b0,br_target,);
+   mux4to1 pcMux(newpc, pc+4, br_target, rs_data, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
+   //adder brtarget(br_target, pc + 4, (imm << 2), 1'b0); //get branch target
    concat conc(j_target, pc, dcd_target); //get jump target
    muxSpecial choosePcMuxSel(pcMuxSelFinal,pcMuxSel,branchTrue); //chooses PC on whether branch condition is met
 
@@ -308,10 +311,10 @@ module mips_core(/*AUTOARG*/
 
 
    /*Cycle Counter*/
-   wire [31:0] cyclesCount;
+   /*wire [31:0] cyclesCount;
    wire [31:0] cfTaken;
    counter cycles(cyclesCount, 1'b1, clk, rst_b);
-   counter cycles2(cfTaken, pcMuxSelFinal!=2'b00, clk, rst_b);
+   counter cycles2(cfTaken, pcMuxSelFinal!=2'b00, clk, rst_b);*/
 
 endmodule // mips_core
 
