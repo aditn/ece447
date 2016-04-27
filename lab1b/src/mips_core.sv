@@ -311,7 +311,7 @@ module mips_core(/*AUTOARG*/
    wire [31:0] cyclesCount;
    wire [31:0] cfTaken;
    counter cycles(cyclesCount, 1'b1, clk, rst_b);
-   counter cycles(cfTaken, branchTrue, clk, rst_b);
+   counter cycles2(cfTaken, pcMuxSelFinal!=2'b00, clk, rst_b);
 
 endmodule // mips_core
 
