@@ -151,6 +151,7 @@ module mips_core(/*AUTOARG*/
        $display ("br_target: %x", br_target);
        $display ("");*/
        $display ("cyclesCount:%d", cyclesCount);
+       $display ("CFtaken: %d", cfTaken);
      end
    end
    // synthesis translate_on
@@ -308,7 +309,9 @@ module mips_core(/*AUTOARG*/
 
    /*Cycle Counter*/
    wire [31:0] cyclesCount;
+   wire [31:0] cfTaken;
    counter cycles(cyclesCount, 1'b1, clk, rst_b);
+   counter cycles(cfTaken, branchTrue, clk, rst_b);
 
 endmodule // mips_core
 
