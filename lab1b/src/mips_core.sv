@@ -348,7 +348,7 @@ endmodule
 //// in2 (input)  - Operand used (in arithmetic ops) to modify in1
 //// sel (input)  - Selects which operation is to be performed
 ////
-module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
+/*module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
 
    output logic [31:0] alu__out;
    output logic branchTrue;
@@ -432,7 +432,7 @@ module mips_ALU(alu__out, branchTrue, alu__op1, alu__op2, alu__sel, brcond);
    end
    //adder AdderUnit(alu__out, alu__op1, alu__op2, alu__sel[0]);
 
-endmodule
+endmodule*/
 
 //// register: A register which may be reset to an arbirary value
 ////
