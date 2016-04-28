@@ -297,16 +297,16 @@ module mips_core(/*AUTOARG*/
    storer storer(store_data, mem_write_en, rt_data, store_sel, alu__out); //operates on data to write to memory
 
    //Mux for next state PC
-   //wire [31:0] pcPlus4;
-   //carry_select cs_1(pc,32'd4,1'b0,pcPlus4,);
-   carry_select cs_2(pc+4,(imm << 2),1'b0,br_target,);
-   mux4to1 pcMux(newpc, pc+4, br_target, rs_data, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
+   wire [31:0] pcPlus4;
+   carry_select cs_1(pc,32'd4,1'b0,pcPlus4,);
+   carry_select cs_2(pcPlus4,(imm << 2),1'b0,br_target,);
+   mux4to1 pcMux(newpc, pcPlus4, br_target, rs_data, j_target, pcMuxSelFinal); //chooses next PC depending on jump or branch
    //adder brtarget(br_target, pc + 4, (imm << 2), 1'b0); //get branch target
    concat conc(j_target, pc, dcd_target); //get jump target
    muxSpecial choosePcMuxSel(pcMuxSelFinal,pcMuxSel,branchTrue); //chooses PC on whether branch condition is met
 
    //Set wr_data and wr_reg when there is a jump/branch with link
-   mux2to1 dataToReg(wr_data, wr_dataMem, pc+4, jLink_en); 
+   mux2to1 dataToReg(wr_data, wr_dataMem, pcPlus4, jLink_en); 
    mux2to1 #(31)regNumber(wr_reg, wr_regNum, 5'd31, jLink_en);
 
 

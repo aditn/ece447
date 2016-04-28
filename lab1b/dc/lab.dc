@@ -13,7 +13,7 @@ set link_library /afs/ece/class/ece341/setup/Artisan/typical.db
 set search_path [concat $search_path ./447src ./src]
 
 # TODO: Add sources files here. Dependencies should be listed first
-set src [list ./447src/regfile.v ./src/mips_decode.sv ./src/carry_select.sv ./src/mips_ALU.sv src/mips_core.sv]
+set src [list ./447src/regfile.v ./src/mips_decode.sv ./src/parad32.sv ./src/carry_select.sv ./src/mips_ALU.sv src/mips_core.sv]
 
 # Set top module
 set top_module mips_core
@@ -41,7 +41,7 @@ set_max_delay 20.0 [all_outputs]
 # =============================== REPORTS ================================
 
 check_design
-compile -area_effort high 
+compile -map_effort none -ungroup_all 
 
 report_area > area_mips_core.rpt
 report_timing > timing_mips_core.rpt
