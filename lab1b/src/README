@@ -1,0 +1,26 @@
+For our final MIPS implementation, we decided to optimize our single-cycle
+implementation since it had a smaller clock cycle time and greater throughput
+than our pipelined implementations since the single cycle implementation does
+not need to stall or flush any cycles. Though a superscalar pipelined 
+implementation could have resulted in greater throughput than our single-cycle
+implementation, the power tradeoff between a small single-cycle processor
+and a superscalar pipelined implementation is worth the possible loss in 
+throughput.
+
+The critical path of our synthesized is through the decoder, the mux that
+determines whether there is a branch, the mux to choose the next PC,and finally
+the register that holds the next PC to fetch from.
+The minimum clock cycle is 2.32 ns, which is much better than our Lab 3 clock
+cycle time of 9.74 ns.
+
+To optimize our design, our main goal was to create our own adder, a carry
+select adder, to replace whereever we had a "+" sign in our code. The DC
+file synthesizes "+" to a ripple carry adder, which is extremely slow because
+it needs to calculate the carry for every bit and propagate it to the next bit.
+On the other hand, a carry select adder precalculates the sum between each pair
+of bits for carries equalling both 0 and 1, and then chooses the correct value
+using a mux.
+
+We spent approximately 2 hours planning the design, 5 hours capturing the
+design, 2 hours testing the design, 1 hour debugging, and 1 hour analyzing
+the performance of the design.
